@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/csv"
 	"errors"
 	"flag"
 	"fmt"
@@ -33,7 +32,6 @@ func main() {
 func run(args []string) {
 	fs := flag.NewFlagSet("run", flag.ExitOnError)
 	provider := fs.String("provider", "wits", "provider id")
-	reporters := fs.String("reporters", "configs/reporters.csv", "path to reporters csv")
 	partners := fs.String("partners", "USA,CHN", "comma-separated partner ISO3 list")
 	flows := fs.String("flows", "export,import", "comma-separated flows")
 	limit := fs.Int("limit", 0, "limit number of reporters (0 = all)")
@@ -41,7 +39,7 @@ func run(args []string) {
 	verbose := fs.Bool("verbose", false, "print each observation")
 	fs.Parse(args)
 
-	if err := runCollector(*provider, *reporters, *partners, *flows, *limit, *dbPath, *verbose); err != nil {
+	if err := runCollector(*provider, *partners, *flows, *limit, *dbPath, *verbose); err != nil {
 		fmt.Fprintln(os.Stderr, "collector run failed:", err)
 		os.Exit(1)
 	}
@@ -52,7 +50,6 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "")
 	fmt.Fprintln(os.Stderr, "options:")
 	fmt.Fprintln(os.Stderr, "  -provider    provider id (default: wits)")
-	fmt.Fprintln(os.Stderr, "  -reporters   path to reporters csv (default: configs/reporters.csv)")
 	fmt.Fprintln(os.Stderr, "  -partners    comma-separated partner ISO3 list (default: USA,CHN)")
 	fmt.Fprintln(os.Stderr, "  -flows       comma-separated flows (default: export,import)")
 	fmt.Fprintln(os.Stderr, "  -limit       limit number of reporters (default: 0)")
@@ -60,11 +57,13 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "  -verbose     print each observation")
 }
 
-func runCollector(providerID, reportersPath, partnersCSV, flowsCSV string, limit int, dbPath string, verbose bool) error {
+func runCollector(providerID, partnersCSV, flowsCSV string, limit int, dbPath string, verbose bool) error {
 	provider, err := buildProvider(providerID)
 	if err != nil {
 		return err
 	}
+
+	ctx := context.Background()
 
 	st, err := openStore(dbPath)
 	if err != nil {
@@ -72,11 +71,10 @@ func runCollector(providerID, reportersPath, partnersCSV, flowsCSV string, limit
 	}
 	defer st.Close()
 
-	reporters, err := loadReporters(reportersPath)
+	reporters, err := resolveReporters(ctx, provider)
 	if err != nil {
 		return err
 	}
-	reporters = filterActiveReporters(reporters)
 	if limit > 0 && len(reporters) > limit {
 		reporters = reporters[:limit]
 	}
@@ -91,7 +89,6 @@ func runCollector(providerID, reportersPath, partnersCSV, flowsCSV string, limit
 		return err
 	}
 
-	ctx := context.Background()
 	requests := 0
 	success := 0
 	failed := 0
@@ -163,6 +160,7 @@ func buildProvider(providerID string) (providers, error) {
 }
 
 type providers interface {
+	ListReporters(ctx context.Context) ([]model.Reporter, error)
 	FetchLatest(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow) (model.Observation, error)
 }
 
@@ -173,52 +171,12 @@ func openStore(path string) (store.Store, error) {
 	return sqlite.New(path)
 }
 
-func loadReporters(path string) ([]model.Reporter, error) {
-	file, err := os.Open(path)
+func resolveReporters(ctx context.Context, provider providers) ([]model.Reporter, error) {
+	reporters, err := provider.ListReporters(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	reader.TrimLeadingSpace = true
-	records, err := reader.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-	if len(records) == 0 {
-		return nil, errors.New("reporters file is empty")
-	}
-
-	header := normalizeHeader(records[0])
-	isoIndex, ok := header["iso3"]
-	if !ok {
-		return nil, errors.New("reporters file missing iso3 column")
-	}
-
-	reporters := make([]model.Reporter, 0, len(records)-1)
-	for _, record := range records[1:] {
-		if isoIndex >= len(record) {
-			continue
-		}
-		iso3 := strings.ToUpper(strings.TrimSpace(record[isoIndex]))
-		if iso3 == "" {
-			continue
-		}
-		reporter := model.Reporter{
-			ISO3:     iso3,
-			NameEN:   getCell(record, header, "name_en"),
-			NameKO:   getCell(record, header, "name_ko"),
-			Region:   getCell(record, header, "region"),
-			IsActive: parseBool(getCell(record, header, "is_active")),
-		}
-		reporters = append(reporters, reporter)
-	}
-
-	if len(reporters) == 0 {
-		return nil, errors.New("no reporters parsed")
-	}
-	return reporters, nil
+	return filterActiveReporters(reporters), nil
 }
 
 func normalizeHeader(header []string) map[string]int {
