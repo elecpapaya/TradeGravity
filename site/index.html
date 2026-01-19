@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TradeGravity – US/CN Trade Treemap</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="title">TradeGravity</div>
+      <div class="subtitle">US–CN Trade Treemap (anchor cards) + flags</div>
+    </div>
+
+    <div class="controls">
+      <label class="field">
+        <div class="label">Search</div>
+        <input id="search" type="text" placeholder="ISO3 or name (e.g., KOR, Korea)" />
+      </label>
+
+      <label class="field">
+        <div class="label">Metric</div>
+        <select id="metric">
+          <option value="trade" selected>Total trade</option>
+          <option value="export">Exports</option>
+          <option value="import">Imports</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <div class="label">Top N</div>
+        <input id="topN" type="number" min="5" max="200" step="1" value="25" style="min-width:120px"/>
+      </label>
+
+      <label class="field">
+        <div class="label">Label</div>
+        <select id="labelMode">
+          <option value="top" selected>Top 20 by metric</option>
+          <option value="hover">Only on hover</option>
+          <option value="all">All (crowded)</option>
+        </select>
+      </label>
+
+      <button id="fitBtn" class="btn">Fit</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="canvas">
+      <div class="grid">
+        <div class="card" id="card-usa">
+          <div class="cardHeader">
+            <div class="cardTitle">USA</div>
+            <div class="cardHint">Countries sized by selected metric with USA</div>
+          </div>
+          <svg id="svg-usa" class="treemap"></svg>
+        </div>
+
+        <div class="card" id="card-chn">
+          <div class="cardHeader">
+            <div class="cardTitle">CHN</div>
+            <div class="cardHint">Countries sized by selected metric with China</div>
+          </div>
+          <svg id="svg-chn" class="treemap"></svg>
+        </div>
+      </div>
+
+      <div class="footerNote">
+        Each big rectangle is an anchor card (USA/CHN). Inside: sub-rectangles per reporter, sized by selected metric.
+        Flags are loaded from a CDN (optional). Hover highlights the same country on both sides.
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="panel">
+        <div class="panelTitle">Selection</div>
+        <div id="selection" class="panelBody subtle">Hover or search a country.</div>
+      </div>
+
+      <div class="panel">
+        <div class="panelTitle">Legend</div>
+        <div class="panelBody">
+          <div class="legendRow"><span class="swatch usa"></span> USA treemap</div>
+          <div class="legendRow"><span class="swatch chn"></span> CHN treemap</div>
+          <div class="legendRow"><span class="swatch hi"></span> highlight (both sides)</div>
+          <div class="legendRow"><span class="swatch flag"></span> flag icon (CDN)</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panelTitle">Data</div>
+        <div id="dataInfo" class="panelBody subtle"></div>
+      </div>
+    </aside>
+  </main>
+
+  <div id="tooltip" class="tooltip" style="display:none;"></div>
+  <script src="./app.js"></script>
+</body>
+</html>

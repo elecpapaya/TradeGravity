@@ -1,0 +1,33 @@
+name: Update TradeGravity
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Run collector
+        env:
+          WITS_BASE_URL: https://wits.worldbank.org/API/V1/
+        run: go run ./cmd/collector run -db tradegravity.db
+
+      - name: Run publisher
+        run: go run ./cmd/publisher build -db tradegravity.db -out site/data
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
