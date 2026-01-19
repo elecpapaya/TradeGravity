@@ -13,6 +13,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"tradegravity/internal/model"
@@ -23,6 +24,7 @@ const (
 	defaultBaseURL           = "https://wits.worldbank.org/API/V1/"
 	defaultTradePathTemplate = "SDMX/V21/datasource/tradestats-trade/reporter/{reporter}/year/{year}/partner/{partner}/product/{product}/indicator/{indicator}"
 	defaultReportersPath     = "wits/datasource/tradestats-trade/country/ALL"
+	defaultDataAvailPath     = "wits/datasource/tradestats-trade/dataavailability/country/{reporter}/indicator/{indicator}"
 	defaultAPIKeyParam       = "token"
 	defaultFormatParam       = "format"
 	defaultFormatValue       = "JSON"
@@ -35,6 +37,7 @@ const (
 	defaultProductCode       = "Total"
 	defaultYearAllValue      = "all"
 	defaultValueMultiplier   = 1000
+	defaultAutoLatestYear    = true
 )
 
 var ErrNoRecords = errors.New("wits: no records found")
@@ -43,6 +46,7 @@ type Config struct {
 	BaseURL           string
 	TradePathTemplate string
 	ReportersPath     string
+	DataAvailPath     string
 	APIKey            string
 	APIKeyParam       string
 	FormatParam       string
@@ -56,12 +60,15 @@ type Config struct {
 	ProductCode       string
 	YearAllValue      string
 	ValueMultiplier   float64
+	AutoLatestYear    bool
 }
 
 type Provider struct {
 	config  Config
 	client  *http.Client
 	limiter *rateLimiter
+	mu      sync.Mutex
+	yearMap map[string]string
 }
 
 func New() (*Provider, error) {
@@ -82,6 +89,9 @@ func NewWithConfig(cfg Config) (*Provider, error) {
 	}
 	if strings.TrimSpace(cfg.ReportersPath) == "" {
 		cfg.ReportersPath = defaultReportersPath
+	}
+	if strings.TrimSpace(cfg.DataAvailPath) == "" {
+		cfg.DataAvailPath = defaultDataAvailPath
 	}
 	if cfg.APIKeyParam == "" {
 		cfg.APIKeyParam = defaultAPIKeyParam
@@ -119,11 +129,11 @@ func NewWithConfig(cfg Config) (*Provider, error) {
 	if cfg.ValueMultiplier == 0 {
 		cfg.ValueMultiplier = defaultValueMultiplier
 	}
-
 	return &Provider{
 		config:  cfg,
 		client:  &http.Client{Timeout: cfg.Timeout},
 		limiter: newRateLimiter(cfg.RateLimitPerSec, cfg.RateLimitBurst),
+		yearMap: make(map[string]string),
 	}, nil
 }
 
@@ -132,6 +142,7 @@ func ConfigFromEnv() (Config, error) {
 		BaseURL:           getenv("WITS_BASE_URL", defaultBaseURL),
 		TradePathTemplate: getenv("WITS_TRADE_PATH", defaultTradePathTemplate),
 		ReportersPath:     getenv("WITS_REPORTERS_PATH", defaultReportersPath),
+		DataAvailPath:     getenv("WITS_DATAAVAIL_PATH", defaultDataAvailPath),
 		APIKey:            strings.TrimSpace(os.Getenv("WITS_API_KEY")),
 		APIKeyParam:       getenv("WITS_API_KEY_PARAM", defaultAPIKeyParam),
 		FormatParam:       getenv("WITS_FORMAT_PARAM", defaultFormatParam),
@@ -142,6 +153,7 @@ func ConfigFromEnv() (Config, error) {
 		ProductCode:       getenv("WITS_PRODUCT_CODE", defaultProductCode),
 		YearAllValue:      getenv("WITS_YEAR_ALL", defaultYearAllValue),
 		ValueMultiplier:   getenvFloat("WITS_VALUE_MULTIPLIER", defaultValueMultiplier),
+		AutoLatestYear:    getenvBool("WITS_AUTO_LATEST_YEAR", defaultAutoLatestYear),
 	}
 
 	cfg.RateLimitPerSec = getenvInt("WITS_RATE_LIMIT_PER_SEC", defaultRateLimitPerSec)
@@ -188,7 +200,12 @@ func (p *Provider) FetchLatest(ctx context.Context, reporterISO3, partnerISO3 st
 }
 
 func (p *Provider) FetchSeries(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow, from, to string) ([]model.Observation, error) {
-	path, params := p.tradePath(reporterISO3, partnerISO3, flow, from, to)
+	indicator := p.indicatorForFlow(flow)
+	yearValue, err := p.resolveYear(ctx, reporterISO3, indicator, from, to)
+	if err != nil {
+		return nil, err
+	}
+	path, params := p.tradePath(reporterISO3, partnerISO3, indicator, yearValue)
 	var payload sdmxResponse
 	if err := p.doJSON(ctx, path, params, &payload); err != nil {
 		return nil, err
@@ -204,13 +221,11 @@ func (p *Provider) FetchSeries(ctx context.Context, reporterISO3, partnerISO3 st
 	return observations, nil
 }
 
-func (p *Provider) tradePath(reporterISO3, partnerISO3 string, flow model.Flow, from, to string) (string, url.Values) {
+func (p *Provider) tradePath(reporterISO3, partnerISO3, indicator, yearValue string) (string, url.Values) {
 	path := p.config.TradePathTemplate
 	params := url.Values{}
 
-	indicator := p.indicatorForFlow(flow)
 	product := p.config.ProductCode
-	yearValue := p.yearValue(from, to)
 	if strings.Contains(path, "{reporter}") {
 		path = strings.ReplaceAll(path, "{reporter}", url.PathEscape(reporterISO3))
 	} else {
@@ -251,20 +266,26 @@ func (p *Provider) indicatorForFlow(flow model.Flow) string {
 	}
 }
 
-func (p *Provider) yearValue(from, to string) string {
+func (p *Provider) resolveYear(ctx context.Context, reporterISO3, indicator, from, to string) (string, error) {
 	from = strings.TrimSpace(from)
 	to = strings.TrimSpace(to)
 
 	if from == "" && to == "" {
-		return p.config.YearAllValue
+		if p.config.AutoLatestYear {
+			year, err := p.latestYear(ctx, reporterISO3, indicator)
+			if err == nil && year != "" {
+				return year, nil
+			}
+		}
+		return p.config.YearAllValue, nil
 	}
 	if from != "" && to != "" && from != to {
-		return from + ";" + to
+		return from + ";" + to, nil
 	}
 	if from != "" {
-		return from
+		return from, nil
 	}
-	return to
+	return to, nil
 }
 
 func (p *Provider) doJSON(ctx context.Context, path string, params url.Values, dest any) error {
@@ -395,6 +416,72 @@ func (l *rateLimiter) Wait(ctx context.Context) error {
 	case <-l.tokens:
 		return nil
 	}
+}
+
+type dataAvailabilityResponse struct {
+	Reporters []dataAvailabilityReporter `xml:"dataavailability>reporter"`
+}
+
+type dataAvailabilityReporter struct {
+	Year string `xml:"year"`
+}
+
+func (p *Provider) latestYear(ctx context.Context, reporterISO3, indicator string) (string, error) {
+	cacheKey := strings.ToUpper(strings.TrimSpace(reporterISO3)) + "|" + strings.ToUpper(strings.TrimSpace(indicator))
+	p.mu.Lock()
+	if year, ok := p.yearMap[cacheKey]; ok {
+		p.mu.Unlock()
+		return year, nil
+	}
+	p.mu.Unlock()
+
+	path := p.dataAvailabilityPath(reporterISO3, indicator)
+	body, err := p.doRequest(ctx, path, nil, "application/xml")
+	if err != nil {
+		return "", err
+	}
+
+	var response dataAvailabilityResponse
+	if err := xml.Unmarshal(body, &response); err != nil {
+		return "", err
+	}
+
+	maxYear := 0
+	for _, entry := range response.Reporters {
+		yearValue := strings.TrimSpace(entry.Year)
+		if yearValue == "" {
+			continue
+		}
+		year, err := strconv.Atoi(yearValue)
+		if err != nil {
+			continue
+		}
+		if year > maxYear {
+			maxYear = year
+		}
+	}
+
+	if maxYear == 0 {
+		return "", errors.New("wits: no data availability years")
+	}
+	latest := strconv.Itoa(maxYear)
+
+	p.mu.Lock()
+	p.yearMap[cacheKey] = latest
+	p.mu.Unlock()
+
+	return latest, nil
+}
+
+func (p *Provider) dataAvailabilityPath(reporterISO3, indicator string) string {
+	path := p.config.DataAvailPath
+	if strings.Contains(path, "{reporter}") {
+		path = strings.ReplaceAll(path, "{reporter}", url.PathEscape(reporterISO3))
+	}
+	if strings.Contains(path, "{indicator}") {
+		path = strings.ReplaceAll(path, "{indicator}", url.PathEscape(indicator))
+	}
+	return path
 }
 
 type witsCountryList struct {
@@ -1001,6 +1088,21 @@ func getenvFloat(key string, fallback float64) float64 {
 		return fallback
 	}
 	return parsed
+}
+
+func getenvBool(key string, fallback bool) bool {
+	value := strings.TrimSpace(os.Getenv(key))
+	if value == "" {
+		return fallback
+	}
+	switch strings.ToLower(value) {
+	case "1", "true", "yes", "y":
+		return true
+	case "0", "false", "no", "n":
+		return false
+	default:
+		return fallback
+	}
 }
 
 var _ providers.Provider = (*Provider)(nil)
