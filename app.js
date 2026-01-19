@@ -10,20 +10,17 @@ const DATA_URL = "./data/latest.json";
 const els = {
   svgUSA: document.getElementById("svg-usa"),
   svgCHN: document.getElementById("svg-chn"),
-  search: document.getElementById("search"),
   metric: document.getElementById("metric"),
-  labelMode: document.getElementById("labelMode"),
+  metricGroup: document.getElementById("metricGroup"),
   selection: document.getElementById("selection"),
-  dataInfo: document.getElementById("dataInfo"),
+  indicators: document.getElementById("indicators"),
   tooltip: document.getElementById("tooltip"),
-  fitBtn: document.getElementById("fitBtn"),
   topN: document.getElementById("topN"),
 };
 
 let state = {
   rows: [],
   metric: "trade",
-  labelMode: "top",
   highlightKey: null, // ISO3
   topN: 25,
 };
@@ -38,6 +35,16 @@ const FALLBACK_ISO3_TO_ISO2 = {
   SGP:"SG", PHL:"PH", PAK:"PK", BGD:"BD", NZL:"NZ", KAZ:"KZ"
 };
 let ISO3_TO_ISO2 = { ...FALLBACK_ISO3_TO_ISO2 };
+const INDICATORS = [
+  { id: "NY.GDP.MKTP.CD", label: "GDP (current US$)", format: "usd" },
+  { id: "NY.GDP.PCAP.CD", label: "GDP per capita (US$)", format: "usd" },
+  { id: "SP.POP.TOTL", label: "Population", format: "number" },
+];
+const indicatorCache = {};
+const indicatorPromises = {};
+const NEWS_MAX = 5;
+const newsCache = {};
+const newsPromises = {};
 
 function iso2FromRow(row){
   const iso2 = (row.iso2 || row.ISO2 || "").trim();
@@ -95,7 +102,7 @@ function normalizeRows(rows){
 
 function setSelection(row){
   if (!row){
-    els.selection.innerHTML = "<span class='subtle'>Hover or search a country.</span>";
+    els.selection.innerHTML = "<span class='subtle'>Hover a country tile to preview.</span>";
     return;
   }
   const us = row.usa || {};
@@ -200,14 +207,7 @@ function buildTreemap(svgEl, side, rows){
 
   layout(root);
 
-  const mode = state.labelMode;
-  let labelSet = new Set();
-  if (mode === "all"){
-    labelSet = new Set(children.map(d => d.iso3));
-  } else if (mode === "top"){
-    const topN = 20;
-    children.sort((a,b)=>b.value-a.value).slice(0, topN).forEach(d => labelSet.add(d.iso3));
-  }
+  const labelSet = new Set(children.map(d => d.iso3));
 
   const baseFill = side === "usa"
     ? "rgba(90,162,255,.18)"
@@ -236,8 +236,8 @@ function buildTreemap(svgEl, side, rows){
       .append("rect")
       .attr("rx", 6)
       .attr("ry", 6)
-      .attr("x", d.x0)
-      .attr("y", d.y0)
+      .attr("x", 0)
+      .attr("y", 0)
       .attr("width", Math.max(0, d.x1 - d.x0))
       .attr("height", Math.max(0, d.y1 - d.y0));
     d.__clipId = id;
@@ -310,6 +310,7 @@ function buildTreemap(svgEl, side, rows){
     .on("click", (ev, d) => {
       state.highlightKey = d.data.row.iso3;
       applyHighlight(state.highlightKey);
+      setIndicators(d.data.row);
     });
 }
 
@@ -318,15 +319,160 @@ function renderAll(){
   buildTreemap(els.svgUSA, "usa", rows);
   buildTreemap(els.svgCHN, "chn", rows);
 
-  const totals = rows.map(r => r.total).filter(x=>x>0);
-  const extent = totals.length ? d3.extent(totals) : [0,0];
-  els.dataInfo.textContent = `rows: ${rows.length} | generated_at: ${state.generatedAt || "-"} | total extent: ${extent[0] ?? 0} .. ${extent[1] ?? 0} | flags: CDN | topN: ${state.topN}`;
-
   applyHighlight(state.highlightKey);
 }
 
-function fit(){
-  renderAll();
+async function setIndicators(row){
+  if (!els.indicators) return;
+  if (!row) {
+    els.indicators.innerHTML = "<span class='subtle'>Click a country tile to load key economic indicators and news.</span>";
+    return;
+  }
+  if (!row.iso2) {
+    els.indicators.innerHTML = "<span class='subtle'>No ISO2 mapping available for this country.</span>";
+    return;
+  }
+
+  const key = row.iso3;
+  els.indicators.innerHTML = "<span class='subtle'>Loading indicators and news...</span>";
+
+  try {
+    const [summary, news] = await Promise.all([
+      loadIndicators(row.iso2, key).catch(() => null),
+      loadNews(row.iso2, key).catch(() => null),
+    ]);
+    if (!summary && !news) {
+      els.indicators.innerHTML = "<span class='subtle'>No indicator or news data available.</span>";
+      return;
+    }
+    els.indicators.innerHTML = renderSnapshotHTML(summary, news);
+  } catch (err) {
+    console.error(err);
+    els.indicators.innerHTML = "<span class='subtle'>Failed to load indicators or news.</span>";
+  }
+}
+
+async function loadIndicators(iso2, key){
+  if (indicatorCache[key]) return indicatorCache[key];
+  if (indicatorPromises[key]) return indicatorPromises[key];
+
+  const promise = (async () => {
+    const items = [];
+    for (const indicator of INDICATORS) {
+      const result = await fetchIndicator(iso2, indicator.id);
+      items.push({
+        id: indicator.id,
+        label: indicator.label,
+        format: indicator.format,
+        value: result.value,
+        year: result.year
+      });
+    }
+    const summary = { iso2, items };
+    indicatorCache[key] = summary;
+    return summary;
+  })();
+
+  indicatorPromises[key] = promise;
+  try {
+    return await promise;
+  } finally {
+    delete indicatorPromises[key];
+  }
+}
+
+async function fetchIndicator(iso2, indicatorId){
+  const url = `https://api.worldbank.org/v2/country/${iso2}/indicator/${indicatorId}?format=json`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return { value: null, year: null };
+  const data = await res.json();
+  const series = Array.isArray(data) ? data[1] : null;
+  if (!Array.isArray(series)) return { value: null, year: null };
+  const latest = series.find(item => item && item.value != null);
+  return {
+    value: latest ? latest.value : null,
+    year: latest ? latest.date : null
+  };
+}
+
+function renderIndicatorHTML(summary){
+  const rows = summary.items.map(item => {
+    const value = formatIndicatorValue(item.value, item.format);
+    const year = item.year || "-";
+    return `<div class="kv"><span>${item.label} (${year})</span><b>${value}</b></div>`;
+  });
+  return rows.join("");
+}
+
+function formatIndicatorValue(value, format){
+  if (value == null || !isFinite(value)) return "-";
+  if (format === "usd") return "$" + fmt(value);
+  return fmt(value);
+}
+
+async function loadNews(iso2, key){
+  if (newsCache[key]) return newsCache[key];
+  if (newsPromises[key]) return newsPromises[key];
+
+  const promise = (async () => {
+    const query = encodeURIComponent(`sourcecountry:${iso2.toUpperCase()}`);
+    const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=ArtList&maxrecords=${NEWS_MAX}&format=json`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const articles = Array.isArray(data?.articles) ? data.articles : [];
+    const items = articles.map(article => ({
+      title: article.title || "Untitled",
+      url: article.url,
+      domain: article.domain || "",
+      seen: formatGdeltDate(article.seendate || "")
+    }));
+    const summary = { iso2, items };
+    newsCache[key] = summary;
+    return summary;
+  })();
+
+  newsPromises[key] = promise;
+  try {
+    return await promise;
+  } finally {
+    delete newsPromises[key];
+  }
+}
+
+function renderSnapshotHTML(indicators, news){
+  const sections = [];
+  if (indicators) {
+    sections.push(renderIndicatorHTML(indicators));
+    sections.push(`<div class="subtle" style="margin-top:8px;font-size:11px;">Source: World Bank Open Data</div>`);
+  } else {
+    sections.push(`<div class="subtle">No indicator data available.</div>`);
+  }
+
+  sections.push(`<div class="subSectionTitle">Latest news</div>`);
+  sections.push(renderNewsHTML(news));
+
+  return sections.join("");
+}
+
+function renderNewsHTML(news){
+  if (!news || !Array.isArray(news.items) || news.items.length === 0) {
+    return `<div class="subtle">No recent news found. (Source: GDELT, by source country)</div>`;
+  }
+  const rows = news.items.map(item => {
+    const domain = item.domain ? `<span class="subtle"> · ${item.domain}</span>` : "";
+    const seen = item.seen ? `<span class="subtle"> · ${item.seen}</span>` : "";
+    return `<div class="newsItem"><a href="${item.url}" target="_blank" rel="noopener">${item.title}</a>${domain}${seen}</div>`;
+  });
+  rows.push(`<div class="subtle" style="margin-top:6px;font-size:11px;">Source: GDELT (by source country)</div>`);
+  return rows.join("");
+}
+
+function formatGdeltDate(value){
+  if (!value) return "";
+  const match = String(value).match(/^(\d{4})(\d{2})(\d{2})/);
+  if (!match) return "";
+  return `${match[1]}-${match[2]}-${match[3]}`;
 }
 
 async function main(){
@@ -349,15 +495,24 @@ async function main(){
   state.rows = normalizeRows(data.rows || []);
   console.info('[TradeGravity] loaded rows=', state.rows.length, 'generated_at=', state.generatedAt);
 
-  els.metric.addEventListener("change", () => {
-    state.metric = els.metric.value;
-    renderAll();
-  });
-  els.labelMode.addEventListener("change", () => {
-    state.labelMode = els.labelMode.value;
-    renderAll();
-  });
-
+  if (els.metric) {
+    els.metric.addEventListener("change", () => {
+      state.metric = els.metric.value;
+      syncMetricButtons();
+      renderAll();
+    });
+  }
+  if (els.metricGroup) {
+    els.metricGroup.addEventListener("click", (ev) => {
+      const btn = ev.target.closest(".segBtn");
+      if (!btn) return;
+      const value = btn.getAttribute("data-value");
+      if (!value) return;
+      state.metric = value;
+      syncMetricButtons();
+      renderAll();
+    });
+  }
 
   // Top N grouping
   if (els.topN){
@@ -371,39 +526,27 @@ async function main(){
     if (Number.isFinite(initV)) state.topN = initV;
   }
 
-  els.search.addEventListener("input", () => {
-    const q = (els.search.value || "").trim().toLowerCase();
-    if (!q){
-      state.highlightKey = null;
-      applyHighlight(null);
-      setSelection(null);
-      return;
-    }
-    const hit = state.rows.find(r =>
-      (r.iso3 || "").toLowerCase() === q ||
-      (r.name || "").toLowerCase().includes(q)
-    );
-    if (hit){
-      state.highlightKey = hit.iso3;
-      applyHighlight(hit.iso3);
-      setSelection(hit);
-    } else {
-      state.highlightKey = null;
-      applyHighlight(null);
-      setSelection(null);
-    }
-  });
-
-  els.fitBtn.addEventListener("click", fit);
   window.addEventListener("resize", () => {
     clearTimeout(window.__tmResize);
     window.__tmResize = setTimeout(() => renderAll(), 100);
   });
 
   renderAll();
+  setIndicators(null);
+}
+
+function syncMetricButtons(){
+  if (!els.metricGroup) return;
+  const buttons = els.metricGroup.querySelectorAll(".segBtn");
+  buttons.forEach(btn => {
+    const value = btn.getAttribute("data-value");
+    btn.classList.toggle("is-active", value === state.metric);
+  });
 }
 
 main().catch(err => {
   console.error(err);
-  els.dataInfo.textContent = "Failed to load data: " + String(err);
+  if (els.indicators) {
+    els.indicators.textContent = "Failed to load data: " + String(err);
+  }
 });
