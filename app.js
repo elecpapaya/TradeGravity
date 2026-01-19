@@ -1,5 +1,5 @@
 // Treemap MVP (v4): two anchor rectangles (USA/CHN).
-// Inside each: sub-rectangles per reporter sized by selected metric (trade/export/import).
+// Inside each: sub-rectangles per country sized by selected metric (trade/export/import).
 // Adds optional flag icons via CDN.
 // - If row.iso2 exists, use it.
 // - Else try ISO3->ISO2 map (partial).
@@ -24,7 +24,7 @@ let state = {
   rows: [],
   metric: "trade",
   labelMode: "top",
-  highlightKey: null, // reporter ISO3
+  highlightKey: null, // ISO3
   topN: 25,
 };
 
@@ -41,7 +41,7 @@ const ISO3_TO_ISO2 = {
 function iso2FromRow(row){
   const iso2 = (row.iso2 || row.ISO2 || "").trim();
   if (iso2) return iso2.toUpperCase();
-  const iso3 = (row.reporter || "").toUpperCase();
+  const iso3 = (row.iso3 || row.ISO3 || "").toUpperCase();
   return ISO3_TO_ISO2[iso3] || "";
 }
 
@@ -72,6 +72,7 @@ function getMetricValue(row, side){
 
 function normalizeRows(rows){
   return (rows || []).map(r => {
+    const iso3 = (r.iso3 || r.ISO3 || "").toUpperCase();
     const usa = r.usa || {};
     const chn = r.chn || {};
     const trade_us = +(usa.trade ?? (+(usa.export||0) + +(usa.import||0))) || 0;
@@ -80,8 +81,8 @@ function normalizeRows(rows){
     const share_cn = +(r.share_cn ?? (total ? trade_cn/total : 0)) || 0;
     const iso2 = iso2FromRow(r);
     return {
-      reporter: r.reporter,
-      name: r.name || r.reporter,
+      iso3,
+      name: r.name || iso3,
       iso2,
       usa: { ...usa, trade: trade_us },
       chn: { ...chn, trade: trade_cn },
@@ -101,7 +102,7 @@ function setSelection(row){
   const html = `
     <div style="font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:10px;">
       ${row.iso2 ? `<img alt="" src="${flagURL(row.iso2)}" style="width:22px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,.12)"/>` : ""}
-      <div>${row.name} <span style="color:rgba(255,255,255,.55); font-family:var(--mono); font-size:12px;">(${row.reporter})</span></div>
+      <div>${row.name} <span style="color:rgba(255,255,255,.55); font-family:var(--mono); font-size:12px;">(${row.iso3})</span></div>
     </div>
     <div class="kv"><span>USA period</span><b>${us.period || "-"}</b></div>
     <div class="kv"><span>USA ${state.metric}</span><b>${fmt(us[state.metric] ?? 0)}</b></div>
@@ -121,7 +122,7 @@ function showTooltip(ev, row, side){
   els.tooltip.innerHTML = `
     <div class="t1" style="display:flex;align-items:center;gap:10px;">
       ${row.iso2 ? `<img alt="" src="${flagURL(row.iso2)}" style="width:20px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,.10)"/>` : ""}
-      <div>${row.name} <span style="color:rgba(255,255,255,.55); font-family:var(--mono); font-size:12px;">(${row.reporter})</span></div>
+      <div>${row.name} <span style="color:rgba(255,255,255,.55); font-family:var(--mono); font-size:12px;">(${row.iso3})</span></div>
     </div>
     <div class="t2">
       <div class="kv"><span>${side.toUpperCase()} period</span><b>${o.period || "-"}</b></div>
@@ -142,12 +143,12 @@ function hideTooltip(){
 
 function applyHighlight(key){
   state.highlightKey = key;
-  d3.selectAll("[data-reporter]").classed("is-hi", d => {
-    const k = d?.data?.reporter ?? d?.reporter;
+  d3.selectAll("[data-iso3]").classed("is-hi", d => {
+    const k = d?.data?.iso3 ?? d?.iso3;
     return key && k === key;
   });
   d3.selectAll(".tile").classed("is-dim", d => {
-    const k = d?.data?.reporter ?? d?.reporter;
+    const k = d?.data?.iso3 ?? d?.iso3;
     return key && k !== key;
   });
 }
@@ -160,7 +161,7 @@ function buildTreemap(svgEl, side, rows){
   svg.attr("viewBox", `0 0 ${width} ${height}`);
 
   const rawChildren = rows.map(r => ({
-    reporter: r.reporter,
+    iso3: r.iso3,
     name: r.name,
     iso2: r.iso2,
     value: Math.max(0, getMetricValue(r, side)),
@@ -178,11 +179,11 @@ function buildTreemap(svgEl, side, rows){
   if (rest.length > 0){
     const othersValue = rest.reduce((s,d)=>s+(d.value||0), 0);
     children = top.concat([{
-      reporter: "OTH",
+      iso3: "OTH",
       name: `Others (${rest.length})`,
       iso2: "",
       value: othersValue,
-      row: { reporter:"OTH", name:`Others (${rest.length})`, iso2:"", usa:{}, chn:{}, total: othersValue, share_cn: 0 }
+      row: { iso3:"OTH", name:`Others (${rest.length})`, iso2:"", usa:{}, chn:{}, total: othersValue, share_cn: 0 }
     }]);
   }
 
@@ -201,10 +202,10 @@ function buildTreemap(svgEl, side, rows){
   const mode = state.labelMode;
   let labelSet = new Set();
   if (mode === "all"){
-    labelSet = new Set(children.map(d => d.reporter));
+    labelSet = new Set(children.map(d => d.iso3));
   } else if (mode === "top"){
     const topN = 20;
-    children.sort((a,b)=>b.value-a.value).slice(0, topN).forEach(d => labelSet.add(d.reporter));
+    children.sort((a,b)=>b.value-a.value).slice(0, topN).forEach(d => labelSet.add(d.iso3));
   }
 
   const baseFill = side === "usa"
@@ -223,7 +224,7 @@ function buildTreemap(svgEl, side, rows){
     .enter()
     .append("g")
     .attr("class","tile")
-    .attr("data-reporter", d => d.data.reporter)
+    .attr("data-iso3", d => d.data.iso3)
     .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
   nodes.append("rect")
@@ -237,7 +238,7 @@ function buildTreemap(svgEl, side, rows){
 
   // Clip path per tile so flag doesn't spill out
   nodes.each(function(d){
-    const id = `clip-${side}-${d.data.reporter}`;
+    const id = `clip-${side}-${d.data.iso3}`;
     defs.append("clipPath")
       .attr("id", id)
       .append("rect")
@@ -273,7 +274,7 @@ function buildTreemap(svgEl, side, rows){
     .attr("class","tileLabel")
     .attr("x", 6)
     .attr("y", 18)
-    .text(d => labelSet.has(d.data.reporter) ? d.data.reporter : "")
+    .text(d => labelSet.has(d.data.iso3) ? d.data.iso3 : "")
     .attr("fill", "rgba(255,255,255,.78)")
     .attr("font-size", 12)
     .attr("font-family", "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace")
@@ -287,7 +288,7 @@ function buildTreemap(svgEl, side, rows){
     .attr("class","tileValue")
     .attr("x", 6)
     .attr("y", 34)
-    .text(d => labelSet.has(d.data.reporter) ? fmt(d.data.value) : "")
+    .text(d => labelSet.has(d.data.iso3) ? fmt(d.data.value) : "")
     .attr("fill", "rgba(255,255,255,.55)")
     .attr("font-size", 11)
     .attr("font-family", "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace")
@@ -300,7 +301,7 @@ function buildTreemap(svgEl, side, rows){
   nodes
     .on("mousemove", (ev, d) => {
       const row = d.data.row;
-      applyHighlight(row.reporter);
+      applyHighlight(row.iso3);
       setSelection(row);
       showTooltip(ev, row, side);
     })
@@ -310,7 +311,7 @@ function buildTreemap(svgEl, side, rows){
       if (!state.highlightKey) setSelection(null);
     })
     .on("click", (ev, d) => {
-      state.highlightKey = d.data.row.reporter;
+      state.highlightKey = d.data.row.iso3;
       applyHighlight(state.highlightKey);
     });
 }
@@ -370,12 +371,12 @@ async function main(){
       return;
     }
     const hit = state.rows.find(r =>
-      (r.reporter || "").toLowerCase() === q ||
+      (r.iso3 || "").toLowerCase() === q ||
       (r.name || "").toLowerCase().includes(q)
     );
     if (hit){
-      state.highlightKey = hit.reporter;
-      applyHighlight(hit.reporter);
+      state.highlightKey = hit.iso3;
+      applyHighlight(hit.iso3);
       setSelection(hit);
     } else {
       state.highlightKey = null;
