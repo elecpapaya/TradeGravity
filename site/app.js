@@ -251,7 +251,7 @@ function buildTreemap(svgEl, side, rows){
     .attr("stroke", stroke)
     .attr("stroke-width", 1);
 
-  // Flag image (only if enough area + iso2 available)
+  // Flag image (always show when iso2 is available)
   const FLAG_W = 20, FLAG_H = 14;
   nodes.append("image")
     .attr("class", "flagImg")
@@ -263,11 +263,7 @@ function buildTreemap(svgEl, side, rows){
     .attr("y", 6)
     .attr("width", FLAG_W)
     .attr("height", FLAG_H)
-    .attr("clip-path", d => `url(#${d.__clipId})`)
-    .attr("display", d => {
-      const w = (d.x1 - d.x0), h = (d.y1 - d.y0);
-      return (d.data.iso2 && w >= 32 && h >= 22) ? null : "none";
-    });
+    .attr("clip-path", d => `url(#${d.__clipId})`);
 
   // labels
   nodes.append("text")
