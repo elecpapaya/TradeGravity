@@ -242,24 +242,6 @@ function buildTreemap(svgEl, side, rows){
     d.__clipId = id;
   });
 
-  // Flag background image (fills tile)
-  nodes.append("image")
-    .attr("class", "tileFlagBg")
-    .attr("href", d => {
-      const iso2 = d.data.iso2;
-      return iso2 ? `https://flagcdn.com/w320/${iso2.toLowerCase()}.png` : null;
-    })
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", d => Math.max(0, d.x1 - d.x0))
-    .attr("height", d => Math.max(0, d.y1 - d.y0))
-    .attr("preserveAspectRatio", "xMidYMid slice")
-    .attr("clip-path", d => `url(#${d.__clipId})`)
-    .attr("display", d => {
-      const w = (d.x1 - d.x0), h = (d.y1 - d.y0);
-      return (d.data.iso2 && w >= 60 && h >= 40) ? null : "none";
-    });
-
   nodes.append("rect")
     .attr("rx", 6)
     .attr("ry", 6)
