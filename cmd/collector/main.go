@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"flag"
@@ -35,11 +36,12 @@ func run(args []string) {
 	partners := fs.String("partners", "USA,CHN", "comma-separated partner ISO3 list")
 	flows := fs.String("flows", "export,import", "comma-separated flows")
 	limit := fs.Int("limit", 0, "limit number of reporters (0 = all)")
+	allowlist := fs.String("allowlist", "configs/allowlist.csv", "path to allowlist file (empty = no filter)")
 	dbPath := fs.String("db", "tradegravity.db", "sqlite database path (empty disables persistence)")
 	verbose := fs.Bool("verbose", false, "print each observation")
 	fs.Parse(args)
 
-	if err := runCollector(*provider, *partners, *flows, *limit, *dbPath, *verbose); err != nil {
+	if err := runCollector(*provider, *partners, *flows, *limit, *allowlist, *dbPath, *verbose); err != nil {
 		fmt.Fprintln(os.Stderr, "collector run failed:", err)
 		os.Exit(1)
 	}
@@ -53,11 +55,12 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "  -partners    comma-separated partner ISO3 list (default: USA,CHN)")
 	fmt.Fprintln(os.Stderr, "  -flows       comma-separated flows (default: export,import)")
 	fmt.Fprintln(os.Stderr, "  -limit       limit number of reporters (default: 0)")
+	fmt.Fprintln(os.Stderr, "  -allowlist   path to allowlist file (default: configs/allowlist.csv)")
 	fmt.Fprintln(os.Stderr, "  -db          sqlite database path (default: tradegravity.db)")
 	fmt.Fprintln(os.Stderr, "  -verbose     print each observation")
 }
 
-func runCollector(providerID, partnersCSV, flowsCSV string, limit int, dbPath string, verbose bool) error {
+func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, verbose bool) error {
 	provider, err := buildProvider(providerID)
 	if err != nil {
 		return err
@@ -75,8 +78,18 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, dbPath st
 	if err != nil {
 		return err
 	}
+	if strings.TrimSpace(allowlistPath) != "" {
+		allowed, err := loadAllowlist(allowlistPath)
+		if err != nil {
+			return err
+		}
+		reporters = filterReporters(reporters, allowed)
+	}
 	if limit > 0 && len(reporters) > limit {
 		reporters = reporters[:limit]
+	}
+	if len(reporters) == 0 {
+		return errors.New("no reporters after filtering")
 	}
 
 	partners := parseList(partnersCSV)
@@ -177,6 +190,68 @@ func resolveReporters(ctx context.Context, provider providers) ([]model.Reporter
 		return nil, err
 	}
 	return filterActiveReporters(reporters), nil
+}
+
+func loadAllowlist(path string) (map[string]struct{}, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	allowed := make(map[string]struct{})
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		if idx := strings.Index(line, "#"); idx >= 0 {
+			line = strings.TrimSpace(line[:idx])
+		}
+		for _, token := range splitTokens(line) {
+			iso3 := strings.ToUpper(strings.TrimSpace(token))
+			if iso3 == "" || iso3 == "ISO3" {
+				continue
+			}
+			allowed[iso3] = struct{}{}
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	if len(allowed) == 0 {
+		return nil, errors.New("allowlist is empty")
+	}
+	return allowed, nil
+}
+
+func splitTokens(line string) []string {
+	replacer := strings.NewReplacer(";", ",", "\t", ",")
+	line = replacer.Replace(line)
+	parts := strings.Split(line, ",")
+	out := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		out = append(out, part)
+	}
+	return out
+}
+
+func filterReporters(reporters []model.Reporter, allowed map[string]struct{}) []model.Reporter {
+	if len(allowed) == 0 {
+		return reporters
+	}
+	filtered := make([]model.Reporter, 0, len(reporters))
+	for _, reporter := range reporters {
+		if _, ok := allowed[strings.ToUpper(reporter.ISO3)]; ok {
+			filtered = append(filtered, reporter)
+		}
+	}
+	return filtered
 }
 
 func normalizeHeader(header []string) map[string]int {
