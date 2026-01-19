@@ -227,15 +227,6 @@ function buildTreemap(svgEl, side, rows){
     .attr("data-iso3", d => d.data.iso3)
     .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
-  nodes.append("rect")
-    .attr("rx", 6)
-    .attr("ry", 6)
-    .attr("width", d => Math.max(0, d.x1 - d.x0))
-    .attr("height", d => Math.max(0, d.y1 - d.y0))
-    .attr("fill", baseFill)
-    .attr("stroke", stroke)
-    .attr("stroke-width", 1);
-
   // Clip path per tile so flag doesn't spill out
   nodes.each(function(d){
     const id = `clip-${side}-${d.data.iso3}`;
@@ -250,6 +241,33 @@ function buildTreemap(svgEl, side, rows){
       .attr("height", Math.max(0, d.y1 - d.y0));
     d.__clipId = id;
   });
+
+  // Flag background image (fills tile)
+  nodes.append("image")
+    .attr("class", "tileFlagBg")
+    .attr("href", d => {
+      const iso2 = d.data.iso2;
+      return iso2 ? `https://flagcdn.com/w320/${iso2.toLowerCase()}.png` : null;
+    })
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", d => Math.max(0, d.x1 - d.x0))
+    .attr("height", d => Math.max(0, d.y1 - d.y0))
+    .attr("preserveAspectRatio", "xMidYMid slice")
+    .attr("clip-path", d => `url(#${d.__clipId})`)
+    .attr("display", d => {
+      const w = (d.x1 - d.x0), h = (d.y1 - d.y0);
+      return (d.data.iso2 && w >= 60 && h >= 40) ? null : "none";
+    });
+
+  nodes.append("rect")
+    .attr("rx", 6)
+    .attr("ry", 6)
+    .attr("width", d => Math.max(0, d.x1 - d.x0))
+    .attr("height", d => Math.max(0, d.y1 - d.y0))
+    .attr("fill", baseFill)
+    .attr("stroke", stroke)
+    .attr("stroke-width", 1);
 
   // Flag image (only if enough area + iso2 available)
   const FLAG_W = 20, FLAG_H = 14;
