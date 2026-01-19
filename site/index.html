@@ -11,22 +11,17 @@
   <header class="topbar">
     <div class="brand">
       <div class="title">TradeGravity</div>
-      <div class="subtitle">US–CN Trade Treemap (anchor cards) + flags</div>
+      <div class="subtitle">Compare each country's trade with the United States and China. Tiles scale by trade/export/import, with flags and linked highlights on hover. Exports/imports are from each country's perspective; USA/CHN are the partner side.</div>
     </div>
 
     <div class="controls">
       <label class="field">
-        <div class="label">Search</div>
-        <input id="search" type="text" placeholder="ISO3 or name (e.g., KOR, Korea)" />
-      </label>
-
-      <label class="field">
         <div class="label">Metric</div>
-        <select id="metric">
-          <option value="trade" selected>Total trade</option>
-          <option value="export">Exports</option>
-          <option value="import">Imports</option>
-        </select>
+        <div class="segmented" id="metricGroup" role="group" aria-label="Metric">
+          <button type="button" class="segBtn is-active" data-value="trade">Total trade</button>
+          <button type="button" class="segBtn" data-value="export">Exports</button>
+          <button type="button" class="segBtn" data-value="import">Imports</button>
+        </div>
       </label>
 
       <label class="field">
@@ -34,16 +29,6 @@
         <input id="topN" type="number" min="5" max="200" step="1" value="25" style="min-width:120px"/>
       </label>
 
-      <label class="field">
-        <div class="label">Label</div>
-        <select id="labelMode">
-          <option value="top" selected>Top 20 by metric</option>
-          <option value="hover">Only on hover</option>
-          <option value="all">All (crowded)</option>
-        </select>
-      </label>
-
-      <button id="fitBtn" class="btn">Fit</button>
     </div>
   </header>
 
@@ -68,7 +53,7 @@
       </div>
 
       <div class="footerNote">
-        Each big rectangle is an anchor card (USA/CHN). Inside: sub-rectangles per reporter, sized by selected metric.
+        Each big rectangle is an anchor card (USA/CHN). Inside: sub-rectangles per country, sized by the selected metric. Exports/imports are recorded from each country's side with USA/CHN as the partner.
         Flags are loaded from a CDN (optional). Hover highlights the same country on both sides.
       </div>
     </section>
@@ -76,22 +61,12 @@
     <aside class="side">
       <div class="panel">
         <div class="panelTitle">Selection</div>
-        <div id="selection" class="panelBody subtle">Hover or search a country.</div>
+        <div id="selection" class="panelBody subtle">Hover a country tile to preview.</div>
       </div>
 
       <div class="panel">
-        <div class="panelTitle">Legend</div>
-        <div class="panelBody">
-          <div class="legendRow"><span class="swatch usa"></span> USA treemap</div>
-          <div class="legendRow"><span class="swatch chn"></span> CHN treemap</div>
-          <div class="legendRow"><span class="swatch hi"></span> highlight (both sides)</div>
-          <div class="legendRow"><span class="swatch flag"></span> flag icon (CDN)</div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panelTitle">Data</div>
-        <div id="dataInfo" class="panelBody subtle"></div>
+        <div class="panelTitle">Country Snapshot</div>
+        <div id="indicators" class="panelBody subtle">Click a country tile to load key economic indicators.</div>
       </div>
     </aside>
   </main>
