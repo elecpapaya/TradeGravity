@@ -204,10 +204,6 @@ select{min-width:170px}
 }
 
 /* Flag image tint/outline */
-.tileFlagBg{
-  opacity: .18;
-  filter: saturate(.75) contrast(1.05);
-}
 .flagImg{
   opacity: .9;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
