@@ -28,8 +28,8 @@ let state = {
   topN: 25,
 };
 
-// Minimal ISO3->ISO2 map. For full coverage, add iso2 in latest.json or expand this table.
-const ISO3_TO_ISO2 = {
+// Minimal ISO3->ISO2 fallback map (overridden by iso3_to_iso2.json if present).
+const FALLBACK_ISO3_TO_ISO2 = {
   KOR:"KR", JPN:"JP", CHN:"CN", USA:"US", DEU:"DE", FRA:"FR", GBR:"GB", ITA:"IT", ESP:"ES",
   CAN:"CA", MEX:"MX", BRA:"BR", IND:"IN", IDN:"ID", VNM:"VN", AUS:"AU", RUS:"RU", TUR:"TR",
   SAU:"SA", ARE:"AE", ZAF:"ZA", EGY:"EG", NGA:"NG", ARG:"AR", CHL:"CL", COL:"CO", PER:"PE",
@@ -37,6 +37,7 @@ const ISO3_TO_ISO2 = {
   ISR:"IL", IRL:"IE", PRT:"PT", CHE:"CH", AUT:"AT", GRC:"GR", UKR:"UA", THA:"TH", MYS:"MY",
   SGP:"SG", PHL:"PH", PAK:"PK", BGD:"BD", NZL:"NZ", KAZ:"KZ"
 };
+let ISO3_TO_ISO2 = { ...FALLBACK_ISO3_TO_ISO2 };
 
 function iso2FromRow(row){
   const iso2 = (row.iso2 || row.ISO2 || "").trim();
@@ -329,6 +330,18 @@ function fit(){
 }
 
 async function main(){
+  try {
+    const res = await fetch("./iso3_to_iso2.json", { cache: "no-store" });
+    if (res.ok) {
+      const fullMap = await res.json();
+      if (fullMap && typeof fullMap === "object") {
+        ISO3_TO_ISO2 = fullMap;
+      }
+    }
+  } catch (err) {
+    console.warn("[TradeGravity] iso3_to_iso2.json not loaded, using fallback map.", err);
+  }
+
   const res = await fetch(DATA_URL, { cache: "no-store" });
   const data = await res.json();
 
