@@ -277,3 +277,76 @@ configs/
    - Others 클릭 시 상세 목록 팝오버
    - region 기반 treemap 그룹핑(옵션)
    - 최근성(period lag) 시각적 경고 표시
+
+---
+
+## 12. Growth-based coloring (design)
+
+### 12.1 Goal
+- Color each country tile by growth rate (positive/negative) while size stays based on selected metric (trade/export/import).
+- Growth is computed against the previous year data for the same period type.
+
+### 12.2 Data requirements
+- We need at least two periods per (reporter, partner, flow):
+  - current period
+  - previous-year period (same period type)
+- Collector must ingest more than the latest point.
+  - For annual (Y): fetch last 2 years.
+  - For quarterly (Q): fetch last 5 quarters (or 8) to cover prior-year same quarter.
+  - For monthly (M): fetch last 13 months (or 24) to cover prior-year same month.
+
+### 12.3 Storage model
+- No schema change needed; keep `trade_observations` as-is.
+- Ensure multiple periods are stored for each key so publisher can calculate growth.
+
+### 12.4 Publisher output (latest.json)
+Add growth metadata per partner block:
+```json
+{
+  "iso3": "KOR",
+  "usa": {
+    "period": "2023",
+    "period_type": "Y",
+    "export": 123,
+    "import": 456,
+    "trade": 579,
+    "prev_period": "2022",
+    "growth": { "export": 0.12, "import": -0.04, "trade": 0.05 },
+    "growth_basis": "YoY"
+  }
+}
+```
+Rules:
+- `growth` values are ratios (e.g., 0.12 = +12%).
+- If previous value is missing or <= 0, set growth to `null`.
+- `growth_basis`: default `YoY` for M/Q/Y (same period last year).
+
+### 12.5 Growth calculation
+- `growth_pct = (current - previous) / previous`
+- For monthly/quarterly: compare same month/quarter last year.
+- For annual: compare previous year.
+- If previous is missing or <= 0 -> `null` and show neutral color.
+- For aggregated "Others", compute using summed current and summed previous values.
+
+### 12.6 Color scale
+- Diverging scale centered at 0.
+- Example palette (dark UI):
+  - negative: `#E4572E`
+  - neutral: `#2B2F36`
+  - positive: `#4DAA57`
+- Use clamping or soft-saturation to avoid extreme outliers:
+  - `display = tanh(growth_pct / 0.5)` (about +/-50% = strong color)
+  - or hard clamp at +/-100%.
+
+### 12.7 UI/UX
+- Add toggle: `Color = Growth / Neutral`.
+- Tooltip shows:
+  - current period, previous period
+  - growth % (formatted, `n/a` when missing)
+  - metric value
+- Optional legend bar showing scale and 0%.
+
+### 12.8 Edge cases
+- Small denominators: treat as `n/a` when previous <= 0.
+- Mixed period types: always use the same period type for growth.
+- If multiple providers are used later, growth is calculated within the selected provider only.

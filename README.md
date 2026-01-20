@@ -9,6 +9,7 @@ Exports/imports are reported from each reporter's perspective, with USA/CHN as t
 - SQLite persistence for repeatable runs.
 - Static JSON output for a lightweight web viewer.
 - Treemap with linked hover highlights and flag overlays.
+- Optional growth coloring (YoY) when historical data is available.
 - Optional country snapshot (World Bank indicators + GDELT headlines).
 - Allowlist filter for targeted reporter coverage.
 
@@ -34,7 +35,7 @@ Then open `http://localhost:8080`.
 ## Configuration
 Collector options (example):
 ```bash
-go run ./cmd/collector run -partners USA,CHN -flows export,import -allowlist configs/allowlist.csv
+go run ./cmd/collector run -partners USA,CHN -flows export,import -allowlist configs/allowlist.csv -history-years 1
 ```
 
 WITS provider env vars (optional):
@@ -42,6 +43,9 @@ WITS provider env vars (optional):
 - `WITS_API_KEY` (optional; WITS supports access without a key)
 - `WITS_TRADE_PATH`
 - `WITS_RATE_LIMIT_PER_SEC`
+
+Collector flags (common):
+- `-history-years` to fetch previous years for YoY growth (default `1`).
 
 Generated files:
 - SQLite DB: `tradegravity.db`

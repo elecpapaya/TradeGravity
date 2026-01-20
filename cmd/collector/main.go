@@ -7,9 +7,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"tradegravity/internal/model"
+	"tradegravity/internal/providers"
 	"tradegravity/internal/providers/wits"
 	"tradegravity/internal/store"
 	"tradegravity/internal/store/sqlite"
@@ -38,10 +40,11 @@ func run(args []string) {
 	limit := fs.Int("limit", 0, "limit number of reporters (0 = all)")
 	allowlist := fs.String("allowlist", "configs/allowlist.csv", "path to allowlist file (empty = no filter)")
 	dbPath := fs.String("db", "tradegravity.db", "sqlite database path (empty disables persistence)")
+	historyYears := fs.Int("history-years", 1, "number of previous years to fetch for growth (0 = latest only)")
 	verbose := fs.Bool("verbose", false, "print each observation")
 	fs.Parse(args)
 
-	if err := runCollector(*provider, *partners, *flows, *limit, *allowlist, *dbPath, *verbose); err != nil {
+	if err := runCollector(*provider, *partners, *flows, *limit, *allowlist, *dbPath, *historyYears, *verbose); err != nil {
 		fmt.Fprintln(os.Stderr, "collector run failed:", err)
 		os.Exit(1)
 	}
@@ -57,10 +60,11 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "  -limit       limit number of reporters (default: 0)")
 	fmt.Fprintln(os.Stderr, "  -allowlist   path to allowlist file (default: configs/allowlist.csv)")
 	fmt.Fprintln(os.Stderr, "  -db          sqlite database path (default: tradegravity.db)")
+	fmt.Fprintln(os.Stderr, "  -history-years  number of previous years to fetch (default: 1)")
 	fmt.Fprintln(os.Stderr, "  -verbose     print each observation")
 }
 
-func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, verbose bool) error {
+func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, historyYears int, verbose bool) error {
 	provider, err := buildProvider(providerID)
 	if err != nil {
 		return err
@@ -119,7 +123,7 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 					continue
 				}
 				requests++
-				observation, err := provider.FetchLatest(ctx, reporter.ISO3, partner, flow)
+				series, err := collectObservations(ctx, provider, reporter.ISO3, partner, flow, historyYears)
 				if err != nil {
 					if errors.Is(err, wits.ErrNoRecords) {
 						skipped++
@@ -132,17 +136,26 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 					fmt.Fprintf(os.Stderr, "fetch failed reporter=%s partner=%s flow=%s: %v\n", reporter.ISO3, partner, flow, err)
 					continue
 				}
+				if len(series) == 0 {
+					skipped++
+					if verbose {
+						fmt.Fprintf(os.Stderr, "skip empty reporter=%s partner=%s flow=%s\n", reporter.ISO3, partner, flow)
+					}
+					continue
+				}
 				success++
-				observations = append(observations, observation)
+				observations = append(observations, series...)
 				if verbose {
-					fmt.Printf("%s %s %s %s %s %.2f\n",
-						observation.ReporterISO3,
-						observation.PartnerISO3,
-						observation.Flow,
-						observation.PeriodType,
-						observation.Period,
-						observation.ValueUSD,
-					)
+					for _, observation := range series {
+						fmt.Printf("%s %s %s %s %s %.2f\n",
+							observation.ReporterISO3,
+							observation.PartnerISO3,
+							observation.Flow,
+							observation.PeriodType,
+							observation.Period,
+							observation.ValueUSD,
+						)
+					}
 				}
 			}
 		}
@@ -163,18 +176,126 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 	return nil
 }
 
-func buildProvider(providerID string) (providers, error) {
+func collectObservations(ctx context.Context, provider providers.Provider, reporterISO3, partnerISO3 string, flow model.Flow, historyYears int) ([]model.Observation, error) {
+	latest, err := provider.FetchLatest(ctx, reporterISO3, partnerISO3, flow)
+	if err != nil {
+		return nil, err
+	}
+	if historyYears <= 0 {
+		return []model.Observation{latest}, nil
+	}
+
+	year, ok := yearFromPeriod(latest.PeriodType, latest.Period)
+	if !ok {
+		return []model.Observation{latest}, nil
+	}
+	fromYear := year - historyYears
+	if fromYear < 0 {
+		fromYear = 0
+	}
+
+	series, err := provider.FetchSeries(ctx, reporterISO3, partnerISO3, flow, fmt.Sprintf("%04d", fromYear), fmt.Sprintf("%04d", year))
+	if err != nil {
+		if !errors.Is(err, wits.ErrNoRecords) {
+			fmt.Fprintf(os.Stderr, "fetch series failed reporter=%s partner=%s flow=%s: %v\n", reporterISO3, partnerISO3, flow, err)
+		}
+		return []model.Observation{latest}, nil
+	}
+	if len(series) == 0 {
+		return []model.Observation{latest}, nil
+	}
+	return series, nil
+}
+
+func yearFromPeriod(periodType model.PeriodType, period string) (int, bool) {
+	switch periodType {
+	case model.PeriodMonth:
+		year, _, ok := parseYearMonth(period)
+		return year, ok
+	case model.PeriodQuarter:
+		year, _, ok := parseYearQuarter(period)
+		return year, ok
+	case model.PeriodYear:
+		return parseYear(period)
+	default:
+		return 0, false
+	}
+}
+
+func parseYearMonth(value string) (int, int, bool) {
+	value = strings.TrimSpace(value)
+	if len(value) == 6 && isDigits(value) {
+		year, _ := strconv.Atoi(value[:4])
+		month, _ := strconv.Atoi(value[4:])
+		if month >= 1 && month <= 12 {
+			return year, month, true
+		}
+	}
+
+	parts := strings.Split(value, "-")
+	if len(parts) == 2 && len(parts[0]) == 4 {
+		year, errYear := strconv.Atoi(parts[0])
+		month, errMonth := strconv.Atoi(parts[1])
+		if errYear == nil && errMonth == nil && month >= 1 && month <= 12 {
+			return year, month, true
+		}
+	}
+	return 0, 0, false
+}
+
+func parseYearQuarter(value string) (int, int, bool) {
+	value = strings.ToUpper(strings.TrimSpace(value))
+	if strings.Contains(value, "-Q") {
+		parts := strings.Split(value, "-Q")
+		if len(parts) == 2 {
+			year, errYear := strconv.Atoi(parts[0])
+			quarter, errQuarter := strconv.Atoi(parts[1])
+			if errYear == nil && errQuarter == nil && quarter >= 1 && quarter <= 4 {
+				return year, quarter, true
+			}
+		}
+	}
+	if strings.Contains(value, "Q") {
+		parts := strings.Split(value, "Q")
+		if len(parts) == 2 {
+			year, errYear := strconv.Atoi(parts[0])
+			quarter, errQuarter := strconv.Atoi(parts[1])
+			if errYear == nil && errQuarter == nil && quarter >= 1 && quarter <= 4 {
+				return year, quarter, true
+			}
+		}
+	}
+	return 0, 0, false
+}
+
+func parseYear(value string) (int, bool) {
+	value = strings.TrimSpace(value)
+	if len(value) != 4 || !isDigits(value) {
+		return 0, false
+	}
+	year, err := strconv.Atoi(value)
+	if err != nil {
+		return 0, false
+	}
+	return year, true
+}
+
+func isDigits(value string) bool {
+	for _, r := range value {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+func buildProvider(providerID string) (providers.Provider, error) {
 	switch strings.ToLower(strings.TrimSpace(providerID)) {
 	case "wits":
 		return wits.New()
 	default:
 		return nil, fmt.Errorf("unknown provider: %s", providerID)
 	}
-}
-
-type providers interface {
-	ListReporters(ctx context.Context) ([]model.Reporter, error)
-	FetchLatest(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow) (model.Observation, error)
 }
 
 func openStore(path string) (store.Store, error) {
@@ -184,7 +305,7 @@ func openStore(path string) (store.Store, error) {
 	return sqlite.New(path)
 }
 
-func resolveReporters(ctx context.Context, provider providers) ([]model.Reporter, error) {
+func resolveReporters(ctx context.Context, provider providers.Provider) ([]model.Reporter, error) {
 	reporters, err := provider.ListReporters(ctx)
 	if err != nil {
 		return nil, err

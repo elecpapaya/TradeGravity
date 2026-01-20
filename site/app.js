@@ -12,15 +12,18 @@ const els = {
   svgCHN: document.getElementById("svg-chn"),
   metric: document.getElementById("metric"),
   metricGroup: document.getElementById("metricGroup"),
+  colorGroup: document.getElementById("colorGroup"),
   selection: document.getElementById("selection"),
   indicators: document.getElementById("indicators"),
   tooltip: document.getElementById("tooltip"),
   topN: document.getElementById("topN"),
+  growthLegend: document.getElementById("growthLegend"),
 };
 
 let state = {
   rows: [],
   metric: "trade",
+  colorMode: "value",
   highlightKey: null, // ISO3
   selectedRow: null,
   topN: 25,
@@ -47,6 +50,18 @@ const NEWS_MAX = 5;
 const newsCache = {};
 const newsPromises = {};
 
+const GROWTH_COLORS = {
+  neg: "#ff7b6b",
+  zero: "#2b323c",
+  pos: "#86e7b0",
+  missing: "rgba(255,255,255,.06)"
+};
+
+const growthScale = d3.scaleLinear()
+  .domain([-0.5, 0, 0.5])
+  .range([GROWTH_COLORS.neg, GROWTH_COLORS.zero, GROWTH_COLORS.pos])
+  .clamp(true);
+
 function iso2FromRow(row){
   const iso2 = (row.iso2 || row.ISO2 || "").trim();
   if (iso2) return iso2.toUpperCase();
@@ -72,6 +87,45 @@ function fmt(n){
   return String(Math.round(n));
 }
 
+function fmtPct(value){
+  if (value == null || !isFinite(value)) return "-";
+  const pct = value * 100;
+  const sign = pct > 0 ? "+" : "";
+  return sign + pct.toFixed(1) + "%";
+}
+
+function toNullableNumber(value){
+  if (value == null) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeGrowth(value){
+  if (!value || typeof value !== "object") return null;
+  return {
+    export: toNullableNumber(value.export),
+    import: toNullableNumber(value.import),
+    trade: toNullableNumber(value.trade),
+  };
+}
+
+function growthBasisLabel(value){
+  const basis = (value?.growth_basis || "yoy").toUpperCase();
+  return basis === "YOY" ? "YoY" : basis;
+}
+
+function getGrowthValue(row, side){
+  const o = row[side] || {};
+  const g = o.growth || {};
+  const value = g[state.metric];
+  return toNullableNumber(value);
+}
+
+function growthColor(value){
+  if (value == null || !isFinite(value)) return GROWTH_COLORS.missing;
+  return growthScale(value);
+}
+
 function getMetricValue(row, side){
   const o = row[side] || {};
   const m = state.metric;
@@ -84,6 +138,8 @@ function normalizeRows(rows){
     const iso3 = (r.iso3 || r.ISO3 || "").toUpperCase();
     const usa = r.usa || {};
     const chn = r.chn || {};
+    const usaGrowth = normalizeGrowth(usa.growth);
+    const chnGrowth = normalizeGrowth(chn.growth);
     const trade_us = +(usa.trade ?? (+(usa.export||0) + +(usa.import||0))) || 0;
     const trade_cn = +(chn.trade ?? (+(chn.export||0) + +(chn.import||0))) || 0;
     const total = +(r.total ?? (trade_us + trade_cn)) || 0;
@@ -93,8 +149,8 @@ function normalizeRows(rows){
       iso3,
       name: r.name || iso3,
       iso2,
-      usa: { ...usa, trade: trade_us },
-      chn: { ...chn, trade: trade_cn },
+      usa: { ...usa, trade: trade_us, growth: usaGrowth },
+      chn: { ...chn, trade: trade_cn, growth: chnGrowth },
       total,
       share_cn
     };
@@ -115,9 +171,13 @@ function setSelection(row){
     </div>
     <div class="kv"><span>USA period</span><b>${us.period || "-"}</b></div>
     <div class="kv"><span>USA ${state.metric}</span><b>${fmt(us[state.metric] ?? 0)}</b></div>
+    <div class="kv"><span>USA prev period</span><b>${us.prev_period || "-"}</b></div>
+    <div class="kv"><span>USA growth (${growthBasisLabel(us)})</span><b>${fmtPct(getGrowthValue(row, "usa"))}</b></div>
     <div style="height:8px"></div>
     <div class="kv"><span>CHN period</span><b>${cn.period || "-"}</b></div>
     <div class="kv"><span>CHN ${state.metric}</span><b>${fmt(cn[state.metric] ?? 0)}</b></div>
+    <div class="kv"><span>CHN prev period</span><b>${cn.prev_period || "-"}</b></div>
+    <div class="kv"><span>CHN growth (${growthBasisLabel(cn)})</span><b>${fmtPct(getGrowthValue(row, "chn"))}</b></div>
     <div style="height:10px"></div>
     <div class="kv"><span>share_cn</span><b>${(row.share_cn*100).toFixed(1)}%</b></div>
     <div class="kv"><span>total(trade_us+trade_cn)</span><b>${fmt(row.total)}</b></div>
@@ -136,6 +196,8 @@ function showTooltip(ev, row, side){
     <div class="t2">
       <div class="kv"><span>${side.toUpperCase()} period</span><b>${o.period || "-"}</b></div>
       <div class="kv"><span>${side.toUpperCase()} ${state.metric}</span><b>${fmt(o[state.metric] ?? 0)}</b></div>
+      <div class="kv"><span>${side.toUpperCase()} prev</span><b>${o.prev_period || "-"}</b></div>
+      <div class="kv"><span>${side.toUpperCase()} growth (${growthBasisLabel(o)})</span><b>${fmtPct(getGrowthValue(row, side))}</b></div>
       <div class="kv"><span>share_cn</span><b>${(row.share_cn*100).toFixed(1)}%</b></div>
     </div>
   `;
@@ -216,6 +278,7 @@ function buildTreemap(svgEl, side, rows){
   const stroke = side === "usa"
     ? "rgba(90,162,255,.35)"
     : "rgba(255,107,87,.35)";
+  const useGrowthColor = state.colorMode === "growth";
 
   const defs = svg.append("defs");
 
@@ -249,7 +312,7 @@ function buildTreemap(svgEl, side, rows){
     .attr("ry", 6)
     .attr("width", d => Math.max(0, d.x1 - d.x0))
     .attr("height", d => Math.max(0, d.y1 - d.y0))
-    .attr("fill", baseFill)
+    .attr("fill", d => useGrowthColor ? growthColor(getGrowthValue(d.data.row, side)) : baseFill)
     .attr("stroke", stroke)
     .attr("stroke-width", 1);
 
@@ -520,6 +583,18 @@ async function main(){
       renderAll();
     });
   }
+  if (els.colorGroup) {
+    els.colorGroup.addEventListener("click", (ev) => {
+      const btn = ev.target.closest(".segBtn");
+      if (!btn) return;
+      const value = btn.getAttribute("data-value");
+      if (!value) return;
+      state.colorMode = value;
+      syncColorButtons();
+      syncColorLegend();
+      renderAll();
+    });
+  }
 
   // Top N grouping
   if (els.topN){
@@ -538,7 +613,10 @@ async function main(){
     window.__tmResize = setTimeout(() => renderAll(), 100);
   });
 
+  syncMetricButtons();
+  syncColorButtons();
   renderAll();
+  syncColorLegend();
   setIndicators(null);
 }
 
@@ -549,6 +627,20 @@ function syncMetricButtons(){
     const value = btn.getAttribute("data-value");
     btn.classList.toggle("is-active", value === state.metric);
   });
+}
+
+function syncColorButtons(){
+  if (!els.colorGroup) return;
+  const buttons = els.colorGroup.querySelectorAll(".segBtn");
+  buttons.forEach(btn => {
+    const value = btn.getAttribute("data-value");
+    btn.classList.toggle("is-active", value === state.colorMode);
+  });
+}
+
+function syncColorLegend(){
+  if (!els.growthLegend) return;
+  els.growthLegend.classList.toggle("is-hidden", state.colorMode !== "growth");
 }
 
 main().catch(err => {

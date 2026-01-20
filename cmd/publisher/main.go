@@ -36,10 +36,20 @@ type latestEntry struct {
 }
 
 type partnerBlock struct {
-	Period string  `json:"period"`
-	Export float64 `json:"export"`
-	Import float64 `json:"import"`
-	Trade  float64 `json:"trade"`
+	Period      string           `json:"period"`
+	PeriodType  model.PeriodType `json:"period_type"`
+	PrevPeriod  string           `json:"prev_period,omitempty"`
+	Export      float64          `json:"export"`
+	Import      float64          `json:"import"`
+	Trade       float64          `json:"trade"`
+	Growth      *growthBlock     `json:"growth,omitempty"`
+	GrowthBasis string           `json:"growth_basis,omitempty"`
+}
+
+type growthBlock struct {
+	Export *float64 `json:"export"`
+	Import *float64 `json:"import"`
+	Trade  *float64 `json:"trade"`
 }
 
 type observationRow struct {
@@ -191,6 +201,7 @@ func loadObservations(dbPath, provider string, partners []string) ([]observation
 
 func buildLatest(rows []observationRow) []latestEntry {
 	latest := make(map[string]map[string]map[model.Flow]latestValue)
+	series := make(map[string]map[string]map[model.Flow]map[string]float64)
 
 	for _, row := range rows {
 		reporter := strings.ToUpper(row.ReporterISO)
@@ -202,9 +213,19 @@ func buildLatest(rows []observationRow) []latestEntry {
 		if _, ok := latest[reporter]; !ok {
 			latest[reporter] = make(map[string]map[model.Flow]latestValue)
 		}
+		if _, ok := series[reporter]; !ok {
+			series[reporter] = make(map[string]map[model.Flow]map[string]float64)
+		}
 		if _, ok := latest[reporter][partner]; !ok {
 			latest[reporter][partner] = make(map[model.Flow]latestValue)
 		}
+		if _, ok := series[reporter][partner]; !ok {
+			series[reporter][partner] = make(map[model.Flow]map[string]float64)
+		}
+		if _, ok := series[reporter][partner][row.Flow]; !ok {
+			series[reporter][partner][row.Flow] = make(map[string]float64)
+		}
+		series[reporter][partner][row.Flow][seriesKey(row.PeriodType, row.Period)] = row.ValueUSD
 
 		current := latest[reporter][partner][row.Flow]
 		if !current.Valid || comparePeriods(row.PeriodType, row.Period, current.PeriodType, current.Period) > 0 {
@@ -219,8 +240,8 @@ func buildLatest(rows []observationRow) []latestEntry {
 
 	results := make([]latestEntry, 0, len(latest))
 	for reporter, partners := range latest {
-		usa := buildPartnerBlock(partners["USA"])
-		chn := buildPartnerBlock(partners["CHN"])
+		usa := buildPartnerBlock(partners["USA"], series[reporter]["USA"])
+		chn := buildPartnerBlock(partners["CHN"], series[reporter]["CHN"])
 		if !usa.HasData() && !chn.HasData() {
 			continue
 		}
@@ -252,7 +273,7 @@ func (p partnerSummary) HasData() bool {
 	return p.hasData
 }
 
-func buildPartnerBlock(values map[model.Flow]latestValue) partnerSummary {
+func buildPartnerBlock(values map[model.Flow]latestValue, series map[model.Flow]map[string]float64) partnerSummary {
 	if values == nil {
 		return partnerSummary{}
 	}
@@ -260,15 +281,33 @@ func buildPartnerBlock(values map[model.Flow]latestValue) partnerSummary {
 	imported := values[model.FlowImport]
 
 	periodType, period := selectLatestPeriod(export, imported)
+	exportValue, exportOk := seriesValue(series, model.FlowExport, periodType, period)
+	importValue, importOk := seriesValue(series, model.FlowImport, periodType, period)
+	if !exportOk && export.Valid {
+		exportValue = export.ValueUSD
+		exportOk = true
+	}
+	if !importOk && imported.Valid {
+		importValue = imported.ValueUSD
+		importOk = true
+	}
+
+	prevPeriod, growth := buildGrowth(series, periodType, period)
 
 	block := partnerBlock{
-		Period: period,
-		Export: export.ValueUSD,
-		Import: imported.ValueUSD,
-		Trade:  export.ValueUSD + imported.ValueUSD,
+		Period:      period,
+		PeriodType:  periodType,
+		PrevPeriod:  prevPeriod,
+		Export:      exportValue,
+		Import:      importValue,
+		Trade:       exportValue + importValue,
+		Growth:      growth,
+		GrowthBasis: "yoy",
 	}
-	_ = periodType
-	hasData := export.Valid || imported.Valid
+	if block.Period == "" || block.Growth == nil {
+		block.GrowthBasis = ""
+	}
+	hasData := exportOk || importOk
 	return partnerSummary{partnerBlock: block, hasData: hasData}
 }
 
@@ -413,6 +452,99 @@ func isDigits(value string) bool {
 		}
 	}
 	return true
+}
+
+func seriesKey(periodType model.PeriodType, period string) string {
+	return string(periodType) + "|" + period
+}
+
+func seriesValue(series map[model.Flow]map[string]float64, flow model.Flow, periodType model.PeriodType, period string) (float64, bool) {
+	if series == nil {
+		return 0, false
+	}
+	flowSeries, ok := series[flow]
+	if !ok {
+		return 0, false
+	}
+	value, ok := flowSeries[seriesKey(periodType, period)]
+	if !ok {
+		return 0, false
+	}
+	return value, true
+}
+
+func buildGrowth(series map[model.Flow]map[string]float64, periodType model.PeriodType, period string) (string, *growthBlock) {
+	prev := prevPeriod(periodType, period)
+	if prev == "" {
+		return "", nil
+	}
+
+	currentExport, exportOk := seriesValue(series, model.FlowExport, periodType, period)
+	prevExport, prevExportOk := seriesValue(series, model.FlowExport, periodType, prev)
+	currentImport, importOk := seriesValue(series, model.FlowImport, periodType, period)
+	prevImport, prevImportOk := seriesValue(series, model.FlowImport, periodType, prev)
+
+	exportGrowth := growthForValue(currentExport, prevExport, exportOk, prevExportOk)
+	importGrowth := growthForValue(currentImport, prevImport, importOk, prevImportOk)
+
+	currentTrade, tradeOk := tradeValues(series, periodType, period)
+	prevTrade, prevTradeOk := tradeValues(series, periodType, prev)
+	tradeGrowth := growthForValue(currentTrade, prevTrade, tradeOk, prevTradeOk)
+
+	if exportGrowth == nil && importGrowth == nil && tradeGrowth == nil {
+		return "", nil
+	}
+
+	return prev, &growthBlock{
+		Export: exportGrowth,
+		Import: importGrowth,
+		Trade:  tradeGrowth,
+	}
+}
+
+func tradeValues(series map[model.Flow]map[string]float64, periodType model.PeriodType, period string) (float64, bool) {
+	exportValue, exportOk := seriesValue(series, model.FlowExport, periodType, period)
+	importValue, importOk := seriesValue(series, model.FlowImport, periodType, period)
+	if !exportOk || !importOk {
+		return 0, false
+	}
+	return exportValue + importValue, true
+}
+
+func growthForValue(current, prev float64, currentOk, prevOk bool) *float64 {
+	if !currentOk || !prevOk {
+		return nil
+	}
+	if prev == 0 {
+		return nil
+	}
+	value := (current - prev) / prev
+	return &value
+}
+
+func prevPeriod(periodType model.PeriodType, period string) string {
+	switch periodType {
+	case model.PeriodMonth:
+		year, month, ok := parseYearMonth(period)
+		if !ok {
+			return ""
+		}
+		return fmt.Sprintf("%04d-%02d", year-1, month)
+	case model.PeriodQuarter:
+		year, quarter, ok := parseYearQuarter(period)
+		if !ok {
+			return ""
+		}
+		return fmt.Sprintf("%04d-Q%d", year-1, quarter)
+	case model.PeriodYear:
+		year, ok := parseYear(period)
+		if !ok {
+			return ""
+		}
+		return fmt.Sprintf("%04d", year-1)
+	default:
+		return ""
+	}
 }
 
 func parseList(value string) []string {
