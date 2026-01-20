@@ -25,10 +25,23 @@
       </label>
 
       <label class="field">
+        <div class="label">Color</div>
+        <div class="segmented" id="colorGroup" role="group" aria-label="Color">
+          <button type="button" class="segBtn is-active" data-value="value">Value</button>
+          <button type="button" class="segBtn" data-value="growth">Growth</button>
+        </div>
+      </label>
+
+      <label class="field">
         <div class="label">Top N</div>
         <input id="topN" type="number" min="5" max="200" step="1" value="25" style="min-width:120px"/>
       </label>
 
+      <div class="growthLegend is-hidden" id="growthLegend" aria-label="Growth color scale">
+        <span class="legendLabel">-50%</span>
+        <div class="legendBar"><span class="legendMid">0</span></div>
+        <span class="legendLabel">+50%</span>
+      </div>
     </div>
   </header>
 
