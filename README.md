@@ -6,6 +6,7 @@ Exports/imports are reported from each reporter's perspective, with USA/CHN as t
 
 ## Features
 - WITS SDMX ingestion with automatic "latest year" selection.
+- UN Comtrade ingestion (API key via secrets).
 - SQLite persistence for repeatable runs.
 - Static JSON output for a lightweight web viewer.
 - Treemap with linked hover highlights and flag overlays.
@@ -43,6 +44,26 @@ WITS provider env vars (optional):
 - `WITS_API_KEY` (optional; WITS supports access without a key)
 - `WITS_TRADE_PATH`
 - `WITS_RATE_LIMIT_PER_SEC`
+
+Comtrade provider env vars (required for API access):
+- `COMTRADE_PRIMARY_KEY`
+- `COMTRADE_SECONDARY_KEY` (optional fallback)
+- `COMTRADE_BASE_URL` (default `https://comtradeapi.un.org/`)
+- `COMTRADE_DATA_PATH` (default `data/v1/get/{type}/{freq}/{cl}`)
+- `COMTRADE_RATE_LIMIT_PER_SEC` (default `2`)
+- `COMTRADE_RATE_LIMIT_BURST` (default `2`)
+- `COMTRADE_MAX_RETRIES` (default `3`)
+- `COMTRADE_REPORTERS_URL` (default `https://comtradeapi.un.org/files/v1/app/reference/Reporters.json`)
+- `COMTRADE_PARTNERS_URL` (default `https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json`)
+
+Comtrade usage:
+```bash
+go run ./cmd/collector run -provider comtrade -partners USA,CHN -flows export,import -allowlist configs/allowlist.csv -history-years 1
+```
+
+GitHub Actions secrets:
+- `COMTRADE_PRIMARY_KEY`
+- `COMTRADE_SECONDARY_KEY`
 
 Collector flags (common):
 - `-history-years` to fetch previous years for YoY growth (default `1`).

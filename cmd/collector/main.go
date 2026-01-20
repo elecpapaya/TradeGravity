@@ -12,6 +12,7 @@ import (
 
 	"tradegravity/internal/model"
 	"tradegravity/internal/providers"
+	"tradegravity/internal/providers/comtrade"
 	"tradegravity/internal/providers/wits"
 	"tradegravity/internal/store"
 	"tradegravity/internal/store/sqlite"
@@ -78,15 +79,23 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 	}
 	defer st.Close()
 
-	reporters, err := resolveReporters(ctx, provider)
-	if err != nil {
-		return err
-	}
+	allowed := map[string]struct{}{}
 	if strings.TrimSpace(allowlistPath) != "" {
-		allowed, err := loadAllowlist(allowlistPath)
+		loaded, err := loadAllowlist(allowlistPath)
 		if err != nil {
 			return err
 		}
+		allowed = loaded
+	}
+
+	reporters, err := resolveReporters(ctx, provider)
+	if err != nil {
+		if len(allowed) == 0 {
+			return err
+		}
+		fmt.Fprintf(os.Stderr, "warning: %v (using allowlist only)\n", err)
+		reporters = reportersFromAllowlist(allowed)
+	} else if len(allowed) > 0 {
 		reporters = filterReporters(reporters, allowed)
 	}
 	if limit > 0 && len(reporters) > limit {
@@ -123,14 +132,17 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 					continue
 				}
 				requests++
-				series, err := collectObservations(ctx, provider, reporter.ISO3, partner, flow, historyYears)
+				series, err := collectObservations(ctx, provider, st, providerID, reporter.ISO3, partner, flow, historyYears)
 				if err != nil {
-					if errors.Is(err, wits.ErrNoRecords) {
+					if errors.Is(err, wits.ErrNoRecords) || errors.Is(err, comtrade.ErrNoRecords) {
 						skipped++
 						if verbose {
 							fmt.Fprintf(os.Stderr, "skip no-records reporter=%s partner=%s flow=%s\n", reporter.ISO3, partner, flow)
 						}
 						continue
+					}
+					if errors.Is(err, comtrade.ErrQuotaExceeded) {
+						return err
 					}
 					failed++
 					fmt.Fprintf(os.Stderr, "fetch failed reporter=%s partner=%s flow=%s: %v\n", reporter.ISO3, partner, flow, err)
@@ -176,12 +188,23 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 	return nil
 }
 
-func collectObservations(ctx context.Context, provider providers.Provider, reporterISO3, partnerISO3 string, flow model.Flow, historyYears int) ([]model.Observation, error) {
+func collectObservations(ctx context.Context, provider providers.Provider, st store.Store, providerID, reporterISO3, partnerISO3 string, flow model.Flow, historyYears int) ([]model.Observation, error) {
+	existingYears, err := existingObservationYears(ctx, st, providerID, reporterISO3, partnerISO3, flow)
+	if err != nil {
+		return nil, err
+	}
+
 	latest, err := provider.FetchLatest(ctx, reporterISO3, partnerISO3, flow)
 	if err != nil {
 		return nil, err
 	}
 	if historyYears <= 0 {
+		year, ok := yearFromPeriod(latest.PeriodType, latest.Period)
+		if ok {
+			if _, exists := existingYears[year]; exists {
+				return nil, nil
+			}
+		}
 		return []model.Observation{latest}, nil
 	}
 
@@ -194,17 +217,46 @@ func collectObservations(ctx context.Context, provider providers.Provider, repor
 		fromYear = 0
 	}
 
-	series, err := provider.FetchSeries(ctx, reporterISO3, partnerISO3, flow, fmt.Sprintf("%04d", fromYear), fmt.Sprintf("%04d", year))
-	if err != nil {
-		if !errors.Is(err, wits.ErrNoRecords) {
-			fmt.Fprintf(os.Stderr, "fetch series failed reporter=%s partner=%s flow=%s: %v\n", reporterISO3, partnerISO3, flow, err)
+	series := make([]model.Observation, 0)
+	for targetYear := fromYear; targetYear <= year; targetYear++ {
+		if _, exists := existingYears[targetYear]; exists {
+			continue
+		}
+		fetched, err := provider.FetchSeries(ctx, reporterISO3, partnerISO3, flow, fmt.Sprintf("%04d", targetYear), fmt.Sprintf("%04d", targetYear))
+		if err != nil {
+			if errors.Is(err, wits.ErrNoRecords) || errors.Is(err, comtrade.ErrNoRecords) {
+				continue
+			}
+			return nil, err
+		}
+		series = append(series, fetched...)
+	}
+	if len(series) == 0 {
+		if _, exists := existingYears[year]; exists {
+			return nil, nil
 		}
 		return []model.Observation{latest}, nil
 	}
-	if len(series) == 0 {
-		return []model.Observation{latest}, nil
-	}
 	return series, nil
+}
+
+func existingObservationYears(ctx context.Context, st store.Store, providerID, reporterISO3, partnerISO3 string, flow model.Flow) (map[int]struct{}, error) {
+	years := make(map[int]struct{})
+	if st == nil {
+		return years, nil
+	}
+	keys, err := st.ListObservationKeys(ctx, providerID, reporterISO3, partnerISO3, flow)
+	if err != nil {
+		return nil, err
+	}
+	for _, key := range keys {
+		year, ok := yearFromPeriod(key.PeriodType, key.Period)
+		if !ok {
+			continue
+		}
+		years[year] = struct{}{}
+	}
+	return years, nil
 }
 
 func yearFromPeriod(periodType model.PeriodType, period string) (int, bool) {
@@ -293,6 +345,8 @@ func buildProvider(providerID string) (providers.Provider, error) {
 	switch strings.ToLower(strings.TrimSpace(providerID)) {
 	case "wits":
 		return wits.New()
+	case "comtrade":
+		return comtrade.New()
 	default:
 		return nil, fmt.Errorf("unknown provider: %s", providerID)
 	}
@@ -311,6 +365,24 @@ func resolveReporters(ctx context.Context, provider providers.Provider) ([]model
 		return nil, err
 	}
 	return filterActiveReporters(reporters), nil
+}
+
+func reportersFromAllowlist(allowed map[string]struct{}) []model.Reporter {
+	reporters := make([]model.Reporter, 0, len(allowed))
+	for iso3 := range allowed {
+		trimmed := strings.TrimSpace(strings.ToUpper(iso3))
+		if trimmed == "" || trimmed == "ISO3" {
+			continue
+		}
+		reporters = append(reporters, model.Reporter{
+			ISO3:     trimmed,
+			NameEN:   trimmed,
+			NameKO:   "",
+			Region:   "",
+			IsActive: true,
+		})
+	}
+	return reporters
 }
 
 func loadAllowlist(path string) (map[string]struct{}, error) {

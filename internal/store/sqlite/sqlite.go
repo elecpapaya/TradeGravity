@@ -4,11 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	_ "modernc.org/sqlite"
 
 	"tradegravity/internal/model"
+	"tradegravity/internal/store"
 )
 
 type Store struct {
@@ -112,6 +114,39 @@ func (s *Store) ListReporters(ctx context.Context, onlyActive bool) ([]model.Rep
 	_ = ctx
 	_ = onlyActive
 	return nil, nil
+}
+
+func (s *Store) ListObservationKeys(ctx context.Context, provider, reporterISO3, partnerISO3 string, flow model.Flow) ([]store.ObservationKey, error) {
+	if s == nil || s.db == nil {
+		return nil, nil
+	}
+
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT period_type, period
+		FROM trade_observations
+		WHERE provider = ? AND reporter_iso3 = ? AND partner_iso3 = ? AND flow = ?
+	`, provider, reporterISO3, partnerISO3, string(flow))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	keys := make([]store.ObservationKey, 0)
+	for rows.Next() {
+		var periodType string
+		var period string
+		if err := rows.Scan(&periodType, &period); err != nil {
+			return nil, err
+		}
+		keys = append(keys, store.ObservationKey{
+			PeriodType: model.PeriodType(strings.ToUpper(strings.TrimSpace(periodType))),
+			Period:     strings.TrimSpace(period),
+		})
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return keys, nil
 }
 
 func (s *Store) migrate() error {

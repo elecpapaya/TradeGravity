@@ -21,7 +21,7 @@ jobs:
       - name: Run collector
         env:
           WITS_BASE_URL: https://wits.worldbank.org/API/V1/
-        run: go run ./cmd/collector run -db tradegravity.db
+        run: go run ./cmd/collector run -provider wits -db tradegravity.db
 
       - name: Run publisher
         run: go run ./cmd/publisher build -db tradegravity.db -out site/data
