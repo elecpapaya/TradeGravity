@@ -22,6 +22,7 @@ let state = {
   rows: [],
   metric: "trade",
   highlightKey: null, // ISO3
+  selectedRow: null,
   topN: 25,
 };
 
@@ -102,7 +103,7 @@ function normalizeRows(rows){
 
 function setSelection(row){
   if (!row){
-    els.selection.innerHTML = "<span class='subtle'>Hover a country tile to preview.</span>";
+    els.selection.innerHTML = "<span class='subtle'>Click a country tile to view details.</span>";
     return;
   }
   const us = row.usa || {};
@@ -299,18 +300,19 @@ function buildTreemap(svgEl, side, rows){
     .on("mousemove", (ev, d) => {
       const row = d.data.row;
       applyHighlight(row.iso3);
-      setSelection(row);
       showTooltip(ev, row, side);
     })
     .on("mouseleave", () => {
       hideTooltip();
       applyHighlight(state.highlightKey);
-      if (!state.highlightKey) setSelection(null);
     })
     .on("click", (ev, d) => {
-      state.highlightKey = d.data.row.iso3;
+      const row = d.data.row;
+      state.selectedRow = row;
+      state.highlightKey = row.iso3;
       applyHighlight(state.highlightKey);
-      setIndicators(d.data.row);
+      setSelection(row);
+      setIndicators(row);
     });
 }
 
@@ -320,6 +322,11 @@ function renderAll(){
   buildTreemap(els.svgCHN, "chn", rows);
 
   applyHighlight(state.highlightKey);
+  if (state.selectedRow) {
+    setSelection(state.selectedRow);
+  } else {
+    setSelection(null);
+  }
 }
 
 async function setIndicators(row){
