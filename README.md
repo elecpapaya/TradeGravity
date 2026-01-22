@@ -64,6 +64,7 @@ $env:COMTRADE_PRIMARY_KEY = "YOUR_KEY"
 # PowerShell: persist for new terminals
 setx COMTRADE_PRIMARY_KEY "YOUR_KEY"
 ```
+`setx` writes a user-level persistent env var and takes effect in new terminals or after reboot.
 ```bash
 # bash/zsh: current session
 export COMTRADE_PRIMARY_KEY="YOUR_KEY"
