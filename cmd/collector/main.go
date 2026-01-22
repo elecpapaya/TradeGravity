@@ -119,7 +119,7 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 	success := 0
 	failed := 0
 	skipped := 0
-	observations := make([]model.Observation, 0)
+	stored := 0
 
 	for _, reporter := range reporters {
 		for _, partner := range partners {
@@ -155,8 +155,11 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 					}
 					continue
 				}
+				if err := st.UpsertObservations(ctx, series); err != nil {
+					return err
+				}
 				success++
-				observations = append(observations, series...)
+				stored += len(series)
 				if verbose {
 					for _, observation := range series {
 						fmt.Printf("%s %s %s %s %s %.2f\n",
@@ -173,11 +176,8 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 		}
 	}
 
-	if err := st.UpsertObservations(ctx, observations); err != nil {
-		return err
-	}
-	if len(observations) > 0 {
-		fmt.Printf("collector stored observations=%d\n", len(observations))
+	if stored > 0 {
+		fmt.Printf("collector stored observations=%d\n", stored)
 	}
 	fmt.Printf("collector run complete (provider=%s reporters=%d requests=%d success=%d failed=%d)\n",
 		providerID, len(reporters), requests, success, failed,
@@ -189,7 +189,7 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 }
 
 func collectObservations(ctx context.Context, provider providers.Provider, st store.Store, providerID, reporterISO3, partnerISO3 string, flow model.Flow, historyYears int) ([]model.Observation, error) {
-	existingYears, err := existingObservationYears(ctx, st, providerID, reporterISO3, partnerISO3, flow)
+	existingKeys, err := existingObservationKeys(ctx, st, providerID, reporterISO3, partnerISO3, flow)
 	if err != nil {
 		return nil, err
 	}
@@ -199,11 +199,8 @@ func collectObservations(ctx context.Context, provider providers.Provider, st st
 		return nil, err
 	}
 	if historyYears <= 0 {
-		year, ok := yearFromPeriod(latest.PeriodType, latest.Period)
-		if ok {
-			if _, exists := existingYears[year]; exists {
-				return nil, nil
-			}
+		if _, exists := existingKeys[observationKey(latest.PeriodType, latest.Period)]; exists {
+			return nil, nil
 		}
 		return []model.Observation{latest}, nil
 	}
@@ -219,8 +216,10 @@ func collectObservations(ctx context.Context, provider providers.Provider, st st
 
 	series := make([]model.Observation, 0)
 	for targetYear := fromYear; targetYear <= year; targetYear++ {
-		if _, exists := existingYears[targetYear]; exists {
-			continue
+		if latest.PeriodType == model.PeriodYear {
+			if _, exists := existingKeys[observationKey(model.PeriodYear, fmt.Sprintf("%04d", targetYear))]; exists {
+				continue
+			}
 		}
 		fetched, err := provider.FetchSeries(ctx, reporterISO3, partnerISO3, flow, fmt.Sprintf("%04d", targetYear), fmt.Sprintf("%04d", targetYear))
 		if err != nil {
@@ -232,7 +231,7 @@ func collectObservations(ctx context.Context, provider providers.Provider, st st
 		series = append(series, fetched...)
 	}
 	if len(series) == 0 {
-		if _, exists := existingYears[year]; exists {
+		if _, exists := existingKeys[observationKey(latest.PeriodType, latest.Period)]; exists {
 			return nil, nil
 		}
 		return []model.Observation{latest}, nil
@@ -240,23 +239,19 @@ func collectObservations(ctx context.Context, provider providers.Provider, st st
 	return series, nil
 }
 
-func existingObservationYears(ctx context.Context, st store.Store, providerID, reporterISO3, partnerISO3 string, flow model.Flow) (map[int]struct{}, error) {
-	years := make(map[int]struct{})
+func existingObservationKeys(ctx context.Context, st store.Store, providerID, reporterISO3, partnerISO3 string, flow model.Flow) (map[string]struct{}, error) {
+	keys := make(map[string]struct{})
 	if st == nil {
-		return years, nil
+		return keys, nil
 	}
-	keys, err := st.ListObservationKeys(ctx, providerID, reporterISO3, partnerISO3, flow)
+	existing, err := st.ListObservationKeys(ctx, providerID, reporterISO3, partnerISO3, flow)
 	if err != nil {
 		return nil, err
 	}
-	for _, key := range keys {
-		year, ok := yearFromPeriod(key.PeriodType, key.Period)
-		if !ok {
-			continue
-		}
-		years[year] = struct{}{}
+	for _, key := range existing {
+		keys[observationKey(key.PeriodType, key.Period)] = struct{}{}
 	}
-	return years, nil
+	return keys, nil
 }
 
 func yearFromPeriod(periodType model.PeriodType, period string) (int, bool) {
@@ -339,6 +334,10 @@ func isDigits(value string) bool {
 		}
 	}
 	return true
+}
+
+func observationKey(periodType model.PeriodType, period string) string {
+	return string(periodType) + "|" + strings.TrimSpace(period)
 }
 
 func buildProvider(providerID string) (providers.Provider, error) {
