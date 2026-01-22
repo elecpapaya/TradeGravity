@@ -56,6 +56,22 @@ Comtrade provider env vars (required for API access):
 - `COMTRADE_REPORTERS_URL` (default `https://comtradeapi.un.org/files/v1/app/reference/Reporters.json`)
 - `COMTRADE_PARTNERS_URL` (default `https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json`)
 
+Local setup for `COMTRADE_PRIMARY_KEY` (this repo reads OS env vars; no `.env` loader):
+```powershell
+# PowerShell: current session
+$env:COMTRADE_PRIMARY_KEY = "YOUR_KEY"
+
+# PowerShell: persist for new terminals
+setx COMTRADE_PRIMARY_KEY "YOUR_KEY"
+```
+```bash
+# bash/zsh: current session
+export COMTRADE_PRIMARY_KEY="YOUR_KEY"
+
+# bash/zsh: persist
+echo 'export COMTRADE_PRIMARY_KEY="YOUR_KEY"' >> ~/.bashrc
+```
+
 Comtrade usage:
 ```bash
 go run ./cmd/collector run -provider comtrade -partners USA,CHN -flows export,import -allowlist configs/allowlist.csv -history-years 1
