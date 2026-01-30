@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-01-29T01:54:18Z",
+  "generated_at": "2026-01-30T02:07:28Z",
   "rows": [
     {
       "iso3": "AUT",
@@ -35,204 +35,6 @@
       "share_cn": 0.4750302997197635
     },
     {
-      "iso3": "IRL",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 58828192394.853004,
-        "import": 24795843339.46,
-        "trade": 83624035734.313,
-        "growth": {
-          "export": -0.1163040007693404,
-          "import": 0.05304919699388392,
-          "trade": -0.07205379430900151
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 9656810227.954,
-        "import": 11553221072.246,
-        "trade": 21210031300.2,
-        "growth": {
-          "export": -0.30627455069487663,
-          "import": -0.23959089762947774,
-          "trade": -0.27147460672135404
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 104834067034.513,
-      "share_cn": 0.20232002726000634
-    },
-    {
-      "iso3": "KOR",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 116290387484,
-        "import": 71731699514,
-        "trade": 188022086998,
-        "growth": {
-          "export": 0.05554919170970384,
-          "import": -0.12664784946966123,
-          "trade": -0.022267743255445727
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 124655567747,
-        "import": 142853875178,
-        "trade": 267509442925,
-        "growth": {
-          "export": -0.1998455610474419,
-          "import": -0.07583488069034776,
-          "trade": -0.1380826052863756
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 455531529923,
-      "share_cn": 0.5872468212468586
-    },
-    {
-      "iso3": "MEX",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 474696156004,
-        "import": 255946185370,
-        "trade": 730642341374,
-        "growth": {
-          "export": 0.0495297992054998,
-          "import": -0.035708463289947145,
-          "trade": 0.018007278316188077
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 9211714603,
-        "import": 114190613336,
-        "trade": 123402327939,
-        "growth": {
-          "export": -0.1473570095086736,
-          "import": -0.03793754861027696,
-          "trade": -0.047066211978098536
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 854044669313,
-      "share_cn": 0.1444916552646664
-    },
-    {
-      "iso3": "PAK",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 5010808641.874001,
-        "import": 1660091748.958,
-        "trade": 6670900390.832001,
-        "growth": {
-          "export": -0.1909095234930082,
-          "import": -0.4603434793818998,
-          "trade": -0.28032614549351126
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 2743195846.783,
-        "import": 11694818859.581999,
-        "trade": 14438014706.364998,
-        "growth": {
-          "export": 0.08513042503879821,
-          "import": -0.27499292915823853,
-          "trade": -0.22620113727791707
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 21108915097.197,
-      "share_cn": 0.6839771082447618
-    },
-    {
-      "iso3": "PER",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 9180565446.18,
-        "import": 10986462107.09,
-        "trade": 20167027553.27,
-        "growth": {
-          "export": 0.08882903404613252,
-          "import": -0.23018782053567613,
-          "trade": -0.11171025449879439
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 23155748030.08,
-        "import": 13442596716.1,
-        "trade": 36598344746.18,
-        "growth": {
-          "export": 0.32399001263283356,
-          "import": -0.14621383792185563,
-          "trade": 0.10123017238629077
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 56765372299.45,
-      "share_cn": 0.6447301103411349
-    },
-    {
-      "iso3": "AUS",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 12593054655.494001,
-        "import": 32482459444.743,
-        "trade": 45075514100.237,
-        "growth": {
-          "export": 0.018347328779071356,
-          "import": 0.045076764067215454,
-          "trade": 0.03746895917696904
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 120219456120.135,
-        "import": 71820697468.717,
-        "trade": 192040153588.852,
-        "growth": {
-          "export": 0.17455699096917776,
-          "import": -0.14224423873348446,
-          "trade": 0.03200808506372266
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 237115667689.089,
-      "share_cn": 0.8099007352000841
-    },
-    {
       "iso3": "EGY",
       "usa": {
         "period": "2023",
@@ -266,18 +68,18 @@
       "share_cn": 0.6654584529438767
     },
     {
-      "iso3": "KAZ",
+      "iso3": "FRA",
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 1509870177.22,
-        "import": 2556763288.86,
-        "trade": 4066633466.08,
+        "export": 45541269778.089005,
+        "import": 43554622586.681,
+        "trade": 89095892364.77,
         "growth": {
-          "export": 0.4199374108816316,
-          "import": 3.8465014163434255,
-          "trade": 1.5562099786342671
+          "export": -0.07231146442937261,
+          "import": -0.2266452186142208,
+          "trade": -0.15476965470617207
         },
         "growth_basis": "yoy"
       },
@@ -285,117 +87,18 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 14758685491.52,
-        "import": 16772250496.130001,
-        "trade": 31530935987.65,
+        "export": 26640063060.194,
+        "import": 44858574684.799,
+        "trade": 71498637744.99301,
         "growth": {
-          "export": 0.410725389199689,
-          "import": 3.6915375595952598,
-          "trade": 1.2463097076433158
+          "export": 0.06698285906707936,
+          "import": -0.13318717218792162,
+          "trade": -0.06804309666905096
         },
         "growth_basis": "yoy"
       },
-      "total": 35597569453.73,
-      "share_cn": 0.8857609233302897
-    },
-    {
-      "iso3": "NGA",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 4860249603.019,
-        "import": 4039949908.527,
-        "trade": 8900199511.546,
-        "growth": {
-          "export": 0.10249448759022974,
-          "import": 0.196523489865112,
-          "trade": 0.14327644754426982
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 1614309617.5049999,
-        "import": 11952933159.455,
-        "trade": 13567242776.96,
-        "growth": {
-          "export": 0.9354855405758631,
-          "import": -0.13179391952242323,
-          "trade": -0.07082913523376465
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 22467442288.505997,
-      "share_cn": 0.603862362379397
-    },
-    {
-      "iso3": "RUS",
-      "usa": {
-        "period": "2021",
-        "period_type": "Y",
-        "prev_period": "2020",
-        "export": 17747760834.91,
-        "import": 17265493914.25,
-        "trade": 35013254749.16,
-        "growth": {
-          "export": 0.6195586430085316,
-          "import": 0.3066664470320252,
-          "trade": 0.4485176157454488
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2021",
-        "period_type": "Y",
-        "prev_period": "2020",
-        "export": 68679248077.439995,
-        "import": 72693024875.22,
-        "trade": 141372272952.66,
-        "growth": {
-          "export": 0.3974438835998467,
-          "import": 0.3237753065675267,
-          "trade": 0.3585682076592082
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 176385527701.82,
-      "share_cn": 0.8014958755099797
-    },
-    {
-      "iso3": "TUR",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 14880287289,
-        "import": 15779737081,
-        "trade": 30660024370,
-        "growth": {
-          "export": -0.11878689087481548,
-          "import": 0.03621918691611428,
-          "trade": -0.04528507351024821
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 3306083517,
-        "import": 45047968463,
-        "trade": 48354051980,
-        "growth": {
-          "export": 0.007542132117519416,
-          "import": 0.08931075805064455,
-          "trade": 0.0832996706548372
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 79014076350,
-      "share_cn": 0.6119675659538353
+      "total": 160594530109.763,
+      "share_cn": 0.4452121606889424
     },
     {
       "iso3": "HUN",
@@ -429,869 +132,6 @@
       },
       "total": 20577300167,
       "share_cn": 0.5695209247029497
-    },
-    {
-      "iso3": "IND",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 75805285416.116,
-        "import": 42116442605.924,
-        "trade": 117921728022.04001,
-        "growth": {
-          "export": -0.055152651174394,
-          "import": -0.18650893137461008,
-          "trade": -0.1066716052000703
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 16245421866.688,
-        "import": 121967409566.587,
-        "trade": 138212831433.275,
-        "growth": {
-          "export": 0.07696833945353868,
-          "import": 0.19284487147041443,
-          "trade": 0.17794778893594854
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 256134559455.315,
-      "share_cn": 0.5396102413012621
-    },
-    {
-      "iso3": "MYS",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 35455220162.676,
-        "import": 19528114542.848,
-        "trade": 54983334705.524,
-        "growth": {
-          "export": -0.06759340265768755,
-          "import": -0.144616707337441,
-          "trade": -0.09648850936767324
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 42145127266.666,
-        "import": 56708868760.368,
-        "trade": 98853996027.034,
-        "growth": {
-          "export": -0.11909531020161973,
-          "import": -0.09517835742764791,
-          "trade": -0.10553204015060927
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 153837330732.55798,
-      "share_cn": 0.6425878267407602
-    },
-    {
-      "iso3": "NLD",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 36524065340.681,
-        "import": 69198311981.61601,
-        "trade": 105722377322.29701,
-        "growth": {
-          "export": 0.006760263316754075,
-          "import": 0.14803005853944207,
-          "trade": 0.09495019403518555
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 19402904224.834,
-        "import": 54442824584.94,
-        "trade": 73845728809.774,
-        "growth": {
-          "export": 0.25522071901303145,
-          "import": -0.1953033626705998,
-          "trade": -0.11151379300936604
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 179568106132.071,
-      "share_cn": 0.41124078434875855
-    },
-    {
-      "iso3": "ARG",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 5648061872.45,
-        "import": 8629761280.039999,
-        "trade": 14277823152.489998,
-        "growth": {
-          "export": -0.157123472292632,
-          "import": -0.164557908161859,
-          "trade": -0.16163270634730437
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 5173514945.26,
-        "import": 14477565628.23,
-        "trade": 19651080573.489998,
-        "growth": {
-          "export": -0.3475005351804983,
-          "import": -0.17280101225207214,
-          "trade": -0.22726874636962277
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 33928903725.979996,
-      "share_cn": 0.5791840706731352
-    },
-    {
-      "iso3": "COL",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 14112815360.42,
-        "import": 16181689265.44,
-        "trade": 30294504625.86,
-        "growth": {
-          "export": -0.08270853937588803,
-          "import": -0.14791478451911164,
-          "trade": -0.11873110219480844
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 2469306485.48,
-        "import": 13566844921.210001,
-        "trade": 16036151406.69,
-        "growth": {
-          "export": 0.14649329594077534,
-          "import": -0.2744514140358953,
-          "trade": -0.23097339478859638
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 46330656032.55,
-      "share_cn": 0.3461239874398425
-    },
-    {
-      "iso3": "POL",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 11839090711,
-        "import": 16215489876,
-        "trade": 28054580587,
-        "growth": {
-          "export": 0.09164996837288181,
-          "import": -0.014911123489234302,
-          "trade": 0.027411669193386837
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 3309540978,
-        "import": 51523648202,
-        "trade": 54833189180,
-        "growth": {
-          "export": 0.052255133993994486,
-          "import": -0.09429137747921286,
-          "trade": -0.08661364086420086
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 82887769767,
-      "share_cn": 0.6615353427186874
-    },
-    {
-      "iso3": "USA",
-      "usa": {
-        "period": "",
-        "period_type": "",
-        "export": 0,
-        "import": 0,
-        "trade": 0
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 147805519996,
-        "import": 448017376384,
-        "trade": 595822896380,
-        "growth": {
-          "export": -0.03920709283314817,
-          "import": -0.22177063716583892,
-          "trade": -0.1832729466290748
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 595822896380,
-      "share_cn": 1
-    },
-    {
-      "iso3": "VNM",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 97071533042.63701,
-        "import": 13826835117.851,
-        "trade": 110898368160.488,
-        "growth": {
-          "export": -0.11317450806786054,
-          "import": -0.0449146843206357,
-          "trade": -0.10520106159322037
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 60574277766.053,
-        "import": 110654552124.605,
-        "trade": 171228829890.658,
-        "growth": {
-          "export": 0.050218301786177415,
-          "import": -0.05946885666959131,
-          "trade": -0.02338517248985761
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 282127198051.146,
-      "share_cn": 0.6069206764659976
-    },
-    {
-      "iso3": "ARE",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 13544960705.268,
-        "import": 26869233419.732002,
-        "trade": 40414194125,
-        "growth": {
-          "export": 0.17569139168898154,
-          "import": 0.2546709972448902,
-          "trade": 0.22704450391177167
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 9293878219.800999,
-        "import": 77419156210.18199,
-        "trade": 86713034429.98299,
-        "growth": {
-          "export": -0.08031590464495324,
-          "import": 0.15180882708446483,
-          "trade": 0.1214710742626464
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 127127228554.98299,
-      "share_cn": 0.6820964746547533
-    },
-    {
-      "iso3": "BRA",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 37451904934,
-        "import": 40190737125,
-        "trade": 77642642059,
-        "growth": {
-          "export": -0.018229786491595977,
-          "import": -0.26022581701274206,
-          "trade": -0.1603995945467026
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 104324811805,
-        "import": 55980490153,
-        "trade": 160305301958,
-        "growth": {
-          "export": 0.16279639420439412,
-          "import": -0.17393697041788372,
-          "trade": 0.01789728070740409
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 237947944017,
-      "share_cn": 0.6736990421171578
-    },
-    {
-      "iso3": "CHN",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 501220722660,
-        "import": 165157213513,
-        "trade": 666377936173,
-        "growth": {
-          "export": -0.13991339769980973,
-          "import": -0.07711142442913763,
-          "trade": -0.12515870279860783
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "",
-        "period_type": "",
-        "export": 0,
-        "import": 0,
-        "trade": 0
-      },
-      "total": 666377936173,
-      "share_cn": 0
-    },
-    {
-      "iso3": "GBR",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 71907676265.292,
-        "import": 94925884758.224,
-        "trade": 166833561023.516,
-        "growth": {
-          "export": 0.11308136613166204,
-          "import": -0.029534098001468785,
-          "trade": 0.0271920358646137
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 34286412813.993,
-        "import": 99220998768.775,
-        "trade": 133507411582.76799,
-        "growth": {
-          "export": -0.035644460780043324,
-          "import": -0.10068009209977252,
-          "trade": -0.08482996880533793
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 300340972606.284,
-      "share_cn": 0.4445194753956611
-    },
-    {
-      "iso3": "GRC",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 2289041402.935,
-        "import": 1622753312.0879998,
-        "trade": 3911794715.023,
-        "growth": {
-          "export": -0.02115910318870682,
-          "import": -0.5539276244538607,
-          "trade": -0.3454588608408517
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 415890316.138,
-        "import": 7461352914.941,
-        "trade": 7877243231.079,
-        "growth": {
-          "export": -0.03132978042228353,
-          "import": -0.10400530844345443,
-          "trade": -0.10044206134119285
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 11789037946.102001,
-      "share_cn": 0.6681837200874885
-    },
-    {
-      "iso3": "SWE",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 17089983280.684002,
-        "import": 7160126749.575,
-        "trade": 24250110030.259003,
-        "growth": {
-          "export": -0.02649298796062552,
-          "import": -0.024121531517992668,
-          "trade": -0.025793987891780355
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 7183840714.150001,
-        "import": 11054665018.998001,
-        "trade": 18238505733.148003,
-        "growth": {
-          "export": 0.026241813616501283,
-          "import": -0.22809060461101693,
-          "trade": -0.14458911408484793
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 42488615763.407005,
-      "share_cn": 0.42925629384367414
-    },
-    {
-      "iso3": "ZAF",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 8319539966.328,
-        "import": 9200012422.965,
-        "trade": 17519552389.293,
-        "growth": {
-          "export": -0.22453100978277785,
-          "import": 0.12146539426460869,
-          "trade": -0.07460447183243399
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 12482432179.635,
-        "import": 21914518794.096,
-        "trade": 34396950973.731,
-        "growth": {
-          "export": 0.06733426798559382,
-          "import": -0.024354454700271543,
-          "trade": 0.007039143013312075
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 51916503363.024,
-      "share_cn": 0.6625436758175285
-    },
-    {
-      "iso3": "BGD",
-      "usa": {
-        "period": "2015",
-        "period_type": "Y",
-        "export": 6139352462,
-        "import": 978438641,
-        "trade": 7117791103
-      },
-      "chn": {
-        "period": "2015",
-        "period_type": "Y",
-        "export": 715214100,
-        "import": 10349332537,
-        "trade": 11064546637
-      },
-      "total": 18182337740,
-      "share_cn": 0.6085326757878164
-    },
-    {
-      "iso3": "CZE",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 5952848674,
-        "import": 6437626663,
-        "trade": 12390475337,
-        "growth": {
-          "export": -0.027678394562681438,
-          "import": 0.048149314723749226,
-          "trade": 0.010296034175450186
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 2611518329,
-        "import": 40293224988,
-        "trade": 42904743317,
-        "growth": {
-          "export": -0.04105707654684018,
-          "import": -0.0916096568633282,
-          "trade": -0.08868545978387139
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 55295218654,
-      "share_cn": 0.7759213972092018
-    },
-    {
-      "iso3": "DEU",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 173071201815.456,
-        "import": 102050993414.79901,
-        "trade": 275122195230.255,
-        "growth": {
-          "export": 0.0397498012266735,
-          "import": 0.017235245822960682,
-          "trade": 0.03128315316190758
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 106869688999.974,
-        "import": 175604709805.68298,
-        "trade": 282474398805.657,
-        "growth": {
-          "export": -0.062315489274745506,
-          "import": -0.15498599866884044,
-          "trade": -0.12216332287910203
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 557596594035.912,
-      "share_cn": 0.5065927622711845
-    },
-    {
-      "iso3": "DNK",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 6458701038.5130005,
-        "import": 5570876681.686,
-        "trade": 12029577720.199001,
-        "growth": {
-          "export": 0.11638318544001741,
-          "import": 0.1781278068426642,
-          "trade": 0.14415241099714168
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 3354700695.092,
-        "import": 7866136418.502,
-        "trade": 11220837113.594,
-        "growth": {
-          "export": -0.03143424528176185,
-          "import": -0.2098846388134495,
-          "trade": -0.16382572149308855
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 23250414833.793,
-      "share_cn": 0.4826080392030351
-    },
-    {
-      "iso3": "ESP",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 19690852031.073,
-        "import": 30500024618.179,
-        "trade": 50190876649.252,
-        "growth": {
-          "export": -0.008570767946360852,
-          "import": -0.1419077701557629,
-          "trade": -0.09411040395080067
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 8042715438.128,
-        "import": 47555396152.749,
-        "trade": 55598111590.877,
-        "growth": {
-          "export": -0.03238939636127985,
-          "import": -0.08898946197712987,
-          "trade": -0.08121495431682758
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 105788988240.129,
-      "share_cn": 0.5255567003313766
-    },
-    {
-      "iso3": "IDN",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 23284563053.391,
-        "import": 11337694391,
-        "trade": 34622257444.391,
-        "growth": {
-          "export": -0.17547919049376973,
-          "import": -0.029547178050425896,
-          "trade": -0.132774296245261
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 64934538026.315,
-        "import": 62880883428,
-        "trade": 127815421454.315,
-        "growth": {
-          "export": -0.015010686985047783,
-          "import": -0.07150828332756534,
-          "trade": -0.043639858703788455
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 162437678898.706,
-      "share_cn": 0.7868582112283138
-    },
-    {
-      "iso3": "ITA",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 72742094844.705,
-        "import": 27218356598.155,
-        "trade": 99960451442.86,
-        "growth": {
-          "export": 0.06129456017721564,
-          "import": 0.037774538438307366,
-          "trade": 0.05478528754238305
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 20729621690.914,
-        "import": 51456310004.47099,
-        "trade": 72185931695.385,
-        "growth": {
-          "export": 0.19889293243838088,
-          "import": -0.15558663939471415,
-          "trade": -0.07723644937329927
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 172146383138.245,
-      "share_cn": 0.4193287734509931
-    },
-    {
-      "iso3": "CHL",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 14307677666.935001,
-        "import": 17160490877.531,
-        "trade": 31468168544.466003,
-        "growth": {
-          "export": 0.05126603072114357,
-          "import": -0.21466211954673703,
-          "trade": -0.11259888404273605
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 37449226454.102005,
-        "import": 19830053848.045,
-        "trade": 57279280302.147,
-        "growth": {
-          "export": -0.03736488833420461,
-          "import": -0.2491577550719163,
-          "trade": -0.12300659220456282
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 88747448846.613,
-      "share_cn": 0.645418894250649
-    },
-    {
-      "iso3": "FIN",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 9069264520.941,
-        "import": 4464419901.518001,
-        "trade": 13533684422.459,
-        "growth": {
-          "export": 0.12485759643612655,
-          "import": 0.026243630281020773,
-          "trade": 0.0902969591295662
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 3705636170.073,
-        "import": 7742425870.599,
-        "trade": 11448062040.672,
-        "growth": {
-          "export": -0.0834929752850895,
-          "import": -0.12560318318375627,
-          "trade": -0.11240243668031115
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 24981746463.131,
-      "share_cn": 0.45825707412279926
-    },
-    {
-      "iso3": "ISR",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 17332451000,
-        "import": 9686393000,
-        "trade": 27018844000,
-        "growth": {
-          "export": -0.06931550451994721,
-          "import": 0.0030582404632561724,
-          "trade": -0.044601987744286226
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 3399990000,
-        "import": 16329326000,
-        "trade": 19729316000,
-        "growth": {
-          "export": -0.26587099804051756,
-          "import": 0.2416966001658604,
-          "trade": 0.10950159381802295
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 46748160000,
-      "share_cn": 0.42203406508405894
-    },
-    {
-      "iso3": "JPN",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 145131057968.98,
-        "import": 76044028014.669,
-        "trade": 221175085983.64902,
-        "growth": {
-          "export": 0.03837431524618969,
-          "import": -0.16145169472809273,
-          "trade": -0.04025905044698983
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 126439830027.31999,
-        "import": 168056752298.053,
-        "trade": 294496582325.373,
-        "growth": {
-          "export": -0.1252205557511784,
-          "import": -0.11014085669197834,
-          "trade": -0.11667843019929373
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 515671668309.022,
-      "share_cn": 0.5710931982962706
-    },
-    {
-      "iso3": "NOR",
-      "usa": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 5740143961.906,
-        "import": 7350608729.917,
-        "trade": 13090752691.823,
-        "growth": {
-          "export": 0.12095080683581286,
-          "import": 0.13154301405546484,
-          "trade": 0.12687391158379277
-        },
-        "growth_basis": "yoy"
-      },
-      "chn": {
-        "period": "2023",
-        "period_type": "Y",
-        "prev_period": "2022",
-        "export": 3559303912.712,
-        "import": 10830577840.71,
-        "trade": 14389881753.421999,
-        "growth": {
-          "export": -0.3169918407225305,
-          "import": -0.1573765850549375,
-          "trade": -0.20342182656898952
-        },
-        "growth_basis": "yoy"
-      },
-      "total": 27480634445.245,
-      "share_cn": 0.5236371737375188
     },
     {
       "iso3": "NZL",
@@ -1360,6 +200,494 @@
       "share_cn": 0.44425944329772676
     },
     {
+      "iso3": "USA",
+      "usa": {
+        "period": "",
+        "period_type": "",
+        "export": 0,
+        "import": 0,
+        "trade": 0
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 147805519996,
+        "import": 448017376384,
+        "trade": 595822896380,
+        "growth": {
+          "export": -0.03920709283314817,
+          "import": -0.22177063716583892,
+          "trade": -0.1832729466290748
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 595822896380,
+      "share_cn": 1
+    },
+    {
+      "iso3": "ARE",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 13544960705.268,
+        "import": 26869233419.732002,
+        "trade": 40414194125,
+        "growth": {
+          "export": 0.17569139168898154,
+          "import": 0.2546709972448902,
+          "trade": 0.22704450391177167
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 9293878219.800999,
+        "import": 77419156210.18199,
+        "trade": 86713034429.98299,
+        "growth": {
+          "export": -0.08031590464495324,
+          "import": 0.15180882708446483,
+          "trade": 0.1214710742626464
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 127127228554.98299,
+      "share_cn": 0.6820964746547533
+    },
+    {
+      "iso3": "GBR",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 71907676265.292,
+        "import": 94925884758.224,
+        "trade": 166833561023.516,
+        "growth": {
+          "export": 0.11308136613166204,
+          "import": -0.029534098001468785,
+          "trade": 0.0271920358646137
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 34286412813.993,
+        "import": 99220998768.775,
+        "trade": 133507411582.76799,
+        "growth": {
+          "export": -0.035644460780043324,
+          "import": -0.10068009209977252,
+          "trade": -0.08482996880533793
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 300340972606.284,
+      "share_cn": 0.4445194753956611
+    },
+    {
+      "iso3": "MEX",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 474696156004,
+        "import": 255946185370,
+        "trade": 730642341374,
+        "growth": {
+          "export": 0.0495297992054998,
+          "import": -0.035708463289947145,
+          "trade": 0.018007278316188077
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 9211714603,
+        "import": 114190613336,
+        "trade": 123402327939,
+        "growth": {
+          "export": -0.1473570095086736,
+          "import": -0.03793754861027696,
+          "trade": -0.047066211978098536
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 854044669313,
+      "share_cn": 0.1444916552646664
+    },
+    {
+      "iso3": "MYS",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 35455220162.676,
+        "import": 19528114542.848,
+        "trade": 54983334705.524,
+        "growth": {
+          "export": -0.06759340265768755,
+          "import": -0.144616707337441,
+          "trade": -0.09648850936767324
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 42145127266.666,
+        "import": 56708868760.368,
+        "trade": 98853996027.034,
+        "growth": {
+          "export": -0.11909531020161973,
+          "import": -0.09517835742764791,
+          "trade": -0.10553204015060927
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 153837330732.55798,
+      "share_cn": 0.6425878267407602
+    },
+    {
+      "iso3": "PER",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 9180565446.18,
+        "import": 10986462107.09,
+        "trade": 20167027553.27,
+        "growth": {
+          "export": 0.08882903404613252,
+          "import": -0.23018782053567613,
+          "trade": -0.11171025449879439
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 23155748030.08,
+        "import": 13442596716.1,
+        "trade": 36598344746.18,
+        "growth": {
+          "export": 0.32399001263283356,
+          "import": -0.14621383792185563,
+          "trade": 0.10123017238629077
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 56765372299.45,
+      "share_cn": 0.6447301103411349
+    },
+    {
+      "iso3": "CHL",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 14307677666.935001,
+        "import": 17160490877.531,
+        "trade": 31468168544.466003,
+        "growth": {
+          "export": 0.05126603072114357,
+          "import": -0.21466211954673703,
+          "trade": -0.11259888404273605
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 37449226454.102005,
+        "import": 19830053848.045,
+        "trade": 57279280302.147,
+        "growth": {
+          "export": -0.03736488833420461,
+          "import": -0.2491577550719163,
+          "trade": -0.12300659220456282
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 88747448846.613,
+      "share_cn": 0.645418894250649
+    },
+    {
+      "iso3": "NOR",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 5740143961.906,
+        "import": 7350608729.917,
+        "trade": 13090752691.823,
+        "growth": {
+          "export": 0.12095080683581286,
+          "import": 0.13154301405546484,
+          "trade": 0.12687391158379277
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 3559303912.712,
+        "import": 10830577840.71,
+        "trade": 14389881753.421999,
+        "growth": {
+          "export": -0.3169918407225305,
+          "import": -0.1573765850549375,
+          "trade": -0.20342182656898952
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 27480634445.245,
+      "share_cn": 0.5236371737375188
+    },
+    {
+      "iso3": "ZAF",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 8319539966.328,
+        "import": 9200012422.965,
+        "trade": 17519552389.293,
+        "growth": {
+          "export": -0.22453100978277785,
+          "import": 0.12146539426460869,
+          "trade": -0.07460447183243399
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 12482432179.635,
+        "import": 21914518794.096,
+        "trade": 34396950973.731,
+        "growth": {
+          "export": 0.06733426798559382,
+          "import": -0.024354454700271543,
+          "trade": 0.007039143013312075
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 51916503363.024,
+      "share_cn": 0.6625436758175285
+    },
+    {
+      "iso3": "ARG",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 5648061872.45,
+        "import": 8629761280.039999,
+        "trade": 14277823152.489998,
+        "growth": {
+          "export": -0.157123472292632,
+          "import": -0.164557908161859,
+          "trade": -0.16163270634730437
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 5173514945.26,
+        "import": 14477565628.23,
+        "trade": 19651080573.489998,
+        "growth": {
+          "export": -0.3475005351804983,
+          "import": -0.17280101225207214,
+          "trade": -0.22726874636962277
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 33928903725.979996,
+      "share_cn": 0.5791840706731352
+    },
+    {
+      "iso3": "GRC",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 2289041402.935,
+        "import": 1622753312.0879998,
+        "trade": 3911794715.023,
+        "growth": {
+          "export": -0.02115910318870682,
+          "import": -0.5539276244538607,
+          "trade": -0.3454588608408517
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 415890316.138,
+        "import": 7461352914.941,
+        "trade": 7877243231.079,
+        "growth": {
+          "export": -0.03132978042228353,
+          "import": -0.10400530844345443,
+          "trade": -0.10044206134119285
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 11789037946.102001,
+      "share_cn": 0.6681837200874885
+    },
+    {
+      "iso3": "IND",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 75805285416.116,
+        "import": 42116442605.924,
+        "trade": 117921728022.04001,
+        "growth": {
+          "export": -0.055152651174394,
+          "import": -0.18650893137461008,
+          "trade": -0.1066716052000703
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 16245421866.688,
+        "import": 121967409566.587,
+        "trade": 138212831433.275,
+        "growth": {
+          "export": 0.07696833945353868,
+          "import": 0.19284487147041443,
+          "trade": 0.17794778893594854
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 256134559455.315,
+      "share_cn": 0.5396102413012621
+    },
+    {
+      "iso3": "JPN",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 145131057968.98,
+        "import": 76044028014.669,
+        "trade": 221175085983.64902,
+        "growth": {
+          "export": 0.03837431524618969,
+          "import": -0.16145169472809273,
+          "trade": -0.04025905044698983
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 126439830027.31999,
+        "import": 168056752298.053,
+        "trade": 294496582325.373,
+        "growth": {
+          "export": -0.1252205557511784,
+          "import": -0.11014085669197834,
+          "trade": -0.11667843019929373
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 515671668309.022,
+      "share_cn": 0.5710931982962706
+    },
+    {
+      "iso3": "NGA",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 4860249603.019,
+        "import": 4039949908.527,
+        "trade": 8900199511.546,
+        "growth": {
+          "export": 0.10249448759022974,
+          "import": 0.196523489865112,
+          "trade": 0.14327644754426982
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 1614309617.5049999,
+        "import": 11952933159.455,
+        "trade": 13567242776.96,
+        "growth": {
+          "export": 0.9354855405758631,
+          "import": -0.13179391952242323,
+          "trade": -0.07082913523376465
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 22467442288.505997,
+      "share_cn": 0.603862362379397
+    },
+    {
+      "iso3": "PAK",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 5010808641.874001,
+        "import": 1660091748.958,
+        "trade": 6670900390.832001,
+        "growth": {
+          "export": -0.1909095234930082,
+          "import": -0.4603434793818998,
+          "trade": -0.28032614549351126
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 2743195846.783,
+        "import": 11694818859.581999,
+        "trade": 14438014706.364998,
+        "growth": {
+          "export": 0.08513042503879821,
+          "import": -0.27499292915823853,
+          "trade": -0.22620113727791707
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 21108915097.197,
+      "share_cn": 0.6839771082447618
+    },
+    {
       "iso3": "SGP",
       "usa": {
         "period": "2023",
@@ -1393,18 +721,18 @@
       "share_cn": 0.5618624100232841
     },
     {
-      "iso3": "BEL",
+      "iso3": "SWE",
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 27717334728.906,
-        "import": 27982351634.58,
-        "trade": 55699686363.486,
+        "export": 17089983280.684002,
+        "import": 7160126749.575,
+        "trade": 24250110030.259003,
         "growth": {
-          "export": -0.11512352409223066,
-          "import": 0.12051481563518453,
-          "trade": -0.010595244003535162
+          "export": -0.02649298796062552,
+          "import": -0.024121531517992668,
+          "trade": -0.025793987891780355
         },
         "growth_basis": "yoy"
       },
@@ -1412,32 +740,51 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 6804179148.189,
-        "import": 14237893001.577,
-        "trade": 21042072149.766,
+        "export": 7183840714.150001,
+        "import": 11054665018.998001,
+        "trade": 18238505733.148003,
         "growth": {
-          "export": 0.07625642578905026,
-          "import": -0.10706505490613019,
-          "trade": -0.05501645146302287
+          "export": 0.026241813616501283,
+          "import": -0.22809060461101693,
+          "trade": -0.14458911408484793
         },
         "growth_basis": "yoy"
       },
-      "total": 76741758513.252,
-      "share_cn": 0.2741932496390787
+      "total": 42488615763.407005,
+      "share_cn": 0.42925629384367414
     },
     {
-      "iso3": "CAN",
+      "iso3": "BGD",
+      "usa": {
+        "period": "2015",
+        "period_type": "Y",
+        "export": 6139352462,
+        "import": 978438641,
+        "trade": 7117791103
+      },
+      "chn": {
+        "period": "2015",
+        "period_type": "Y",
+        "export": 715214100,
+        "import": 10349332537,
+        "trade": 11064546637
+      },
+      "total": 18182337740,
+      "share_cn": 0.6085326757878164
+    },
+    {
+      "iso3": "BRA",
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 438650206291.982,
-        "import": 276807213354.706,
-        "trade": 715457419646.688,
+        "export": 37451904934,
+        "import": 40190737125,
+        "trade": 77642642059,
         "growth": {
-          "export": -0.04389679405734406,
-          "import": -0.016704061487907994,
-          "trade": -0.03355636046580749
+          "export": -0.018229786491595977,
+          "import": -0.26022581701274206,
+          "trade": -0.1603995945467026
         },
         "growth_basis": "yoy"
       },
@@ -1445,18 +792,150 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 22612235334.833,
-        "import": 66087387913.469,
-        "trade": 88699623248.302,
+        "export": 104324811805,
+        "import": 55980490153,
+        "trade": 160305301958,
         "growth": {
-          "export": 0.024491020741101963,
-          "import": -0.1423334944623411,
-          "trade": -0.10518808098632174
+          "export": 0.16279639420439412,
+          "import": -0.17393697041788372,
+          "trade": 0.01789728070740409
         },
         "growth_basis": "yoy"
       },
-      "total": 804157042894.99,
-      "share_cn": 0.11030136965409224
+      "total": 237947944017,
+      "share_cn": 0.6736990421171578
+    },
+    {
+      "iso3": "CZE",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 5952848674,
+        "import": 6437626663,
+        "trade": 12390475337,
+        "growth": {
+          "export": -0.027678394562681438,
+          "import": 0.048149314723749226,
+          "trade": 0.010296034175450186
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 2611518329,
+        "import": 40293224988,
+        "trade": 42904743317,
+        "growth": {
+          "export": -0.04105707654684018,
+          "import": -0.0916096568633282,
+          "trade": -0.08868545978387139
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 55295218654,
+      "share_cn": 0.7759213972092018
+    },
+    {
+      "iso3": "DNK",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 6458701038.5130005,
+        "import": 5570876681.686,
+        "trade": 12029577720.199001,
+        "growth": {
+          "export": 0.11638318544001741,
+          "import": 0.1781278068426642,
+          "trade": 0.14415241099714168
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 3354700695.092,
+        "import": 7866136418.502,
+        "trade": 11220837113.594,
+        "growth": {
+          "export": -0.03143424528176185,
+          "import": -0.2098846388134495,
+          "trade": -0.16382572149308855
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 23250414833.793,
+      "share_cn": 0.4826080392030351
+    },
+    {
+      "iso3": "IRL",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 58828192394.853004,
+        "import": 24795843339.46,
+        "trade": 83624035734.313,
+        "growth": {
+          "export": -0.1163040007693404,
+          "import": 0.05304919699388392,
+          "trade": -0.07205379430900151
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 9656810227.954,
+        "import": 11553221072.246,
+        "trade": 21210031300.2,
+        "growth": {
+          "export": -0.30627455069487663,
+          "import": -0.23959089762947774,
+          "trade": -0.27147460672135404
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 104834067034.513,
+      "share_cn": 0.20232002726000634
+    },
+    {
+      "iso3": "AUS",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 12593054655.494001,
+        "import": 32482459444.743,
+        "trade": 45075514100.237,
+        "growth": {
+          "export": 0.018347328779071356,
+          "import": 0.045076764067215454,
+          "trade": 0.03746895917696904
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 120219456120.135,
+        "import": 71820697468.717,
+        "trade": 192040153588.852,
+        "growth": {
+          "export": 0.17455699096917776,
+          "import": -0.14224423873348446,
+          "trade": 0.03200808506372266
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 237115667689.089,
+      "share_cn": 0.8099007352000841
     },
     {
       "iso3": "CHE",
@@ -1492,18 +971,18 @@
       "share_cn": 0.4063658145548992
     },
     {
-      "iso3": "FRA",
+      "iso3": "DEU",
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 45541269778.089005,
-        "import": 43554622586.681,
-        "trade": 89095892364.77,
+        "export": 173071201815.456,
+        "import": 102050993414.79901,
+        "trade": 275122195230.255,
         "growth": {
-          "export": -0.07231146442937261,
-          "import": -0.2266452186142208,
-          "trade": -0.15476965470617207
+          "export": 0.0397498012266735,
+          "import": 0.017235245822960682,
+          "trade": 0.03128315316190758
         },
         "growth_basis": "yoy"
       },
@@ -1511,18 +990,84 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 26640063060.194,
-        "import": 44858574684.799,
-        "trade": 71498637744.99301,
+        "export": 106869688999.974,
+        "import": 175604709805.68298,
+        "trade": 282474398805.657,
         "growth": {
-          "export": 0.06698285906707936,
-          "import": -0.13318717218792162,
-          "trade": -0.06804309666905096
+          "export": -0.062315489274745506,
+          "import": -0.15498599866884044,
+          "trade": -0.12216332287910203
         },
         "growth_basis": "yoy"
       },
-      "total": 160594530109.763,
-      "share_cn": 0.4452121606889424
+      "total": 557596594035.912,
+      "share_cn": 0.5065927622711845
+    },
+    {
+      "iso3": "ISR",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 17332451000,
+        "import": 9686393000,
+        "trade": 27018844000,
+        "growth": {
+          "export": -0.06931550451994721,
+          "import": 0.0030582404632561724,
+          "trade": -0.044601987744286226
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 3399990000,
+        "import": 16329326000,
+        "trade": 19729316000,
+        "growth": {
+          "export": -0.26587099804051756,
+          "import": 0.2416966001658604,
+          "trade": 0.10950159381802295
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 46748160000,
+      "share_cn": 0.42203406508405894
+    },
+    {
+      "iso3": "NLD",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 36524065340.681,
+        "import": 69198311981.61601,
+        "trade": 105722377322.29701,
+        "growth": {
+          "export": 0.006760263316754075,
+          "import": 0.14803005853944207,
+          "trade": 0.09495019403518555
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 19402904224.834,
+        "import": 54442824584.94,
+        "trade": 73845728809.774,
+        "growth": {
+          "export": 0.25522071901303145,
+          "import": -0.1953033626705998,
+          "trade": -0.11151379300936604
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 179568106132.071,
+      "share_cn": 0.41124078434875855
     },
     {
       "iso3": "PHL",
@@ -1558,18 +1103,18 @@
       "share_cn": 0.6693341776892344
     },
     {
-      "iso3": "SAU",
+      "iso3": "TUR",
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 2758936586.7599998,
-        "import": 18901072632.539997,
-        "trade": 21660009219.299995,
+        "export": 14880287289,
+        "import": 15779737081,
+        "trade": 30660024370,
         "growth": {
-          "export": -0.1672797525350517,
-          "import": 0.0861811593730638,
-          "trade": 0.04564170974279232
+          "export": -0.11878689087481548,
+          "import": 0.03621918691611428,
+          "trade": -0.04528507351024821
         },
         "growth_basis": "yoy"
       },
@@ -1577,18 +1122,275 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 7610500551.071,
-        "import": 43346593974.201996,
-        "trade": 50957094525.272995,
+        "export": 3306083517,
+        "import": 45047968463,
+        "trade": 48354051980,
         "growth": {
-          "export": -0.23626217774703012,
-          "import": 0.08911375165992347,
-          "trade": 0.02396095192319335
+          "export": 0.007542132117519416,
+          "import": 0.08931075805064455,
+          "trade": 0.0832996706548372
         },
         "growth_basis": "yoy"
       },
-      "total": 72617103744.573,
-      "share_cn": 0.701723036276853
+      "total": 79014076350,
+      "share_cn": 0.6119675659538353
+    },
+    {
+      "iso3": "UKR",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 521249747.44,
+        "import": 2866877335.67,
+        "trade": 3388127083.11,
+        "growth": {
+          "export": -0.41614618296317174,
+          "import": 0.317717188012959,
+          "trade": 0.104194992300495
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 2406413384.9900002,
+        "import": 10441798784.800001,
+        "trade": 12848212169.79,
+        "growth": {
+          "export": -0.03339293393352923,
+          "import": 0.20592699631131572,
+          "trade": 0.15248393620322037
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 16236339252.900002,
+      "share_cn": 0.7913244463338717
+    },
+    {
+      "iso3": "BEL",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 27717334728.906,
+        "import": 27982351634.58,
+        "trade": 55699686363.486,
+        "growth": {
+          "export": -0.11512352409223066,
+          "import": 0.12051481563518453,
+          "trade": -0.010595244003535162
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 6804179148.189,
+        "import": 14237893001.577,
+        "trade": 21042072149.766,
+        "growth": {
+          "export": 0.07625642578905026,
+          "import": -0.10706505490613019,
+          "trade": -0.05501645146302287
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 76741758513.252,
+      "share_cn": 0.2741932496390787
+    },
+    {
+      "iso3": "VNM",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 97071533042.63701,
+        "import": 13826835117.851,
+        "trade": 110898368160.488,
+        "growth": {
+          "export": -0.11317450806786054,
+          "import": -0.0449146843206357,
+          "trade": -0.10520106159322037
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 60574277766.053,
+        "import": 110654552124.605,
+        "trade": 171228829890.658,
+        "growth": {
+          "export": 0.050218301786177415,
+          "import": -0.05946885666959131,
+          "trade": -0.02338517248985761
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 282127198051.146,
+      "share_cn": 0.6069206764659976
+    },
+    {
+      "iso3": "CHN",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 501220722660,
+        "import": 165157213513,
+        "trade": 666377936173,
+        "growth": {
+          "export": -0.13991339769980973,
+          "import": -0.07711142442913763,
+          "trade": -0.12515870279860783
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "",
+        "period_type": "",
+        "export": 0,
+        "import": 0,
+        "trade": 0
+      },
+      "total": 666377936173,
+      "share_cn": 0
+    },
+    {
+      "iso3": "COL",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 14112815360.42,
+        "import": 16181689265.44,
+        "trade": 30294504625.86,
+        "growth": {
+          "export": -0.08270853937588803,
+          "import": -0.14791478451911164,
+          "trade": -0.11873110219480844
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 2469306485.48,
+        "import": 13566844921.210001,
+        "trade": 16036151406.69,
+        "growth": {
+          "export": 0.14649329594077534,
+          "import": -0.2744514140358953,
+          "trade": -0.23097339478859638
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 46330656032.55,
+      "share_cn": 0.3461239874398425
+    },
+    {
+      "iso3": "ESP",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 19690852031.073,
+        "import": 30500024618.179,
+        "trade": 50190876649.252,
+        "growth": {
+          "export": -0.008570767946360852,
+          "import": -0.1419077701557629,
+          "trade": -0.09411040395080067
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 8042715438.128,
+        "import": 47555396152.749,
+        "trade": 55598111590.877,
+        "growth": {
+          "export": -0.03238939636127985,
+          "import": -0.08898946197712987,
+          "trade": -0.08121495431682758
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 105788988240.129,
+      "share_cn": 0.5255567003313766
+    },
+    {
+      "iso3": "FIN",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 9069264520.941,
+        "import": 4464419901.518001,
+        "trade": 13533684422.459,
+        "growth": {
+          "export": 0.12485759643612655,
+          "import": 0.026243630281020773,
+          "trade": 0.0902969591295662
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 3705636170.073,
+        "import": 7742425870.599,
+        "trade": 11448062040.672,
+        "growth": {
+          "export": -0.0834929752850895,
+          "import": -0.12560318318375627,
+          "trade": -0.11240243668031115
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 24981746463.131,
+      "share_cn": 0.45825707412279926
+    },
+    {
+      "iso3": "RUS",
+      "usa": {
+        "period": "2021",
+        "period_type": "Y",
+        "prev_period": "2020",
+        "export": 17747760834.91,
+        "import": 17265493914.25,
+        "trade": 35013254749.16,
+        "growth": {
+          "export": 0.6195586430085316,
+          "import": 0.3066664470320252,
+          "trade": 0.4485176157454488
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2021",
+        "period_type": "Y",
+        "prev_period": "2020",
+        "export": 68679248077.439995,
+        "import": 72693024875.22,
+        "trade": 141372272952.66,
+        "growth": {
+          "export": 0.3974438835998467,
+          "import": 0.3237753065675267,
+          "trade": 0.3585682076592082
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 176385527701.82,
+      "share_cn": 0.8014958755099797
     },
     {
       "iso3": "THA",
@@ -1624,18 +1426,18 @@
       "share_cn": 0.6072308370438733
     },
     {
-      "iso3": "UKR",
+      "iso3": "CAN",
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 521249747.44,
-        "import": 2866877335.67,
-        "trade": 3388127083.11,
+        "export": 438650206291.982,
+        "import": 276807213354.706,
+        "trade": 715457419646.688,
         "growth": {
-          "export": -0.41614618296317174,
-          "import": 0.317717188012959,
-          "trade": 0.104194992300495
+          "export": -0.04389679405734406,
+          "import": -0.016704061487907994,
+          "trade": -0.03355636046580749
         },
         "growth_basis": "yoy"
       },
@@ -1643,18 +1445,216 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 2406413384.9900002,
-        "import": 10441798784.800001,
-        "trade": 12848212169.79,
+        "export": 22612235334.833,
+        "import": 66087387913.469,
+        "trade": 88699623248.302,
         "growth": {
-          "export": -0.03339293393352923,
-          "import": 0.20592699631131572,
-          "trade": 0.15248393620322037
+          "export": 0.024491020741101963,
+          "import": -0.1423334944623411,
+          "trade": -0.10518808098632174
         },
         "growth_basis": "yoy"
       },
-      "total": 16236339252.900002,
-      "share_cn": 0.7913244463338717
+      "total": 804157042894.99,
+      "share_cn": 0.11030136965409224
+    },
+    {
+      "iso3": "ITA",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 72742094844.705,
+        "import": 27218356598.155,
+        "trade": 99960451442.86,
+        "growth": {
+          "export": 0.06129456017721564,
+          "import": 0.037774538438307366,
+          "trade": 0.05478528754238305
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 20729621690.914,
+        "import": 51456310004.47099,
+        "trade": 72185931695.385,
+        "growth": {
+          "export": 0.19889293243838088,
+          "import": -0.15558663939471415,
+          "trade": -0.07723644937329927
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 172146383138.245,
+      "share_cn": 0.4193287734509931
+    },
+    {
+      "iso3": "KAZ",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 1509870177.22,
+        "import": 2556763288.86,
+        "trade": 4066633466.08,
+        "growth": {
+          "export": 0.4199374108816316,
+          "import": 3.8465014163434255,
+          "trade": 1.5562099786342671
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 14758685491.52,
+        "import": 16772250496.130001,
+        "trade": 31530935987.65,
+        "growth": {
+          "export": 0.410725389199689,
+          "import": 3.6915375595952598,
+          "trade": 1.2463097076433158
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 35597569453.73,
+      "share_cn": 0.8857609233302897
+    },
+    {
+      "iso3": "KOR",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 116290387484,
+        "import": 71731699514,
+        "trade": 188022086998,
+        "growth": {
+          "export": 0.05554919170970384,
+          "import": -0.12664784946966123,
+          "trade": -0.022267743255445727
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 124655567747,
+        "import": 142853875178,
+        "trade": 267509442925,
+        "growth": {
+          "export": -0.1998455610474419,
+          "import": -0.07583488069034776,
+          "trade": -0.1380826052863756
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 455531529923,
+      "share_cn": 0.5872468212468586
+    },
+    {
+      "iso3": "POL",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 11839090711,
+        "import": 16215489876,
+        "trade": 28054580587,
+        "growth": {
+          "export": 0.09164996837288181,
+          "import": -0.014911123489234302,
+          "trade": 0.027411669193386837
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 3309540978,
+        "import": 51523648202,
+        "trade": 54833189180,
+        "growth": {
+          "export": 0.052255133993994486,
+          "import": -0.09429137747921286,
+          "trade": -0.08661364086420086
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 82887769767,
+      "share_cn": 0.6615353427186874
+    },
+    {
+      "iso3": "SAU",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 2758936586.7599998,
+        "import": 18901072632.539997,
+        "trade": 21660009219.299995,
+        "growth": {
+          "export": -0.1672797525350517,
+          "import": 0.0861811593730638,
+          "trade": 0.04564170974279232
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 7610500551.071,
+        "import": 43346593974.201996,
+        "trade": 50957094525.272995,
+        "growth": {
+          "export": -0.23626217774703012,
+          "import": 0.08911375165992347,
+          "trade": 0.02396095192319335
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 72617103744.573,
+      "share_cn": 0.701723036276853
+    },
+    {
+      "iso3": "IDN",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 23284563053.391,
+        "import": 11337694391,
+        "trade": 34622257444.391,
+        "growth": {
+          "export": -0.17547919049376973,
+          "import": -0.029547178050425896,
+          "trade": -0.132774296245261
+        },
+        "growth_basis": "yoy"
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "prev_period": "2022",
+        "export": 64934538026.315,
+        "import": 62880883428,
+        "trade": 127815421454.315,
+        "growth": {
+          "export": -0.015010686985047783,
+          "import": -0.07150828332756534,
+          "trade": -0.043639858703788455
+        },
+        "growth_basis": "yoy"
+      },
+      "total": 162437678898.706,
+      "share_cn": 0.7868582112283138
     }
   ]
 }
