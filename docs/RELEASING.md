@@ -65,5 +65,6 @@ Replace `v0.1.0` with the prepared version. Do not move an existing public tag; 
 
 - Verify the release page, source archive, citation metadata, and changelog link.
 - Verify the public GitHub Pages site and its `meta.json` and `latest.json` endpoints.
+- Confirm the main-branch site deployment reused the latest published dataset without running provider collectors.
 - Confirm the next scheduled collection and deployment succeeds.
 - Record any release regression in a public issue and fix it through the normal pull-request process.
