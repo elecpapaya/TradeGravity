@@ -27,6 +27,13 @@ type SelectedProductProvider interface {
 	FetchProductCodes(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow, year string, level int, codes []string) ([]model.Observation, error)
 }
 
+// SelectedProductPeriodsProvider batches a bounded product-code set across
+// explicit source periods. It is used for focused monthly turning-point
+// signals without requesting an entire HS classification.
+type SelectedProductPeriodsProvider interface {
+	FetchProductPeriods(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow, periods []string, level int, codes []string) ([]model.Observation, error)
+}
+
 // TariffProvider exposes detailed HS6 tariff schedules separately from trade
 // values. Implementations must preserve the source nomenclature and data type
 // so reported rates are never silently mixed with estimated AVEs.

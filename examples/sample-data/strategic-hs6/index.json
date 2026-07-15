@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-15T14:10:35Z",
+  "generated_at": "2026-07-15T19:53:00Z",
   "provider": "comtrade",
   "level": 6,
   "partners": [
@@ -79,11 +79,137 @@
       "notes": "Passenger vehicles with only an electric motor for propulsion"
     },
     {
+      "code": "280461",
+      "sector": "semiconductors",
+      "label": "High-purity silicon",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Silicon containing at least 99.99 percent by weight; broad upstream material proxy rather than semiconductor-grade certification"
+    },
+    {
+      "code": "370710",
+      "sector": "semiconductors",
+      "label": "Sensitising emulsions",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Broad photolithography-chemicals proxy; end use is not observable in customs data"
+    },
+    {
+      "code": "370790",
+      "sector": "semiconductors",
+      "label": "Other photographic chemicals",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Broad photoresist and lithography-chemicals proxy; includes non-semiconductor uses"
+    },
+    {
+      "code": "381800",
+      "sector": "semiconductors",
+      "label": "Doped electronic wafers and chemical elements",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Chemical elements doped for use in electronics in discs wafers or similar forms"
+    },
+    {
+      "code": "848610",
+      "sector": "semiconductors",
+      "label": "Wafer and boule manufacturing machinery",
+      "revision_note": "HS 2007 and later",
+      "notes": "Machinery for manufacturing semiconductor boules or wafers"
+    },
+    {
       "code": "848620",
       "sector": "semiconductors",
       "label": "Semiconductor manufacturing machinery",
       "revision_note": "Compatible HS revisions",
       "notes": "Wafer and semiconductor-device manufacturing equipment"
+    },
+    {
+      "code": "848640",
+      "sector": "semiconductors",
+      "label": "Specified semiconductor assembly machinery",
+      "revision_note": "HS 2007 and later",
+      "notes": "Machinery covered by semiconductor and electronic assembly provisions; verify source revision"
+    },
+    {
+      "code": "848690",
+      "sector": "semiconductors",
+      "label": "Semiconductor equipment parts and accessories",
+      "revision_note": "HS 2007 and later",
+      "notes": "Parts and accessories of machines and apparatus under heading 8486"
+    },
+    {
+      "code": "853400",
+      "sector": "semiconductors",
+      "label": "Printed circuits",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Broad downstream substrate and interconnect proxy; not limited to advanced semiconductor packaging"
+    },
+    {
+      "code": "854110",
+      "sector": "semiconductors",
+      "label": "Diodes other than photosensitive or LED",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Discrete semiconductor devices"
+    },
+    {
+      "code": "854121",
+      "sector": "semiconductors",
+      "label": "Transistors with dissipation below one watt",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Discrete low-power transistors"
+    },
+    {
+      "code": "854129",
+      "sector": "semiconductors",
+      "label": "Other transistors",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Discrete transistor trade without process-node detail"
+    },
+    {
+      "code": "854130",
+      "sector": "semiconductors",
+      "label": "Thyristors diacs and triacs",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Power and switching semiconductor devices"
+    },
+    {
+      "code": "854141",
+      "sector": "semiconductors",
+      "label": "Light-emitting diodes",
+      "revision_note": "HS 2022 and later",
+      "notes": "HS 2022 split; keep separate from legacy photosensitive-device groups"
+    },
+    {
+      "code": "854149",
+      "sector": "semiconductors",
+      "label": "Other photosensitive semiconductor devices",
+      "revision_note": "HS 2022 and later",
+      "notes": "HS 2022 split excluding separately classified photovoltaic cells and LEDs"
+    },
+    {
+      "code": "854150",
+      "sector": "semiconductors",
+      "label": "Other semiconductor devices legacy group",
+      "revision_note": "Through HS 2017",
+      "notes": "Legacy group replaced by more detailed HS 2022 semiconductor-device codes"
+    },
+    {
+      "code": "854151",
+      "sector": "semiconductors",
+      "label": "Semiconductor transducers",
+      "revision_note": "HS 2022 and later",
+      "notes": "HS 2022 category for semiconductor-based transducers"
+    },
+    {
+      "code": "854159",
+      "sector": "semiconductors",
+      "label": "Other semiconductor devices",
+      "revision_note": "HS 2022 and later",
+      "notes": "HS 2022 residual semiconductor-device category"
+    },
+    {
+      "code": "854190",
+      "sector": "semiconductors",
+      "label": "Parts of semiconductor devices",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Parts of devices under heading 8541"
     },
     {
       "code": "854231",
@@ -121,6 +247,27 @@
       "notes": "Parts of electronic integrated circuits"
     },
     {
+      "code": "903082",
+      "sector": "semiconductors",
+      "label": "Semiconductor wafer and device measuring instruments",
+      "revision_note": "HS 2007 through HS 2017",
+      "notes": "Dedicated electrical measuring and checking instruments before the HS 2022 inspection split"
+    },
+    {
+      "code": "903090",
+      "sector": "semiconductors",
+      "label": "Parts of measuring and checking instruments",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Broad parts category that includes but is not limited to semiconductor test equipment"
+    },
+    {
+      "code": "903141",
+      "sector": "semiconductors",
+      "label": "Optical semiconductor inspection instruments",
+      "revision_note": "HS 2022 and later",
+      "notes": "Optical instruments for inspecting semiconductor wafers devices photomasks or reticles"
+    },
+    {
       "code": "854140",
       "sector": "solar",
       "label": "Photosensitive semiconductor devices legacy group",
@@ -142,8 +289,109 @@
       "notes": "Use only where the source classification supports HS 2022"
     }
   ],
-  "reporters": [],
-  "periods": [],
-  "partitions": [],
-  "observation_count": 0
+  "reporters": [
+    "DEU",
+    "JPN",
+    "KOR"
+  ],
+  "periods": [
+    "2023",
+    "2022",
+    "2021",
+    "2020",
+    "2019"
+  ],
+  "partitions": [
+    {
+      "reporter_iso3": "DEU",
+      "period": "2023",
+      "href": "./DEU/2023.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "DEU",
+      "period": "2022",
+      "href": "./DEU/2022.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "DEU",
+      "period": "2021",
+      "href": "./DEU/2021.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "DEU",
+      "period": "2020",
+      "href": "./DEU/2020.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "DEU",
+      "period": "2019",
+      "href": "./DEU/2019.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "JPN",
+      "period": "2023",
+      "href": "./JPN/2023.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "JPN",
+      "period": "2022",
+      "href": "./JPN/2022.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "JPN",
+      "period": "2021",
+      "href": "./JPN/2021.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "JPN",
+      "period": "2020",
+      "href": "./JPN/2020.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "JPN",
+      "period": "2019",
+      "href": "./JPN/2019.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "KOR",
+      "period": "2023",
+      "href": "./KOR/2023.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "KOR",
+      "period": "2022",
+      "href": "./KOR/2022.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "KOR",
+      "period": "2021",
+      "href": "./KOR/2021.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "KOR",
+      "period": "2020",
+      "href": "./KOR/2020.json",
+      "row_count": 7
+    },
+    {
+      "reporter_iso3": "KOR",
+      "period": "2019",
+      "href": "./KOR/2019.json",
+      "row_count": 7
+    }
+  ],
+  "observation_count": 420
 }

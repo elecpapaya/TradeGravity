@@ -1,0 +1,837 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-07-16",
+  "generated_at": "2026-07-15T19:53:00Z",
+  "title": "US–China Chip Supply Chain Lens",
+  "scope": "A stage-based semiconductor observatory that shows where connector economies sit and move between United States and China trade exposure while keeping customs observations, industrial context, policy events, and analytical estimates separate.",
+  "perspective": {
+    "lens": "us_china",
+    "principle": "Neutral reported observations, explicit United States–China analytical lens, and no hidden geopolitical score.",
+    "anchors": [
+      "USA",
+      "CHN"
+    ],
+    "questions": [
+      "Is the selected economy or stage currently more exposed to the United States or China within the two-anchor sample?",
+      "Is that position moving toward the United States, toward China, or remaining stable?",
+      "Which stages and products contribute to the observed position?",
+      "Is exposure concentrated on one anchor or material on both anchors?",
+      "Which dated official policy and project events provide context without claiming causality?"
+    ]
+  },
+  "data_policy": {
+    "mode": "free_public_only",
+    "rule": "TradeGravity may use openly accessible official, intergovernmental, or public-web evidence and must keep source terms and measurement limits visible.",
+    "exclusions": [
+      "paid market databases",
+      "licensed proprietary fab-capacity datasets",
+      "undisclosed vendor estimates",
+      "paywalled evidence required to reproduce a published metric"
+    ]
+  },
+  "open_datasets": [
+    {
+      "id": "un_comtrade",
+      "provider": "United Nations Statistics Division",
+      "title": "UN Comtrade API",
+      "url": "https://comtradeapi.un.org/",
+      "granularity": "reporter × partner × flow × HS6 × annual/monthly period",
+      "role": "Observed USA/China trade position, annual direction, focused monthly turning points and mirror diagnostics",
+      "access": "official_open_data",
+      "reuse_note": "Public API; retain source classification, period, partner, flow and UN Comtrade attribution."
+    },
+    {
+      "id": "world_bank_wits_trains",
+      "provider": "World Bank",
+      "title": "WITS and UNCTAD TRAINS",
+      "url": "https://wits.worldbank.org/",
+      "granularity": "bilateral totals and tariff schedule by reporter/importer, partner, product and period",
+      "role": "Headline history and reproducible tariff context",
+      "access": "official_open_data",
+      "reuse_note": "Public web/API access; retain provider, nomenclature, tariff data type and reuse terms."
+    },
+    {
+      "id": "world_bank_open_data",
+      "provider": "World Bank",
+      "title": "World Bank Open Data API",
+      "url": "https://datahelpdesk.worldbank.org/knowledgebase/articles/889392",
+      "granularity": "country × indicator × year",
+      "role": "GDP, population and normalization context",
+      "access": "official_open_data",
+      "reuse_note": "Public API under World Bank data terms; indicators are context and not semiconductor capacity."
+    },
+    {
+      "id": "oecd_icio_2025",
+      "provider": "OECD",
+      "title": "2025 edition Inter-Country Input-Output tables",
+      "url": "https://www.oecd.org/en/data/datasets/inter-country-input-output-tables.html",
+      "granularity": "country × economic activity × origin/destination × year through 2022",
+      "role": "Lagged industry-level value-added and propagation context; never substituted for semiconductor HS6 observations",
+      "access": "public_download",
+      "reuse_note": "Public download with OECD attribution; industry aggregation and release lag must remain explicit."
+    },
+    {
+      "id": "official_policy_projects",
+      "provider": "Official government institutions",
+      "title": "Dated policy, award and project pages",
+      "url": "https://www.nist.gov/chips/chips-america-awards",
+      "granularity": "event/project × jurisdiction × date × stated status",
+      "role": "Policy and project context kept separate from customs values and operating capacity",
+      "access": "free_public_web",
+      "reuse_note": "Public official pages; quote sparingly, link the dated source, and preserve announced/planned/operating status."
+    }
+  ],
+  "caveats": [
+    "HS6 trade does not identify fab ownership, process node, wafer capacity, HBM generation, advanced-packaging technology, design IP, EDA services, or physical shipment routes.",
+    "Broad proxy codes can include non-semiconductor end uses. Every stage declares whether a code is direct, legacy, or a broad proxy.",
+    "Country roles are curated context from official and intergovernmental sources, not measured market shares or investment advice.",
+    "Announced capacity and operating capacity must never be combined; this reference release does not publish proprietary fab-capacity estimates."
+  ],
+  "stages": [
+    {
+      "id": "design_eda",
+      "order": 1,
+      "label": "Design, IP \u0026 EDA",
+      "short_label": "Design/IP",
+      "description": "Architecture, chip design, reusable IP and electronic-design-automation software.",
+      "observation_type": "external_context",
+      "codes": [],
+      "gap": "Mostly intangible services and intellectual property, so HS goods trade cannot observe this stage directly."
+    },
+    {
+      "id": "materials_wafers",
+      "order": 2,
+      "label": "Materials \u0026 wafers",
+      "short_label": "Materials",
+      "description": "High-purity silicon, doped wafers and broad lithography-chemical proxies.",
+      "observation_type": "mixed_proxy",
+      "codes": [
+        "280461",
+        "370710",
+        "370790",
+        "381800"
+      ],
+      "gap": "Purity, semiconductor grade and final end use are not consistently visible in HS6."
+    },
+    {
+      "id": "manufacturing_equipment",
+      "order": 3,
+      "label": "Manufacturing equipment",
+      "short_label": "Equipment",
+      "description": "Wafer, device, assembly, inspection and related equipment and parts.",
+      "observation_type": "observed_goods",
+      "codes": [
+        "848610",
+        "848620",
+        "848640",
+        "848690",
+        "903082",
+        "903090",
+        "903141"
+      ],
+      "gap": "HS6 does not identify tool model, supported node, installed base or end-user fab."
+    },
+    {
+      "id": "logic_foundry",
+      "order": 4,
+      "label": "Logic \u0026 foundry output",
+      "short_label": "Logic/foundry",
+      "description": "Processors, controllers, amplifiers and other integrated circuits used as a customs-trade proxy for fabricated logic output.",
+      "observation_type": "observed_goods",
+      "codes": [
+        "854231",
+        "854233",
+        "854239"
+      ],
+      "gap": "Foundry ownership, fabless origin and process node cannot be inferred from the exported integrated circuit."
+    },
+    {
+      "id": "memory_hbm",
+      "order": 5,
+      "label": "Memory \u0026 HBM",
+      "short_label": "Memory/HBM",
+      "description": "Memory integrated circuits, with HBM treated as current industry context rather than a separately observed HS6 product.",
+      "observation_type": "observed_with_gap",
+      "codes": [
+        "854232"
+      ],
+      "gap": "HS6 854232 combines memory types and cannot separate DRAM, NAND, HBM generation or package configuration."
+    },
+    {
+      "id": "discrete_power",
+      "order": 6,
+      "label": "Discrete, power \u0026 sensors",
+      "short_label": "Discrete/power",
+      "description": "Diodes, transistors, power switches, photosensitive devices and semiconductor transducers.",
+      "observation_type": "revision_sensitive",
+      "codes": [
+        "854110",
+        "854121",
+        "854129",
+        "854130",
+        "854140",
+        "854141",
+        "854149",
+        "854150",
+        "854151",
+        "854159",
+        "854190"
+      ],
+      "gap": "The HS 2022 revision split several legacy categories; comparisons require revision-aware code selection."
+    },
+    {
+      "id": "packaging_test",
+      "order": 7,
+      "label": "Packaging, substrates \u0026 test",
+      "short_label": "Packaging/test",
+      "description": "Assembly machinery, printed circuits, IC parts, inspection and test-equipment proxies.",
+      "observation_type": "mixed_proxy",
+      "codes": [
+        "848640",
+        "853400",
+        "854290",
+        "903082",
+        "903090",
+        "903141"
+      ],
+      "gap": "OSAT activity, 2.5D/3D packaging, chiplets and substrate technology are not uniquely identified by HS6."
+    },
+    {
+      "id": "downstream_demand",
+      "order": 8,
+      "label": "Downstream compute \u0026 network demand",
+      "short_label": "End demand",
+      "description": "Broad processing units and network equipment used only as downstream demand context.",
+      "observation_type": "broad_proxy",
+      "codes": [
+        "847150",
+        "851762"
+      ],
+      "gap": "These products are not semiconductor output and cannot isolate AI servers or semiconductor content."
+    }
+  ],
+  "country_roles": [
+    {
+      "iso3": "CHN",
+      "name": "China",
+      "roles": [
+        "logic_foundry",
+        "discrete_power",
+        "packaging_test",
+        "downstream_demand"
+      ],
+      "note": "Large manufacturing, assembly and end-demand context with rapidly changing export-control exposure.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "DEU",
+      "name": "Germany",
+      "roles": [
+        "manufacturing_equipment",
+        "discrete_power",
+        "downstream_demand"
+      ],
+      "note": "Equipment, industrial and automotive-semiconductor context.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "JPN",
+      "name": "Japan",
+      "roles": [
+        "materials_wafers",
+        "manufacturing_equipment"
+      ],
+      "note": "Materials, wafers and manufacturing equipment are prominent supply-chain roles; next-generation fabrication support is expanding.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "KOR",
+      "name": "Korea, Rep.",
+      "roles": [
+        "memory_hbm",
+        "logic_foundry",
+        "packaging_test"
+      ],
+      "note": "Memory and HBM are central roles, alongside foundry and advanced-packaging investment.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "MYS",
+      "name": "Malaysia",
+      "roles": [
+        "packaging_test"
+      ],
+      "note": "Assembly, packaging and test specialization makes the country relevant to diversification analysis.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "NLD",
+      "name": "Netherlands",
+      "roles": [
+        "manufacturing_equipment"
+      ],
+      "note": "Lithography equipment makes this an important equipment-stage context node.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "PHL",
+      "name": "Philippines",
+      "roles": [
+        "packaging_test"
+      ],
+      "note": "Assembly and test specialization is relevant to Southeast Asian supply-chain mapping.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "SGP",
+      "name": "Singapore",
+      "roles": [
+        "manufacturing_equipment",
+        "logic_foundry",
+        "packaging_test"
+      ],
+      "note": "Regional manufacturing, equipment and assembly hub context.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "TWN",
+      "name": "Chinese Taipei",
+      "roles": [
+        "logic_foundry",
+        "packaging_test"
+      ],
+      "note": "Foundry and advanced-packaging specialization is material to leading-edge supply-chain monitoring.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "USA",
+      "name": "United States",
+      "roles": [
+        "design_eda",
+        "manufacturing_equipment",
+        "logic_foundry",
+        "downstream_demand"
+      ],
+      "note": "Strong design, EDA, equipment and AI-compute demand context; domestic manufacturing and packaging policy is expanding.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "VNM",
+      "name": "Viet Nam",
+      "roles": [
+        "packaging_test",
+        "downstream_demand"
+      ],
+      "note": "Growing electronics assembly and packaging context; customs data should not be treated as proof of physical rerouting.",
+      "evidence": "contextual"
+    }
+  ],
+  "trends": [
+    {
+      "id": "ai_hbm_packaging",
+      "label": "AI shifts the bottleneck",
+      "summary": "AI demand is increasing the strategic importance of advanced logic, HBM, substrates, power delivery and advanced packaging rather than chips in aggregate.",
+      "as_of": "2026-06-29",
+      "source_ids": [
+        "semi_memory_2026",
+        "nist_packaging"
+      ]
+    },
+    {
+      "id": "fab_investment",
+      "label": "Capacity investment remains elevated",
+      "summary": "SEMI projects double-digit growth in global 300 mm fab-equipment spending in both 2026 and 2027, driven by AI and regionalization.",
+      "as_of": "2026-04-01",
+      "source_ids": [
+        "semi_300mm_2026"
+      ]
+    },
+    {
+      "id": "policy_fragmentation",
+      "label": "Policy is now a first-class supply variable",
+      "summary": "Controls now cover advanced computing, semiconductor equipment, software, HBM and foundry due diligence, while industrial programs support regional capacity.",
+      "as_of": "2026-06-03",
+      "source_ids": [
+        "bis_2024_controls",
+        "bis_2025_foundry",
+        "eu_2026_sovereignty"
+      ]
+    },
+    {
+      "id": "ecosystem_competition",
+      "label": "Competition is ecosystem-wide",
+      "summary": "Current strategies increasingly connect design, manufacturing, packaging, equipment, data, power, talent and security rather than treating a fab as an isolated asset.",
+      "as_of": "2026-06-26",
+      "source_ids": [
+        "oecd_mapping_2025",
+        "meti_strategy_2026"
+      ]
+    }
+  ],
+  "policy_events": [
+    {
+      "date": "2023-07-03",
+      "jurisdiction": "China",
+      "title": "Gallium and germanium-related export controls announced",
+      "kind": "export_control",
+      "stages": [
+        "materials_wafers",
+        "discrete_power"
+      ],
+      "status": "in_force",
+      "source_id": "mofcom_gallium_germanium_2023"
+    },
+    {
+      "date": "2023-09-21",
+      "jurisdiction": "European Union",
+      "title": "European Chips Act enters into force",
+      "kind": "industrial_policy",
+      "stages": [
+        "logic_foundry",
+        "manufacturing_equipment",
+        "packaging_test"
+      ],
+      "status": "in_force",
+      "source_id": "eu_chips_act"
+    },
+    {
+      "date": "2024-03-22",
+      "jurisdiction": "China",
+      "title": "2024 integrated-circuit and software tax-incentive eligibility notice",
+      "kind": "industrial_policy",
+      "stages": [
+        "design_eda",
+        "materials_wafers",
+        "logic_foundry",
+        "memory_hbm",
+        "packaging_test"
+      ],
+      "status": "in_force",
+      "source_id": "ndrc_ic_tax_2024"
+    },
+    {
+      "date": "2024-12-02",
+      "jurisdiction": "United States",
+      "title": "Controls expanded to equipment, software and HBM",
+      "kind": "export_control",
+      "stages": [
+        "manufacturing_equipment",
+        "memory_hbm",
+        "design_eda"
+      ],
+      "status": "in_force",
+      "source_id": "bis_2024_controls"
+    },
+    {
+      "date": "2025-01-15",
+      "jurisdiction": "United States",
+      "title": "Advanced-computing controls and foundry due diligence strengthened",
+      "kind": "export_control",
+      "stages": [
+        "logic_foundry",
+        "design_eda"
+      ],
+      "status": "in_force",
+      "source_id": "bis_2025_foundry"
+    },
+    {
+      "date": "2025-04-04",
+      "jurisdiction": "China",
+      "title": "Selected medium and heavy rare-earth export controls issued",
+      "kind": "export_control",
+      "stages": [
+        "materials_wafers",
+        "manufacturing_equipment",
+        "discrete_power"
+      ],
+      "status": "in_force",
+      "source_id": "mofcom_rare_earth_2025"
+    },
+    {
+      "date": "2025-08-29",
+      "jurisdiction": "United States",
+      "title": "VEU loophole for foreign-owned fabs in China closed",
+      "kind": "export_control",
+      "stages": [
+        "logic_foundry",
+        "memory_hbm"
+      ],
+      "status": "announced",
+      "source_id": "bis_2025_veu"
+    },
+    {
+      "date": "2025-11-21",
+      "jurisdiction": "Japan",
+      "title": "Rapidus selected for next-generation semiconductor support",
+      "kind": "industrial_policy",
+      "stages": [
+        "logic_foundry",
+        "packaging_test"
+      ],
+      "status": "announced",
+      "source_id": "meti_rapidus_2025"
+    },
+    {
+      "date": "2026-01-13",
+      "jurisdiction": "United States",
+      "title": "License review policy revised for selected advanced accelerators to China",
+      "kind": "export_control",
+      "stages": [
+        "logic_foundry",
+        "downstream_demand"
+      ],
+      "status": "in_force",
+      "source_id": "bis_2026_accelerators"
+    },
+    {
+      "date": "2026-06-03",
+      "jurisdiction": "European Union",
+      "title": "Technology-sovereignty package outlines Chips Act 2.0 direction",
+      "kind": "industrial_policy",
+      "stages": [
+        "design_eda",
+        "logic_foundry",
+        "packaging_test",
+        "downstream_demand"
+      ],
+      "status": "proposal",
+      "source_id": "eu_2026_sovereignty"
+    },
+    {
+      "date": "2026-06-26",
+      "jurisdiction": "Japan",
+      "title": "Semiconductor and digital-industry strategy integrates AI, compute, power and security",
+      "kind": "industrial_policy",
+      "stages": [
+        "design_eda",
+        "logic_foundry",
+        "memory_hbm",
+        "packaging_test",
+        "downstream_demand"
+      ],
+      "status": "strategy",
+      "source_id": "meti_strategy_2026"
+    }
+  ],
+  "capacity_signals": [
+    {
+      "announced_at": "2024-11-15",
+      "country": "United States",
+      "iso3": "USA",
+      "title": "TSMC Arizona final CHIPS incentives award",
+      "stage": "logic_foundry",
+      "status": "official_award",
+      "expected_operation": "milestone-based; three planned fabs",
+      "claim": "NIST states that the award supports more than $65 billion in planned investment across three leading-edge fabs. TradeGravity records the award and plan without treating all three fabs as operating capacity.",
+      "source_id": "nist_tsmc_arizona"
+    },
+    {
+      "announced_at": "2024-12-19",
+      "country": "United States",
+      "iso3": "USA",
+      "title": "SK hynix advanced-packaging and R\u0026D facility in Indiana",
+      "stage": "packaging_test",
+      "status": "planned",
+      "expected_operation": "2028-H2",
+      "claim": "The official CHIPS project page describes a high-volume advanced-packaging line for next-generation HBM with production expected in the second half of 2028.",
+      "source_id": "nist_sk_hynix"
+    },
+    {
+      "announced_at": "2025-01-07",
+      "country": "Global",
+      "iso3": "WLD",
+      "title": "Eighteen new semiconductor fabs expected to start construction in 2025",
+      "stage": "logic_foundry",
+      "status": "industry_forecast",
+      "expected_operation": "varies",
+      "claim": "SEMI forecast 18 new fab construction starts and projected industry capacity growth; it is an aggregate forecast, not operating-capacity evidence.",
+      "source_id": "semi_fabs_2025"
+    },
+    {
+      "announced_at": "2025-11-21",
+      "country": "Japan",
+      "iso3": "JPN",
+      "title": "Rapidus next-generation semiconductor production plan selected for support",
+      "stage": "logic_foundry",
+      "status": "supported_plan",
+      "expected_operation": "not stated here",
+      "claim": "METI selected the plan under Japan's next-generation semiconductor support framework; TradeGravity does not convert the announcement into operating capacity.",
+      "source_id": "meti_rapidus_2025"
+    },
+    {
+      "announced_at": "2025-10-13",
+      "country": "European Union",
+      "iso3": "WLD",
+      "title": "First four EU IPF/OEF semiconductor project designations",
+      "stage": "logic_foundry",
+      "status": "official_designation",
+      "expected_operation": "project-specific; source includes targets through 2029",
+      "claim": "The European Commission granted IPF or OEF status to four projects in Germany, Austria and Italy. The register retains the designation and stated project targets rather than aggregating them as current output.",
+      "source_id": "eu_ipf_oef_2025"
+    },
+    {
+      "announced_at": "2026-03-16",
+      "country": "Italy",
+      "iso3": "ITA",
+      "title": "Silicon Box chiplet packaging facility receives Open EU Foundry status",
+      "stage": "packaging_test",
+      "status": "official_designation",
+      "expected_operation": "full capacity expected 2033",
+      "claim": "The European Commission describes a panel-level advanced packaging and testing facility and states that full capacity is expected in 2033; this is not counted as current production.",
+      "source_id": "eu_silicon_box_2026"
+    },
+    {
+      "announced_at": "2026-04-01",
+      "country": "Global",
+      "iso3": "WLD",
+      "title": "Global 300 mm fab-equipment spending forecast to rise in 2026 and 2027",
+      "stage": "manufacturing_equipment",
+      "status": "industry_forecast",
+      "expected_operation": "2026-2027",
+      "claim": "SEMI projects double-digit equipment-spending growth driven by AI and regionalization; spending is not the same as installed or productive capacity.",
+      "source_id": "semi_300mm_2026"
+    },
+    {
+      "announced_at": "2026-06-29",
+      "country": "Global",
+      "iso3": "WLD",
+      "title": "300 mm memory-equipment investment forecast above $50 billion in 2026",
+      "stage": "memory_hbm",
+      "status": "industry_forecast",
+      "expected_operation": "2026",
+      "claim": "SEMI links the investment outlook to HBM and DDR5 demand; the forecast does not identify HBM generation or country-level output.",
+      "source_id": "semi_memory_2026"
+    }
+  ],
+  "sources": [
+    {
+      "id": "oecd_mapping_2025",
+      "publisher": "OECD",
+      "title": "Mapping the semiconductor value chain",
+      "published_at": "2025-06-24",
+      "url": "https://www.oecd.org/en/publications/mapping-the-semiconductor-value-chain_4154cdbf-en.html",
+      "source_type": "intergovernmental_analysis",
+      "access": "free_public_web",
+      "reuse_note": "Public OECD page; retain OECD attribution and distinguish analysis from customs observations."
+    },
+    {
+      "id": "semi_300mm_2026",
+      "publisher": "SEMI",
+      "title": "SEMI Projects Double-Digit Growth in Global 300mm Fab Equipment Spending for 2026 and 2027",
+      "published_at": "2026-04-01",
+      "url": "https://www.semi.org/en/semi-press-release/semi-projects-double-digit-growth-in-global-300mm-fab-equipment-spending-for-2026-and-2027",
+      "source_type": "industry_forecast",
+      "access": "free_public_web",
+      "reuse_note": "Freely accessible press release; contextual forecast only, not a licensed capacity dataset."
+    },
+    {
+      "id": "semi_memory_2026",
+      "publisher": "SEMI",
+      "title": "SEMI Projects 300mm Memory Equipment Investment to Surpass $50 Billion in 2026",
+      "published_at": "2026-06-29",
+      "url": "https://www.semi.org/en/semi-press-release/semi-projects-300mm-memory-equipment-investment-to-surpass-50-billion-dollars-in-2026",
+      "source_type": "industry_forecast",
+      "access": "free_public_web",
+      "reuse_note": "Freely accessible press release; contextual forecast only, not a licensed capacity dataset."
+    },
+    {
+      "id": "semi_fabs_2025",
+      "publisher": "SEMI",
+      "title": "Eighteen New Semiconductor Fabs to Start Construction in 2025",
+      "published_at": "2025-01-07",
+      "url": "https://www.semi.org/en/semi-press-release/eighteen-new-semiconductor-fabs-to-start-construction-in-2025-semi-reports",
+      "source_type": "industry_forecast",
+      "access": "free_public_web",
+      "reuse_note": "Freely accessible press release; construction forecast is not operating capacity."
+    },
+    {
+      "id": "nist_packaging",
+      "publisher": "NIST",
+      "title": "National Advanced Packaging Manufacturing Program",
+      "published_at": "2025-01-01",
+      "url": "https://www.nist.gov/chips/research-development-programs/national-advanced-packaging-manufacturing-program",
+      "source_type": "official_program",
+      "access": "free_public_web",
+      "reuse_note": "Official public program page; preserve status and NIST attribution."
+    },
+    {
+      "id": "nist_sk_hynix",
+      "publisher": "NIST",
+      "title": "SK hynix Indiana Advanced Packaging Facility",
+      "published_at": "2024-12-19",
+      "url": "https://www.nist.gov/chips/sk-hynix-indiana-west-lafayette",
+      "source_type": "official_project",
+      "access": "free_public_web",
+      "reuse_note": "Official public project page; planned operation is not current output."
+    },
+    {
+      "id": "nist_tsmc_arizona",
+      "publisher": "NIST",
+      "title": "CHIPS Incentives Award with TSMC Arizona",
+      "published_at": "2024-11-15",
+      "url": "https://www.nist.gov/news-events/news/2024/11/biden-harris-administration-announces-chips-incentives-award-tsmc-arizona",
+      "source_type": "official_project",
+      "access": "free_public_web",
+      "reuse_note": "Official public award page; retain milestone-based and planned status."
+    },
+    {
+      "id": "bis_2024_controls",
+      "publisher": "U.S. Bureau of Industry and Security",
+      "title": "Commerce Strengthens Export Controls to Restrict China’s Capability to Produce Advanced Semiconductors",
+      "published_at": "2024-12-02",
+      "url": "https://www.bis.gov/press-release/commerce-strengthens-export-controls-restrict-chinas-capability-produce-advanced-semiconductors-military",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page; verify current legal text before compliance use."
+    },
+    {
+      "id": "bis_2025_foundry",
+      "publisher": "U.S. Bureau of Industry and Security",
+      "title": "Commerce Strengthens Restrictions on Advanced Computing Semiconductors and Foundry Due Diligence",
+      "published_at": "2025-01-15",
+      "url": "https://www.bis.gov/press-release/commerce-strengthens-restrictions-advanced-computing-semiconductors-enhance-foundry-due-diligence-prevent",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page; verify current legal text before compliance use."
+    },
+    {
+      "id": "bis_2025_veu",
+      "publisher": "U.S. Bureau of Industry and Security",
+      "title": "Department of Commerce Closes Export Controls Loophole for Foreign-Owned Semiconductor Fabs in China",
+      "published_at": "2025-08-29",
+      "url": "https://www.bis.gov/press-release/department-commerce-closes-export-controls-loophole-foreign-owned-semiconductor-fabs-china",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page; verify current legal text before compliance use."
+    },
+    {
+      "id": "bis_2026_accelerators",
+      "publisher": "U.S. Bureau of Industry and Security",
+      "title": "Department of Commerce Revises License Review Policy for Semiconductors Exported to China",
+      "published_at": "2026-01-13",
+      "url": "https://www.bis.gov/press-release/department-commerce-revises-license-review-policy-semiconductors-exported-china",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page; verify current legal text before compliance use."
+    },
+    {
+      "id": "mofcom_gallium_germanium_2023",
+      "publisher": "China Ministry of Commerce and General Administration of Customs",
+      "title": "Export controls on gallium and germanium-related items",
+      "published_at": "2023-07-03",
+      "url": "https://www.mofcom.gov.cn/zcfb/blgg/art/2023/art_ca2e9d349361441f847bdabac5d8331b.html",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page in Chinese; verify the authoritative current legal text for compliance."
+    },
+    {
+      "id": "ndrc_ic_tax_2024",
+      "publisher": "China National Development and Reform Commission",
+      "title": "2024 integrated circuit and software enterprise/project tax incentive list requirements",
+      "published_at": "2024-03-22",
+      "url": "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202403/t20240322_1365168_ext.html",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page in Chinese; list eligibility is context, not a production estimate."
+    },
+    {
+      "id": "mofcom_rare_earth_2025",
+      "publisher": "China Ministry of Commerce and General Administration of Customs",
+      "title": "Export controls on selected medium and heavy rare earth-related items",
+      "published_at": "2025-04-04",
+      "url": "https://english.mofcom.gov.cn/Policies/AnnouncementsOrders/art/2025/art_0dd87cbee7b045bf93fabe6ab2faceee.html",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page; English version is for reference and current legal text should be verified."
+    },
+    {
+      "id": "eu_chips_act",
+      "publisher": "European Commission",
+      "title": "European Chips Act",
+      "published_at": "2023-09-21",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/european-chips-act",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page; preserve status and Commission attribution."
+    },
+    {
+      "id": "eu_ipf_oef_2025",
+      "publisher": "European Commission",
+      "title": "Milestone in strengthening Europe’s semiconductor manufacturing capacity under Chips Act reached",
+      "published_at": "2025-10-13",
+      "url": "https://digital-strategy.ec.europa.eu/en/news/milestone-strengthening-europes-semiconductor-manufacturing-capacity-under-chips-act-reached",
+      "source_type": "official_project",
+      "access": "free_public_web",
+      "reuse_note": "Official public project page; designations and expected targets are not current output."
+    },
+    {
+      "id": "eu_silicon_box_2026",
+      "publisher": "European Commission",
+      "title": "Open EU Foundry status granted to innovative chiplet facility",
+      "published_at": "2026-03-16",
+      "url": "https://digital-strategy.ec.europa.eu/en/news/open-eu-foundry-status-granted-innovative-chiplet-facility",
+      "source_type": "official_project",
+      "access": "free_public_web",
+      "reuse_note": "Official public project page; planned full-capacity date is not current output."
+    },
+    {
+      "id": "eu_2026_sovereignty",
+      "publisher": "European Commission",
+      "title": "Strengthening Europe’s tech sovereignty",
+      "published_at": "2026-06-03",
+      "url": "https://commission.europa.eu/news-and-media/news/strengthening-europes-tech-sovereignty-2026-06-03_en",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page; preserve proposal status."
+    },
+    {
+      "id": "meti_rapidus_2025",
+      "publisher": "Japan Ministry of Economy, Trade and Industry",
+      "title": "Selection of Specified Semiconductor Production Facility Development Plan",
+      "published_at": "2025-11-21",
+      "url": "https://www.meti.go.jp/press/2025/11/20251121001/20251121001.html",
+      "source_type": "official_policy",
+      "access": "free_public_web",
+      "reuse_note": "Official public policy page; supported plan is not operating capacity."
+    },
+    {
+      "id": "meti_strategy_2026",
+      "publisher": "Japan Ministry of Economy, Trade and Industry",
+      "title": "Semiconductor and Digital Industry Strategy",
+      "published_at": "2026-06-26",
+      "url": "https://www.meti.go.jp/policy/mono_info_service/joho/conference/semicon_digital.html",
+      "source_type": "official_strategy",
+      "access": "free_public_web",
+      "reuse_note": "Official public strategy page; strategic direction is contextual evidence."
+    }
+  ],
+  "scenario_defaults": {
+    "disruption_percent": 20,
+    "substitution_percent": 25,
+    "warning": "A transparent exposure sensitivity based on observed trade, not a capacity, price, GDP, welfare or causal forecast."
+  },
+  "publication": {
+    "status": "limited",
+    "scope": "UN Comtrade reporter observations against USA and China partners; not total world semiconductor trade or physical routes",
+    "registered_code_count": 30,
+    "observed_reporter_count": 3,
+    "observed_period_count": 5,
+    "observed_row_count": 105,
+    "observed_reporters": [
+      "DEU",
+      "JPN",
+      "KOR"
+    ],
+    "observed_periods": [
+      "2023",
+      "2022",
+      "2021",
+      "2020",
+      "2019"
+    ],
+    "minimum_reporter_target": 15,
+    "minimum_period_target": 5,
+    "minimum_code_target": 30,
+    "measurement_description": "Coverage gates describe published stage-mapped HS6 observations. Passing them does not reveal capacity, process node, firms, services or shipment routes."
+  }
+}

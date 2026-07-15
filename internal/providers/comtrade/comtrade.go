@@ -391,6 +391,96 @@ func (p *Provider) FetchProductCodes(ctx context.Context, reporterISO3, partnerI
 	return filtered, nil
 }
 
+// FetchProductPeriods requests selected HS6 codes for a bounded set of monthly
+// periods in one API call. The provider must be configured with frequency M;
+// this guard prevents a monthly period list from silently hitting an annual
+// endpoint.
+func (p *Provider) FetchProductPeriods(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow, periods []string, level int, codes []string) ([]model.Observation, error) {
+	if !strings.EqualFold(strings.TrimSpace(p.config.Frequency), "M") {
+		return nil, fmt.Errorf("comtrade: selected product periods require monthly frequency M, got %q", p.config.Frequency)
+	}
+	if level != 6 {
+		return nil, fmt.Errorf("comtrade: selected product period collection requires HS6, got level %d", level)
+	}
+	normalizedCodes, err := normalizeProductCodes(codes, level)
+	if err != nil {
+		return nil, err
+	}
+	normalizedPeriods, apiPeriods, err := normalizeMonthlyPeriods(periods)
+	if err != nil {
+		return nil, err
+	}
+	refsErr := p.ensureReferences(ctx)
+	reporterISO3 = strings.ToUpper(strings.TrimSpace(reporterISO3))
+	partnerISO3 = strings.ToUpper(strings.TrimSpace(partnerISO3))
+	reporterCode, partnerCode := reporterISO3, partnerISO3
+	if refsErr == nil {
+		reporterCode, err = p.resolveReporterCode(reporterISO3)
+		if err != nil {
+			return nil, err
+		}
+		partnerCode, err = p.resolvePartnerCode(partnerISO3)
+		if err != nil {
+			return nil, err
+		}
+	} else if !p.config.AllowISO3Fallback {
+		return nil, refsErr
+	}
+
+	observations, err := p.fetchPeriods(ctx, reporterISO3, partnerISO3, reporterCode, partnerCode, flow, p.flowCode(flow), strings.Join(apiPeriods, ","), strings.Join(normalizedCodes, ","))
+	if err != nil {
+		return nil, err
+	}
+	wantedCodes := make(map[string]struct{}, len(normalizedCodes))
+	for _, code := range normalizedCodes {
+		wantedCodes[code] = struct{}{}
+	}
+	wantedPeriods := make(map[string]struct{}, len(normalizedPeriods))
+	for _, period := range normalizedPeriods {
+		wantedPeriods[period] = struct{}{}
+	}
+	filtered := make([]model.Observation, 0, len(observations))
+	for _, observation := range observations {
+		if observation.PeriodType != model.PeriodMonth || observation.ProductLevel != level {
+			continue
+		}
+		if _, ok := wantedCodes[observation.ProductCode]; !ok {
+			continue
+		}
+		if _, ok := wantedPeriods[observation.Period]; !ok {
+			continue
+		}
+		filtered = append(filtered, observation)
+	}
+	if len(filtered) == 0 {
+		return nil, ErrNoRecords
+	}
+	return filtered, nil
+}
+
+func normalizeMonthlyPeriods(periods []string) ([]string, []string, error) {
+	if len(periods) == 0 {
+		return nil, nil, errors.New("comtrade: at least one monthly period is required")
+	}
+	seen := make(map[string]struct{}, len(periods))
+	normalized := make([]string, 0, len(periods))
+	api := make([]string, 0, len(periods))
+	for _, raw := range periods {
+		year, month, ok := parseYearMonth(raw)
+		if !ok {
+			return nil, nil, fmt.Errorf("comtrade: invalid monthly period %q", raw)
+		}
+		period := fmt.Sprintf("%04d-%02d", year, month)
+		if _, exists := seen[period]; exists {
+			continue
+		}
+		seen[period] = struct{}{}
+		normalized = append(normalized, period)
+		api = append(api, fmt.Sprintf("%04d%02d", year, month))
+	}
+	return normalized, api, nil
+}
+
 // FetchPartnerMatrix omits partnerCode, which the UN Comtrade API defines as
 // an all-partners breakdown. It is intentionally separate from partnerCode=0,
 // which represents the World aggregate rather than bilateral rows.
@@ -585,10 +675,14 @@ func (p *Provider) resolveCode(kind, iso3 string, codes map[string]string) (stri
 }
 
 func (p *Provider) fetchYear(ctx context.Context, reporterISO3, partnerISO3, reporterCode, partnerCode string, flow model.Flow, flowCode string, year int, commodity string) ([]model.Observation, error) {
+	return p.fetchPeriods(ctx, reporterISO3, partnerISO3, reporterCode, partnerCode, flow, flowCode, strconv.Itoa(year), commodity)
+}
+
+func (p *Provider) fetchPeriods(ctx context.Context, reporterISO3, partnerISO3, reporterCode, partnerCode string, flow model.Flow, flowCode, periods, commodity string) ([]model.Observation, error) {
 	params := url.Values{}
 	params.Set("reportercode", reporterCode)
 	params.Set("flowCode", flowCode)
-	params.Set("period", strconv.Itoa(year))
+	params.Set("period", periods)
 	params.Set("cmdCode", commodity)
 	params.Set("partnerCode", partnerCode)
 	params.Set("partner2Code", "0")
@@ -1463,4 +1557,5 @@ func getenvBool(key string, fallback bool) bool {
 
 var _ providers.Provider = (*Provider)(nil)
 var _ providers.ProductProvider = (*Provider)(nil)
+var _ providers.SelectedProductPeriodsProvider = (*Provider)(nil)
 var _ providers.PartnerMatrixProvider = (*Provider)(nil)

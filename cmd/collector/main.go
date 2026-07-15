@@ -37,6 +37,8 @@ func main() {
 		runTariffs(os.Args[2:])
 	case "matrix":
 		runMatrix(os.Args[2:])
+	case "chip-monthly":
+		runChipMonthly(os.Args[2:])
 	default:
 		usage()
 		os.Exit(2)
@@ -101,6 +103,7 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "strategic HS6: collector strategic [options]")
 	fmt.Fprintln(os.Stderr, "strategic HS6 tariffs: collector tariffs [options]")
 	fmt.Fprintln(os.Stderr, "multi-partner matrix: collector matrix [options]")
+	fmt.Fprintln(os.Stderr, "monthly semiconductor lens: collector chip-monthly [options]")
 }
 
 func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, historyYears, concurrency int, verbose bool) (runErr error) {
@@ -270,6 +273,10 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 }
 
 func runProductCollector(providerID, primaryProvider, year string, level int, selectedCodes []string, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, concurrency int, verbose bool) (runErr error) {
+	return runProductCollectorHistory(providerID, primaryProvider, year, level, selectedCodes, partnersCSV, flowsCSV, limit, allowlistPath, dbPath, concurrency, verbose, 0)
+}
+
+func runProductCollectorHistory(providerID, primaryProvider, year string, level int, selectedCodes []string, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, concurrency int, verbose bool, historyYears int) (runErr error) {
 	provider, err := buildProvider(providerID)
 	if err != nil {
 		return err
@@ -326,6 +333,10 @@ func runProductCollector(providerID, primaryProvider, year string, level int, se
 	if _, ok := parseYear(selectedYear); !ok {
 		return fmt.Errorf("product year must be a four-digit annual period, got %q", selectedYear)
 	}
+	if historyYears < 0 || historyYears > 20 {
+		return fmt.Errorf("product history-years must be between 0 and 20, got %d", historyYears)
+	}
+	selectedYears := annualHistory(selectedYear, historyYears)
 
 	allowed, err := loadAllowlist(allowlistPath)
 	if err != nil {
@@ -353,6 +364,7 @@ func runProductCollector(providerID, primaryProvider, year string, level int, se
 
 	type productResult struct {
 		reporter, partner string
+		year              string
 		flow              model.Flow
 		observations      []model.Observation
 		err               error
@@ -367,14 +379,16 @@ func runProductCollector(providerID, primaryProvider, year string, level int, se
 		go func() {
 			defer workers.Done()
 			for reporter := range reporterJobs {
-				for _, partner := range partners {
-					for _, flow := range flows {
-						if strings.EqualFold(reporter.ISO3, partner) {
-							results <- productResult{reporter: reporter.ISO3, partner: partner, flow: flow}
-							continue
+				for _, selectedPeriod := range selectedYears {
+					for _, partner := range partners {
+						for _, flow := range flows {
+							if strings.EqualFold(reporter.ISO3, partner) {
+								results <- productResult{reporter: reporter.ISO3, partner: partner, year: selectedPeriod, flow: flow}
+								continue
+							}
+							observations, fetchErr := fetchProducts(ctx, reporter.ISO3, partner, flow, selectedPeriod, level)
+							results <- productResult{reporter: reporter.ISO3, partner: partner, year: selectedPeriod, flow: flow, observations: observations, err: fetchErr, requested: true}
 						}
-						observations, fetchErr := fetchProducts(ctx, reporter.ISO3, partner, flow, selectedYear, level)
-						results <- productResult{reporter: reporter.ISO3, partner: partner, flow: flow, observations: observations, err: fetchErr, requested: true}
 					}
 				}
 			}
@@ -401,8 +415,8 @@ func runProductCollector(providerID, primaryProvider, year string, level int, se
 				continue
 			}
 			runRecord.FailureCount++
-			runRecord.Errors = appendLimited(runRecord.Errors, fmt.Sprintf("%s/%s/%s: %v", result.reporter, result.partner, result.flow, result.err))
-			fmt.Fprintf(os.Stderr, "product fetch failed reporter=%s partner=%s flow=%s: %v\n", result.reporter, result.partner, result.flow, result.err)
+			runRecord.Errors = appendLimited(runRecord.Errors, fmt.Sprintf("%s/%s/%s/%s: %v", result.reporter, result.partner, result.flow, result.year, result.err))
+			fmt.Fprintf(os.Stderr, "product fetch failed reporter=%s partner=%s flow=%s year=%s: %v\n", result.reporter, result.partner, result.flow, result.year, result.err)
 			continue
 		}
 		if persistErr != nil {
@@ -415,7 +429,7 @@ func runProductCollector(providerID, primaryProvider, year string, level int, se
 		runRecord.SuccessCount++
 		runRecord.StoredCount += len(result.observations)
 		if verbose {
-			fmt.Printf("products reporter=%s partner=%s flow=%s year=%s rows=%d\n", result.reporter, result.partner, result.flow, selectedYear, len(result.observations))
+			fmt.Printf("products reporter=%s partner=%s flow=%s year=%s rows=%d\n", result.reporter, result.partner, result.flow, result.year, len(result.observations))
 		}
 	}
 	if persistErr != nil {
@@ -424,9 +438,24 @@ func runProductCollector(providerID, primaryProvider, year string, level int, se
 	if runRecord.SuccessCount == 0 {
 		return errors.New("no product observations collected")
 	}
-	fmt.Printf("product collector complete (provider=%s year=%s level=%d reporters=%d requests=%d success=%d failed=%d observations=%d)\n",
-		providerID, selectedYear, level, len(reporters), runRecord.RequestCount, runRecord.SuccessCount, runRecord.FailureCount, runRecord.StoredCount)
+	fmt.Printf("product collector complete (provider=%s years=%s level=%d reporters=%d requests=%d success=%d failed=%d observations=%d)\n",
+		providerID, strings.Join(selectedYears, ","), level, len(reporters), runRecord.RequestCount, runRecord.SuccessCount, runRecord.FailureCount, runRecord.StoredCount)
 	return nil
+}
+
+func annualHistory(selectedYear string, historyYears int) []string {
+	latest, ok := parseYear(selectedYear)
+	if !ok {
+		return nil
+	}
+	if historyYears < 0 {
+		historyYears = 0
+	}
+	years := make([]string, 0, historyYears+1)
+	for offset := historyYears; offset >= 0; offset-- {
+		years = append(years, fmt.Sprintf("%04d", latest-offset))
+	}
+	return years
 }
 
 func newRunID(provider, mode string) string {

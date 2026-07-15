@@ -9,7 +9,8 @@
   const COLORS = new Set(["value", "growth"]);
   const MODES = new Set(["comparable", "all"]);
   const NORMALIZATIONS = new Set(["raw", "per_capita", "gdp_share"]);
-  const TABS = new Set(["overview", "intelligence", "products", "quality", "lab"]);
+  const TABS = new Set(["overview", "intelligence", "semiconductors", "products", "quality", "lab"]);
+  const SCENARIO_PARTNERS = new Set(["usa", "chn"]);
 
   function clean(value, max = 100) {
     return String(value || "").trim().slice(0, max);
@@ -20,7 +21,16 @@
       metric: "trade", color: "value", top: 25, mode: "comparable",
       period: "latest", region: "", income: "", group: "",
       normalization: "raw", country: "", query: "", tab: "overview", sector: "all",
+      chipStage: "all", chipCountry: "KOR",
+      scenarioPartner: "usa", scenarioProduct: "", tariffBase: 0,
+      tariffChange: 10, elasticity: -1.5, passThrough: 1,
     };
+  }
+
+  function boundedNumber(params, key, fallback, minimum, maximum) {
+    if (!params.has(key)) return fallback;
+    const value = Number(params.get(key));
+    return Number.isFinite(value) ? Math.max(minimum, Math.min(maximum, value)) : fallback;
   }
 
   function parseViewState(search) {
@@ -32,6 +42,8 @@
     const normalization = clean(params.get("normalize"));
     const period = clean(params.get("period"), 16);
     const top = Number.parseInt(params.get("top"), 10);
+    const scenarioPartner = clean(params.get("scenario_partner"), 3);
+    const scenarioProduct = clean(params.get("scenario_product"), 6);
     return {
       metric: METRICS.has(metric) ? metric : defaults.metric,
       color: COLORS.has(color) ? color : defaults.color,
@@ -46,6 +58,14 @@
       query: clean(params.get("q")),
       tab: TABS.has(clean(params.get("tab"))) ? clean(params.get("tab")) : defaults.tab,
       sector: /^(all|[a-z0-9_-]{1,40})$/.test(clean(params.get("sector"))) ? clean(params.get("sector")) : defaults.sector,
+      chipStage: /^(all|[a-z0-9_-]{1,40})$/.test(clean(params.get("chip_stage"))) ? clean(params.get("chip_stage")) : defaults.chipStage,
+      chipCountry: /^[A-Z]{3}$/.test(clean(params.get("chip_country"), 3).toUpperCase()) ? clean(params.get("chip_country"), 3).toUpperCase() : defaults.chipCountry,
+      scenarioPartner: SCENARIO_PARTNERS.has(scenarioPartner) ? scenarioPartner : defaults.scenarioPartner,
+      scenarioProduct: /^\d{6}$/.test(scenarioProduct) ? scenarioProduct : defaults.scenarioProduct,
+      tariffBase: boundedNumber(params, "tariff_base", defaults.tariffBase, 0, 300),
+      tariffChange: boundedNumber(params, "tariff_change", defaults.tariffChange, -100, 300),
+      elasticity: boundedNumber(params, "elasticity", defaults.elasticity, -10, -0.05),
+      passThrough: boundedNumber(params, "pass_through", defaults.passThrough, 0, 1),
     };
   }
 
@@ -66,6 +86,14 @@
     if (values.query) params.set("q", clean(values.query));
     if (values.tab !== defaults.tab && TABS.has(values.tab)) params.set("tab", values.tab);
     if (values.sector !== defaults.sector && /^(all|[a-z0-9_-]{1,40})$/.test(values.sector)) params.set("sector", values.sector);
+    if (values.chipStage !== defaults.chipStage && /^(all|[a-z0-9_-]{1,40})$/.test(values.chipStage)) params.set("chip_stage", values.chipStage);
+    if (values.chipCountry !== defaults.chipCountry && /^[A-Z]{3}$/.test(String(values.chipCountry || ""))) params.set("chip_country", values.chipCountry);
+    if (values.scenarioPartner !== defaults.scenarioPartner && SCENARIO_PARTNERS.has(values.scenarioPartner)) params.set("scenario_partner", values.scenarioPartner);
+    if (values.scenarioProduct && /^\d{6}$/.test(values.scenarioProduct)) params.set("scenario_product", values.scenarioProduct);
+    if (Number(values.tariffBase) !== defaults.tariffBase) params.set("tariff_base", String(Number(values.tariffBase)));
+    if (Number(values.tariffChange) !== defaults.tariffChange) params.set("tariff_change", String(Number(values.tariffChange)));
+    if (Number(values.elasticity) !== defaults.elasticity) params.set("elasticity", String(Number(values.elasticity)));
+    if (Number(values.passThrough) !== defaults.passThrough) params.set("pass_through", String(Number(values.passThrough)));
     return params.toString();
   }
 

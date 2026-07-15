@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-15T14:10:35Z",
+  "generated_at": "2026-07-15T19:53:00Z",
   "primary_provider": "wits",
   "dominant_period": "Y:2023",
   "summary": {
@@ -25,7 +25,7 @@
       "success_count": 6,
       "failure_count": 0,
       "skipped_count": 0,
-      "stored_count": 30,
+      "stored_count": 42,
       "errors": []
     },
     {
@@ -41,6 +41,21 @@
       "failure_count": 0,
       "skipped_count": 0,
       "stored_count": 9,
+      "errors": []
+    },
+    {
+      "run_id": "sample-comtrade-strategic",
+      "provider": "comtrade",
+      "mode": "products-strategic-hs6",
+      "started_at": "2026-01-01T00:03:00Z",
+      "finished_at": "2026-01-01T00:04:00Z",
+      "status": "success",
+      "reporter_count": 3,
+      "request_count": 30,
+      "success_count": 30,
+      "failure_count": 0,
+      "skipped_count": 0,
+      "stored_count": 420,
       "errors": []
     },
     {

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"tradegravity/internal/model"
+	"tradegravity/internal/semiconductor"
 	"tradegravity/internal/strategic"
 )
 
@@ -346,7 +347,11 @@ type providerComparison struct {
 	DeltaRatio        float64 `json:"delta_ratio"`
 }
 
-func buildDataCatalog(generatedAt, provider, contextStatus string, series seriesFile, products productIndexFile, strategicIndex strategicIndexFile, tariffIndex tariffIndexFile, matrixIndex matrixIndexFile) dataCatalogFile {
+func buildDataCatalog(generatedAt, provider, contextStatus string, series seriesFile, products productIndexFile, strategicIndex strategicIndexFile, tariffIndex tariffIndexFile, matrixIndex matrixIndexFile, mirrorIndex mirrorIndexFile, semiconductorMonthlyIndex semiconductorMonthlyIndexFile, semiconductorReferences ...semiconductor.Reference) dataCatalogFile {
+	semiconductorReference := semiconductor.Reference{}
+	if len(semiconductorReferences) > 0 {
+		semiconductorReference = semiconductorReferences[0]
+	}
 	primaryProvider := strings.ToLower(strings.TrimSpace(provider))
 	productStatus := "partial"
 	if len(products.Reporters) > 0 {
@@ -368,6 +373,18 @@ func buildDataCatalog(generatedAt, provider, contextStatus string, series series
 	if len(matrixIndex.Partitions) > 0 {
 		matrixStatus = "ready"
 	}
+	mirrorStatus := "partial"
+	if len(mirrorIndex.Partitions) > 0 {
+		mirrorStatus = "ready"
+	}
+	semiconductorStatus := "partial"
+	if semiconductorReference.Publication.Status == "research_ready" {
+		semiconductorStatus = "ready"
+	}
+	semiconductorMonthlyStatus := "partial"
+	if len(semiconductorMonthlyIndex.Partitions) > 0 {
+		semiconductorMonthlyStatus = "ready"
+	}
 	return dataCatalogFile{
 		SchemaVersion: "1.0",
 		GeneratedAt:   generatedAt,
@@ -380,7 +397,9 @@ func buildDataCatalog(generatedAt, provider, contextStatus string, series series
 			{ID: "strategic_hs6", Title: "Curated strategic HS6 products", Status: strategicStatus, Provider: strategicIndex.Provider, Classification: "source HS revision", ProductLevel: 6, Grain: "reporter × partner × flow × HS6 × period × source classification", Partitioning: "index + reporter/year chunks", Href: "./strategic-hs6/index.json"},
 			{ID: "tariff_schedules", Title: "Tariff schedules", Status: tariffStatus, Provider: tariffIndex.Provider, Classification: "source HS revision", ProductLevel: 6, Grain: "importer × exporter/regime × HS6 × year × data type", Partitioning: "index + importer/year chunks", Href: "./tariffs/index.json"},
 			{ID: "bilateral_matrix", Title: "Multi-partner bilateral matrix", Status: matrixStatus, Provider: matrixIndex.Provider, ProductLevel: 0, Grain: "reporter × partner × flow × TOTAL × annual period", Partitioning: "index + reporter/year chunks", Href: "./bilateral-matrix/index.json"},
-			{ID: "mirror_reconciliation", Title: "Mirror and reconciled estimates", Status: "planned", Grain: "reporter pair × flow × product × period × estimate type", Partitioning: "period/reporter chunks"},
+			{ID: "semiconductor_atlas", Title: "Semiconductor value-chain atlas", Status: semiconductorStatus, Provider: "tradegravity + cited official sources", Classification: "stage-mapped source HS revision", ProductLevel: 6, Grain: "stage taxonomy + country role context + policy event + published HS6 coverage", Partitioning: "reference publication + strategic HS6 reporter/year chunks", Href: "./semiconductors/reference.json"},
+			{ID: "semiconductor_monthly", Title: "Focused US-China semiconductor turning points", Status: semiconductorMonthlyStatus, Provider: semiconductorMonthlyIndex.Provider, Classification: "source HS revision", ProductLevel: 6, Grain: "focused reporter × USA/CHN partner × flow × selected HS6 × month", Partitioning: "index + one file per reporter", Href: "./semiconductors/monthly/index.json"},
+			{ID: "mirror_reconciliation", Title: "Unadjusted mirror-reporting diagnostics", Status: mirrorStatus, Provider: mirrorIndex.Provider, ProductLevel: 0, Grain: "third-country reporter × USA/CHN anchor × mirrored flow × TOTAL × annual period", Partitioning: "index + reporter/year chunks", Href: "./mirror/index.json"},
 			{ID: "value_added_network", Title: "Value-added supply-chain exposure", Status: "planned", Grain: "origin × destination × industry × year", Partitioning: "year/industry chunks"},
 			{ID: "scenario_runs", Title: "Versioned scenario outputs", Status: "planned", Grain: "scenario × market × product × partner", Partitioning: "one manifest and result set per run"},
 		},
@@ -1412,4 +1431,14 @@ func augmentMatrixMeta(meta *metaFile, index matrixIndexFile) {
 	meta.MatrixPartitionCount = len(index.Partitions)
 	meta.MatrixPartnerRowCount = index.PartnerRowCount
 	meta.MatrixObservationCount = index.ObservationCount
+}
+
+func augmentMirrorMeta(meta *metaFile, index mirrorIndexFile) {
+	if meta == nil {
+		return
+	}
+	meta.MirrorProvider = index.Provider
+	meta.MirrorReporterCount = len(index.Reporters)
+	meta.MirrorPartitionCount = len(index.Partitions)
+	meta.MirrorComparisonCount = index.ComparisonCount
 }

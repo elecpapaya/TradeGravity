@@ -14,6 +14,7 @@ func runStrategic(args []string) {
 	provider := fs.String("provider", "comtrade", "strategic product data provider id")
 	primaryProvider := fs.String("primary-provider", "wits", "provider used to choose the dominant year when -year=auto")
 	year := fs.String("year", "auto", "annual strategic-product period or auto")
+	historyYears := fs.Int("history-years", 4, "number of previous annual periods to collect in addition to the selected year")
 	registryPath := fs.String("registry", "configs/strategic_hs6.csv", "strategic HS6 registry CSV")
 	sectorsCSV := fs.String("sectors", "all", "comma-separated strategic sectors or all")
 	partners := fs.String("partners", "USA,CHN", "comma-separated partner ISO3 list")
@@ -35,7 +36,7 @@ func runStrategic(args []string) {
 		fmt.Fprintln(os.Stderr, "strategic collector failed:", err)
 		os.Exit(1)
 	}
-	if err := runProductCollector(*provider, *primaryProvider, *year, 6, strategic.Codes(selected), *partners, *flows, *limit, *allowlist, *dbPath, *concurrency, *verbose); err != nil {
+	if err := runProductCollectorHistory(*provider, *primaryProvider, *year, 6, strategic.Codes(selected), *partners, *flows, *limit, *allowlist, *dbPath, *concurrency, *verbose, *historyYears); err != nil {
 		fmt.Fprintln(os.Stderr, "strategic collector failed:", err)
 		os.Exit(1)
 	}

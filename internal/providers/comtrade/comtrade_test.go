@@ -107,3 +107,41 @@ func TestNormalizeProductCodesValidatesAndDeduplicatesHS6(t *testing.T) {
 		t.Fatal("normalizeProductCodes() accepted an HS4 code for HS6 collection")
 	}
 }
+
+func TestFetchProductPeriodsBatchesMonthlyPeriodsAndFiltersExactCodes(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		switch request.URL.Path {
+		case "/files/reporters":
+			_, _ = writer.Write([]byte(`{"results":[{"id":"410","iso3":"KOR","text":"Korea","isReporter":true,"isGroup":false}]}`))
+		case "/files/partners":
+			_, _ = writer.Write([]byte(`{"results":[{"id":"842","iso3":"USA","text":"United States","isPartner":true,"isGroup":false}]}`))
+		case "/data/M", "/data/M/":
+			if request.URL.Query().Get("period") != "202401,202402" || request.URL.Query().Get("cmdCode") != "854231,854232" {
+				t.Fatalf("unexpected monthly query %s", request.URL.RawQuery)
+			}
+			_, _ = writer.Write([]byte(`{"data":[
+				{"period":"202401","primaryValue":100,"cmdCode":"854231","classificationSearchCode":"H6"},
+				{"period":"202402","primaryValue":120,"cmdCode":"854232","classificationSearchCode":"H6"},
+				{"period":"202402","primaryValue":999,"cmdCode":"TOTAL","classificationSearchCode":"H6"}
+			]}`))
+		default:
+			http.NotFound(writer, request)
+		}
+	}))
+	defer server.Close()
+	provider, err := NewWithConfig(Config{
+		BaseURL: server.URL, DataPath: "data/{freq}", PreviewDataPath: "data/{freq}", Frequency: "M",
+		ReportersURL: server.URL + "/files/reporters", PartnersURL: server.URL + "/files/partners",
+		MaxRecords: 500, Timeout: time.Second, RateLimitPerSec: 100, RateLimitBurst: 10,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows, err := provider.FetchProductPeriods(context.Background(), "KOR", "USA", model.FlowExport, []string{"2024-01", "202402"}, 6, []string{"854231", "854232"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 2 || rows[0].Period != "2024-01" || rows[1].Period != "2024-02" || rows[0].Provider != "comtrade" {
+		t.Fatalf("unexpected monthly rows: %#v", rows)
+	}
+}

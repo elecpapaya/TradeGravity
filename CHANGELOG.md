@@ -4,6 +4,29 @@ All notable changes to TradeGravity will be documented in this file. The project
 
 ## Unreleased
 
+### Added
+
+- A specialist US–China Chip Supply Chain Lens covering design/IP, materials, equipment, logic/foundry, memory/HBM, discrete/power, packaging/test, and downstream demand.
+- A validated 30-code semiconductor stage registry, country-role matrix, current trend and official policy timeline, bounded capacity/project evidence register, and explicit research-coverage gate.
+- Observed-sample HHI and top-three shares, stage/country URL state, stage CSV export, and a disruption/substitution sensitivity that never claims capacity or causal effects.
+- Five-year strategic HS6 collection support and a published `semiconductors/reference.json` artifact with cross-registry and source validation.
+- Explicit USA/China shares, exposure balance, position shift, dual exposure, and growth-divergence signals across the general and semiconductor lenses.
+- Focused 12-month semiconductor HS6 collection/publication for selected connector economies, with missing coverage left unestimated.
+- Unadjusted USA/China mirror-reporting diagnostics that preserve both reports, symmetric gaps, and interpretation caveats.
+- A validated free/public-only semiconductor data policy and open-dataset register, including OECD ICIO as industry-level future context rather than fabricated HS6 evidence.
+- A first-visit 30-second onboarding guide with a ready-made Viet Nam view.
+- Global PNG snapshot, CSV, and Markdown summary-report exports for the active analysis view.
+- Always-visible metric, observation-period, scope, and limitation context plus a definitions dialog.
+- Current, partial, and degraded publication-health states with recovery guidance.
+
+### Changed
+
+- The scheduled strategic HS6 collection now requests the selected year plus four prior annual periods and a focused 12-month panel; main-branch fast deploys preserve the latest observed coverage block while refreshing the versioned semiconductor reference.
+- Intelligence and semiconductor navigation now state the explicit US–China perspective while keeping reported observations, context, and illustrative estimates separate.
+- Recent headline panels now state their rolling window beside the selected historical trade periods and explicitly warn that the clocks are not aligned.
+- Share URLs now restore scenario partner, HS6 product, tariff, elasticity, and pass-through assumptions in addition to the existing filters and country selection.
+- Narrow layouts use compact context, stacked cards, bounded tooltips, and touch-friendly export and dialog controls.
+
 ## [0.1.1] - 2026-07-16
 
 ### Added

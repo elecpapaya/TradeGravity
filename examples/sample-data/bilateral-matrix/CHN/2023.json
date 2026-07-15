@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T19:53:00Z",
+  "provider": "comtrade",
+  "product_code": "TOTAL",
+  "product_level": 0,
+  "reporter_iso3": "CHN",
+  "period": "2023",
+  "rows": [
+    {
+      "partner_iso3": "KOR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 95748999999.99998,
+      "import_usd": 112400999999.99998,
+      "trade_usd": 208149999999.99997,
+      "balance_usd": -16652000000
+    },
+    {
+      "partner_iso3": "JPN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 86227000000,
+      "import_usd": 101223000000,
+      "trade_usd": 187450000000,
+      "balance_usd": -14996000000
+    },
+    {
+      "partner_iso3": "DEU",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 76705000000,
+      "import_usd": 90045000000,
+      "trade_usd": 166750000000,
+      "balance_usd": -13340000000
+    }
+  ]
+}

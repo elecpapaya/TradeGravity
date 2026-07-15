@@ -1,6 +1,6 @@
 # TradeGravity roadmap
 
-TradeGravity is maintained as a small, inspectable public-data pipeline. The roadmap prioritizes data trust, repeatability, and accessibility before expanding the number of features.
+TradeGravity is maintained as a small, inspectable public-data pipeline with an explicit US–China analytical lens. The roadmap prioritizes data trust, repeatability, free/public inputs, and accessibility before expanding the number of features.
 
 ## Current maintenance commitments
 
@@ -27,12 +27,18 @@ TradeGravity is maintained as a small, inspectable public-data pipeline. The roa
 - Publish a quality dashboard with collection runs and same-period provider comparisons.
 - Generate evidence-grounded explanations at build time with citation and numeric-claim validation.
 - Add filtered JSON export and a deterministic sample-data generator.
-- Split the viewer into synchronized Overview, Intelligence, Products, Data & Quality, and Scenario Lab tabs.
+- Split the viewer into synchronized Overview, US–China Lens, Chip Lens, Products, Data & Quality, and Scenario Lab tabs.
 - Publish curated strategic HS6 trade partitions with source-revision metadata.
 - Collect and publish WITS/TRAINS strategic-HS6 tariffs with AVE/reported identity and fallback behavior.
 - Publish reported UN Comtrade multi-partner matrices and selected-country partner networks without route claims.
 - Connect published MFN tariffs and HS6 import baselines to the transparent scenario sensitivity lab.
 - Publish the reviewed [`v0.1.0` release](https://github.com/elecpapaya/TradeGravity/releases/tag/v0.1.0) using the documented checklist.
+- Add a first-visit guide, in-context definitions and limits, PNG/CSV/summary exports, explicit data-health and multi-clock notices, small-screen layout improvements, and restorable scenario URLs.
+- Add a specialist US–China Chip Supply Chain Lens with an eight-stage taxonomy, 30 mapped HS6 codes, five-year strategic collection, country-role matrix, policy and capacity/project evidence registers, observed-distribution metrics, explicit coverage gates, stage CSV export, and a transparent disruption/substitution sensitivity.
+- Publish USA/China exposure balance, position shift, and dual-exposure metrics with explicit formulas and non-alignment caveats across the Intelligence and Chip Lens views.
+- Collect and publish a focused 12-month, 30-code semiconductor turning-point panel for selected connector economies.
+- Publish unadjusted mirror-reporting diagnostics against USA and China counterpart reports without selecting a ground truth or claiming fraud, rerouting, or reconciliation.
+- Register only free/public semiconductor evidence layers, including OECD ICIO as lagged industry context, and validate that paid/proprietary sources cannot become required metric inputs.
 
 ## Near term: adoption evidence and release operations
 
@@ -43,11 +49,14 @@ TradeGravity is maintained as a small, inspectable public-data pipeline. The roa
 
 ## Next: usability and analytical depth
 
+- Expand the semiconductor coverage gate from the current publication sample to at least 15 observed reporters and five annual periods, then monitor annual and monthly coverage drift in scheduled runs.
+- Evaluate only free, public, and reproducible fab/project evidence before publishing any facility layer; keep announcements, awards, construction, expected operation, and operating output separate.
+- Add computed OECD ICIO value-added/propagation context only after its industry aggregation, release lag, mapping, uncertainty, and validation cases are documented. Never manufacture an HS6-level value-added result from industry-level tables.
 - Add constant-price or deflator-aware normalization; current values are nominal.
 - [Add product-share changes across multiple years](https://github.com/elecpapaya/TradeGravity/issues/12) when provider quotas permit reliable collection.
 - [Improve chart keyboard navigation and screen-reader summaries](https://github.com/elecpapaya/TradeGravity/issues/9); continue testing small-screen layouts.
 - [Add automated magnitude and cross-file schema anomaly checks](https://github.com/elecpapaya/TradeGravity/issues/10).
-- [Add bilateral mirror-statistics diagnostics](https://github.com/elecpapaya/TradeGravity/issues/11) with explicit CIF/FOB, lag, and indirect-trade reconciliation assumptions.
+- Extend the published mirror diagnostics with optional revision-aware time series and documented CIF/FOB sensitivity; retain both source reports and never silently replace them with an adjusted truth.
 - Prototype ESI/ECI/ICI/SPDI/RPI only after formulas, benchmark datasets, uncertainty, and validation cases are documented.
 - Add tariff-change decomposition and Marimekko/waterfall views when the required multi-year product coverage is reliable.
 - [Add versioned scenario manifests and reproducible result artifacts](https://github.com/elecpapaya/TradeGravity/issues/13) before introducing SMART-like substitution or welfare outputs.

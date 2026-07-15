@@ -61,6 +61,10 @@ func main() {
 	ctx := context.Background()
 	observations := totalObservations()
 	observations = append(observations, productObservations()...)
+	strategic := strategicObservations()
+	observations = append(observations, strategic...)
+	monthly := semiconductorMonthlyObservations()
+	observations = append(observations, monthly...)
 	matrix := matrixObservations()
 	observations = append(observations, matrix...)
 	if err := store.UpsertObservations(ctx, observations); err != nil {
@@ -93,6 +97,14 @@ func main() {
 		RunID: "sample-comtrade-products", Provider: "comtrade", Mode: "products-hs2", StartedAt: fixed.Add(2 * time.Minute),
 		FinishedAt: fixed.Add(3 * time.Minute), Status: "success", ReporterCount: 3,
 		RequestCount: 12, SuccessCount: 12, StoredCount: 36, Errors: []string{},
+	}); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if err := store.RecordIngestRun(ctx, model.IngestRun{
+		RunID: "sample-comtrade-strategic", Provider: "comtrade", Mode: "products-strategic-hs6", StartedAt: fixed.Add(3 * time.Minute),
+		FinishedAt: fixed.Add(4 * time.Minute), Status: "success", ReporterCount: 3,
+		RequestCount: 30, SuccessCount: 30, StoredCount: len(strategic), Errors: []string{},
 	}); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -192,6 +204,76 @@ func productObservations() []model.Observation {
 	return observations
 }
 
+func strategicObservations() []model.Observation {
+	// One observable proxy for each customs-visible semiconductor stage. Design
+	// and EDA are services/intangibles and intentionally have no HS6 fixture.
+	products := []struct {
+		code  string
+		value float64
+	}{
+		{"280461", 1.8e9}, // silicon materials
+		{"848620", 7.5e9}, // manufacturing equipment
+		{"854231", 24e9},  // logic and controllers
+		{"854232", 20e9},  // memory
+		{"854129", 4.2e9}, // discrete devices
+		{"854290", 3.4e9}, // IC parts / packaging proxy
+		{"851762", 13e9},  // downstream network demand proxy
+	}
+	var observations []model.Observation
+	for reporterIndex, reporter := range []string{"DEU", "JPN", "KOR"} {
+		for year := 2019; year <= 2023; year++ {
+			yearFactor := 1 + float64(year-2019)*0.06
+			for _, product := range products {
+				for partnerIndex, partner := range []string{"USA", "CHN"} {
+					for _, flow := range []struct {
+						name  model.Flow
+						share float64
+					}{{model.FlowExport, 0.56}, {model.FlowImport, 0.44}} {
+						observations = append(observations, model.Observation{
+							Provider: "comtrade", Classification: "H6", ProductCode: product.code, ProductLevel: 6,
+							ReporterISO3: reporter, PartnerISO3: partner, Flow: flow.name,
+							PeriodType: model.PeriodYear, Period: fmt.Sprintf("%d", year),
+							ValueUSD: product.value * yearFactor * (1 + float64(reporterIndex)*0.12) * (1 + float64(partnerIndex)*0.08) * flow.share,
+						})
+					}
+				}
+			}
+		}
+	}
+	return observations
+}
+
+func semiconductorMonthlyObservations() []model.Observation {
+	products := []struct {
+		code  string
+		value float64
+	}{{"280461", 1.8e9}, {"848620", 7.5e9}, {"854231", 24e9}, {"854232", 20e9}, {"854129", 4.2e9}, {"854290", 3.4e9}, {"851762", 13e9}}
+	var observations []model.Observation
+	start := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
+	for reporterIndex, reporter := range []string{"DEU", "JPN", "KOR"} {
+		for monthIndex := 0; monthIndex < 12; monthIndex++ {
+			period := start.AddDate(0, monthIndex, 0).Format("2006-01")
+			trend := 1 + float64(monthIndex)*0.018
+			for _, product := range products {
+				for partnerIndex, partner := range []string{"USA", "CHN"} {
+					anchorShift := 1 + float64(monthIndex)*(0.004-float64(partnerIndex)*0.006)
+					for _, flow := range []struct {
+						name  model.Flow
+						share float64
+					}{{model.FlowExport, 0.56}, {model.FlowImport, 0.44}} {
+						observations = append(observations, model.Observation{
+							Provider: "comtrade", Classification: "H6", ProductCode: product.code, ProductLevel: 6,
+							ReporterISO3: reporter, PartnerISO3: partner, Flow: flow.name, PeriodType: model.PeriodMonth, Period: period,
+							ValueUSD: product.value / 12 * trend * anchorShift * (1 + float64(reporterIndex)*0.12) * (1 + float64(partnerIndex)*0.08) * flow.share,
+						})
+					}
+				}
+			}
+		}
+	}
+	return observations
+}
+
 func matrixObservations() []model.Observation {
 	partners := []struct {
 		iso3  string
@@ -209,6 +291,23 @@ func matrixObservations() []model.Observation {
 					ReporterISO3: reporter, PartnerISO3: partner.iso3, Flow: flow.name,
 					PeriodType: model.PeriodYear, Period: "2023",
 					ValueUSD: partner.value * (1 + float64(reporterIndex)*0.08) * (1 + float64(partnerIndex)*0.01) * flow.share,
+				})
+			}
+		}
+	}
+	// Anchor-reported counterparts make the free mirror-reporting diagnostic
+	// deterministic without pretending either direction is ground truth.
+	for anchorIndex, anchor := range []string{"USA", "CHN"} {
+		for reporterIndex, reporter := range []string{"DEU", "JPN", "KOR"} {
+			base := (145e9 + float64(reporterIndex)*18e9) * (1 + float64(anchorIndex)*0.15)
+			for _, flow := range []struct {
+				name  model.Flow
+				share float64
+			}{{model.FlowExport, 0.46}, {model.FlowImport, 0.54}} {
+				observations = append(observations, model.Observation{
+					Provider: "comtrade", Classification: "H6", ProductCode: "TOTAL", ProductLevel: 0,
+					ReporterISO3: anchor, PartnerISO3: reporter, Flow: flow.name,
+					PeriodType: model.PeriodYear, Period: "2023", ValueUSD: base * flow.share,
 				})
 			}
 		}
