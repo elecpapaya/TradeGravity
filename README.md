@@ -4,6 +4,7 @@
 [![Daily data update](https://github.com/elecpapaya/TradeGravity/actions/workflows/update-tradegravity.yml/badge.svg)](https://github.com/elecpapaya/TradeGravity/actions/workflows/update-tradegravity.yml)
 [![CodeQL](https://github.com/elecpapaya/TradeGravity/actions/workflows/codeql.yml/badge.svg)](https://github.com/elecpapaya/TradeGravity/actions/workflows/codeql.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![User study recruiting](https://img.shields.io/badge/user%20study-recruiting-008672.svg)](https://github.com/elecpapaya/TradeGravity/issues/3)
 
 TradeGravity is an open-source pipeline and static web explorer for comparing how reporter countries trade with the United States and China. It combines same-period headline comparisons, 5–10 year trends, HS2 product chapters, country context, and explicit quality signals in a static deployment that needs no application server.
 
@@ -24,6 +25,8 @@ TradeGravity provides a reproducible path from public source data to a lightweig
 ## Project status
 
 TradeGravity is an early-stage project under active maintenance. A scheduled GitHub Actions workflow currently refreshes and deploys the public dataset every day. The default allowlist publishes 51 reporter countries; coverage can be changed through configuration.
+
+**Help test v0.1.0:** we are recruiting three students, researchers, or developers for a 15-minute, task-based evaluation. No setup or trade-data expertise is required. Start with [the public study tracker](https://github.com/elecpapaya/TradeGravity/issues/3), then submit only nonidentifying feedback through the linked form. Participation is voluntary, and public feedback is recorded only with consent.
 
 The viewer is intended for exploration and education, not financial, legal, or policy advice. Its default comparison mode includes only reporters whose USA and China values use the same observation period. Users can opt into all available values, where mixed or stale periods remain visibly flagged.
 
@@ -210,7 +213,7 @@ Before deployment, `cmd/validator` checks provenance across every artifact, repo
 
 TradeGravity is created and primarily maintained by [@elecpapaya](https://github.com/elecpapaya). Maintenance includes monitoring scheduled collection runs, reviewing source/API changes, keeping dependencies current, improving tests and documentation, and planning releases.
 
-Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow and [ROADMAP.md](ROADMAP.md) for planned work. Please do not include API keys or other secrets in issues, logs, or commits.
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow and [ROADMAP.md](ROADMAP.md) for planned work. The [user-testing protocol](docs/USER_TESTING.md) explains how nonidentifying feedback is collected and turned into follow-up issues. Please do not include API keys or other secrets in issues, logs, or commits.
 
 Support routes are documented in [SUPPORT.md](SUPPORT.md), and the release procedure is documented in [docs/RELEASING.md](docs/RELEASING.md).
 
