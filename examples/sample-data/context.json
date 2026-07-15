@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-01-01T00:00:00Z",
+  "source": "Deterministic TradeGravity sample fixture",
+  "status": "success",
+  "errors": [],
+  "countries": [
+    {
+      "iso3": "DEU",
+      "iso2": "DE",
+      "name": "Germany",
+      "region": "Europe \u0026 Central Asia",
+      "income_group": "High income",
+      "groups": [
+        "EU"
+      ],
+      "population": {
+        "value": 84480000,
+        "year": "2023"
+      },
+      "gdp": {
+        "value": 4530000000000,
+        "year": "2023"
+      }
+    },
+    {
+      "iso3": "JPN",
+      "iso2": "JP",
+      "name": "Japan",
+      "region": "East Asia \u0026 Pacific",
+      "income_group": "High income",
+      "groups": [],
+      "population": {
+        "value": 124520000,
+        "year": "2023"
+      },
+      "gdp": {
+        "value": 4210000000000,
+        "year": "2023"
+      }
+    },
+    {
+      "iso3": "KOR",
+      "iso2": "KR",
+      "name": "Korea, Rep.",
+      "region": "East Asia \u0026 Pacific",
+      "income_group": "High income",
+      "groups": [],
+      "population": {
+        "value": 51710000,
+        "year": "2023"
+      },
+      "gdp": {
+        "value": 1710000000000,
+        "year": "2023"
+      }
+    }
+  ]
+}

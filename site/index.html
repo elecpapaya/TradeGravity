@@ -3,15 +3,30 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TradeGravity – US/CN Trade Treemap</title>
+  <meta name="description" content="Explore reproducible public trade data comparing reporter countries' trade with the United States and China." />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagcdn.com; connect-src 'self' https://api.worldbank.org https://api.gdeltproject.org; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
+  <title>TradeGravity – US/CN Trade Data Explorer</title>
   <link rel="stylesheet" href="./styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="./security.js"></script>
+  <script src="./data-tools.js"></script>
+  <script src="./explorer-tools.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 </head>
 <body>
+  <a class="skipLink" href="#dataTableTitle">Skip to accessible data table</a>
   <header class="topbar">
     <div class="brand">
       <div class="title">TradeGravity</div>
       <div class="subtitle">Compare each country's trade with the United States and China. Tiles scale by trade/export/import, with flags and linked highlights on hover. Exports/imports are from each country's perspective; USA/CHN are the partner side.</div>
+      <div class="datasetMeta">
+        <span id="dataStatus">Loading dataset metadata…</span>
+        <a id="sourceLink" href="https://wits.worldbank.org/" target="_blank" rel="noopener noreferrer">Data source</a>
+        <a href="./data/latest.json" target="_blank" rel="noopener noreferrer">Latest JSON</a>
+        <a href="./data/meta.json" target="_blank" rel="noopener noreferrer">Metadata JSON</a>
+        <a href="https://github.com/elecpapaya/TradeGravity/blob/main/docs/DATA_RIGHTS.md" target="_blank" rel="noopener noreferrer">Reuse terms</a>
+        <a href="https://github.com/elecpapaya/TradeGravity" target="_blank" rel="noopener noreferrer">Source code</a>
+      </div>
     </div>
 
     <div class="controls">
@@ -37,15 +52,55 @@
         <input id="topN" type="number" min="5" max="200" step="1" value="25" style="min-width:120px"/>
       </label>
 
+      <label class="field">
+        <span class="label">Observation period</span>
+        <select id="periodFilter" aria-label="Observation period">
+          <option value="latest">Latest by reporter</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label">Comparison mode</span>
+        <select id="comparisonMode">
+          <option value="comparable">Same-period only</option>
+          <option value="all">All available</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label">Region</span>
+        <select id="regionFilter"><option value="">All regions</option></select>
+      </label>
+
+      <label class="field">
+        <span class="label">Income group</span>
+        <select id="incomeFilter"><option value="">All income groups</option></select>
+      </label>
+
+      <label class="field">
+        <span class="label">Country group</span>
+        <select id="groupFilter"><option value="">All groups</option></select>
+      </label>
+
+      <label class="field">
+        <span class="label">Normalize values</span>
+        <select id="normalization">
+          <option value="raw">Nominal US$</option>
+          <option value="per_capita">US$ per person</option>
+          <option value="gdp_share">Share of GDP</option>
+        </select>
+      </label>
+
       <div class="growthLegend is-hidden" id="growthLegend" aria-label="Growth color scale">
         <span class="legendLabel">-50%</span>
         <div class="legendBar"><span class="legendMid">0</span></div>
         <span class="legendLabel">+50%</span>
       </div>
+      <button id="copyShareURL" class="btn" type="button">Copy view URL</button>
     </div>
   </header>
 
-  <main class="layout">
+  <main class="layout" aria-label="Trade visualization and country details">
     <section class="canvas">
       <div class="grid">
         <div class="card" id="card-usa">
@@ -53,7 +108,7 @@
             <div class="cardTitle">USA</div>
             <div class="cardHint">Countries sized by selected metric with USA</div>
           </div>
-          <svg id="svg-usa" class="treemap"></svg>
+          <svg id="svg-usa" class="treemap" role="img" aria-label="Treemap of reporter countries trading with the United States"></svg>
         </div>
 
         <div class="card" id="card-chn">
@@ -61,30 +116,106 @@
             <div class="cardTitle">CHN</div>
             <div class="cardHint">Countries sized by selected metric with China</div>
           </div>
-          <svg id="svg-chn" class="treemap"></svg>
+          <svg id="svg-chn" class="treemap" role="img" aria-label="Treemap of reporter countries trading with China"></svg>
         </div>
       </div>
 
       <div class="footerNote">
         Each big rectangle is an anchor card (USA/CHN). Inside: sub-rectangles per country, sized by the selected metric. Exports/imports are recorded from each country's side with USA/CHN as the partner.
-        Flags are loaded from a CDN (optional). Hover highlights the same country on both sides.
+        Flags are loaded from a CDN (optional). Hover or keyboard focus highlights the same country on both sides. Pipeline refresh time and source observation periods are different concepts; always check the period shown for each value.
       </div>
     </section>
 
     <aside class="side">
       <div class="panel">
         <div class="panelTitle">Selection</div>
-        <div id="selection" class="panelBody subtle">Click a country tile to view details.</div>
+        <div id="selection" class="panelBody subtle" aria-live="polite">Click a country tile to view details.</div>
       </div>
 
       <div class="panel">
         <div class="panelTitle">Country Snapshot</div>
-        <div id="indicators" class="panelBody subtle">Click a country tile to load key economic indicators.</div>
+        <div id="indicators" class="panelBody subtle" aria-live="polite">Click a country tile to load key economic indicators.</div>
       </div>
     </aside>
   </main>
 
-  <div id="tooltip" class="tooltip" style="display:none;"></div>
+  <section class="analysisGrid" aria-label="Selected-country analysis and data quality">
+    <article class="analysisCard" aria-labelledby="trendTitle">
+      <div class="analysisHeader">
+        <div>
+          <h2 id="trendTitle">5–10 year trend</h2>
+          <p>USA and China values use the selected metric and normalization.</p>
+        </div>
+      </div>
+      <div id="timeSeries" class="analysisBody subtle" aria-live="polite">Select a country to view its time series.</div>
+    </article>
+
+    <article class="analysisCard" aria-labelledby="productsTitle">
+      <div class="analysisHeader">
+        <div>
+          <h2 id="productsTitle">HS2 product mix</h2>
+          <p>Top traded product chapters from UN Comtrade, kept separate from headline totals.</p>
+        </div>
+      </div>
+      <div id="products" class="analysisBody subtle" aria-live="polite">Select a country to view product chapters.</div>
+    </article>
+
+    <article class="analysisCard" aria-labelledby="qualityTitle">
+      <div class="analysisHeader">
+        <div>
+          <h2 id="qualityTitle">Data quality</h2>
+          <p>Coverage, period comparability, collection runs, and provider differences.</p>
+        </div>
+        <a href="./data/quality.json" target="_blank" rel="noopener noreferrer">Quality JSON</a>
+      </div>
+      <div id="qualityDashboard" class="analysisBody subtle" aria-live="polite">Loading quality report…</div>
+    </article>
+
+    <article class="analysisCard" aria-labelledby="explanationTitle">
+      <div class="analysisHeader">
+        <div>
+          <h2 id="explanationTitle">Evidence-grounded explanation</h2>
+          <p>Every statement links back to a published observation or quality signal.</p>
+        </div>
+      </div>
+      <div id="explanation" class="analysisBody subtle" aria-live="polite">Select a country to view its explanation.</div>
+    </article>
+  </section>
+
+  <section class="dataTableCard" aria-labelledby="dataTableTitle" aria-describedby="dataTableHelp">
+    <div class="tableHeader">
+      <div>
+        <h2 id="dataTableTitle">Accessible trade data table</h2>
+        <p id="dataTableHelp">Filter all reporters, open country details, or download the normalized dataset as CSV. Values are nominal US dollars.</p>
+      </div>
+      <div class="tableActions">
+        <label class="tableSearchLabel" for="tableSearch">Filter reporters</label>
+        <input id="tableSearch" type="search" autocomplete="off" placeholder="Country or ISO3" />
+        <button id="downloadCSV" class="btn" type="button">Download CSV</button>
+        <button id="downloadJSON" class="btn" type="button">Download filtered JSON</button>
+      </div>
+    </div>
+    <div id="tableSummary" class="tableSummary" aria-live="polite">Loading reporters…</div>
+    <div class="tableScroll" tabindex="0" aria-label="Scrollable trade data table">
+      <table class="tradeTable">
+        <caption class="srOnly">Reporter countries and their trade with the United States and China for the selected metric.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Reporter</th>
+            <th scope="col">USA period</th>
+            <th id="usaMetricHeader" class="numeric" scope="col">USA trade</th>
+            <th scope="col">CHN period</th>
+            <th id="chnMetricHeader" class="numeric" scope="col">CHN trade</th>
+            <th id="combinedMetricHeader" class="numeric" scope="col" aria-sort="descending">Combined trade</th>
+            <th class="numeric" scope="col">China share</th>
+          </tr>
+        </thead>
+        <tbody id="tradeTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div id="tooltip" class="tooltip" role="status" aria-live="polite" style="display:none;"></div>
   <script src="./app.js"></script>
 </body>
 </html>

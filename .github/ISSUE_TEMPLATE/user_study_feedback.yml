@@ -1,0 +1,90 @@
+name: User-study feedback
+description: Record a consented, non-identifying TradeGravity usability session.
+title: "research: user task feedback "
+labels:
+  - user-research
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Record only a real completed session. Use a participant alias and do not include names, contact details, employers, recordings, API keys, or other private information. Confirm publication consent before submitting.
+
+  - type: input
+    id: participant
+    attributes:
+      label: Participant alias and broad role
+      placeholder: "P1 — student"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Tested release or commit
+    validations:
+      required: true
+
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Task outcome
+      options:
+        - Completed unaided
+        - Completed with one hint
+        - Completed with multiple hints
+        - Abandoned
+    validations:
+      required: true
+
+  - type: input
+    id: time
+    attributes:
+      label: Approximate task time
+      placeholder: "7 minutes"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: interpretation
+    attributes:
+      label: Interpretation checks
+      options:
+        - label: Participant noticed the observation period.
+        - label: Participant understood WITS totals and Comtrade products are separate sources.
+        - label: Participant reached a conclusion supported by the displayed evidence.
+
+  - type: textarea
+    id: findings
+    attributes:
+      label: Observed findings
+      description: List concrete blocks, errors, delays, or positive signals. Quote only with permission.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Highest finding severity
+      options:
+        - Blocks task
+        - Causes wrong interpretation
+        - Slows task
+        - Cosmetic only
+        - No issue observed
+    validations:
+      required: true
+
+  - type: textarea
+    id: followups
+    attributes:
+      label: Linked follow-up issues or decisions
+
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Publication and privacy
+      options:
+        - label: The participant consented to publication of this non-identifying summary.
+          required: true
+        - label: This issue contains no identity, contact details, credentials, or sensitive information.
+          required: true

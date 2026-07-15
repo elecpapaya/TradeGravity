@@ -1,0 +1,69 @@
+name: Bug report
+description: Report a reproducible problem in collection, publishing, or the viewer.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve TradeGravity. Do not include API keys, tokens, or private information. Security vulnerabilities belong in a private report under the Security tab.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - WITS collector
+        - UN Comtrade collector
+        - SQLite storage
+        - Publisher or generated JSON
+        - Static viewer
+        - GitHub Actions or deployment
+        - Documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Include commands, provider, reporter, partner, and period when relevant.
+      placeholder: |
+        1. Run ...
+        2. Open ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: input
+    id: source
+    attributes:
+      label: Upstream source link
+      description: For a data discrepancy, link to the WITS, UN Comtrade, World Bank, or GDELT source when possible.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include OS, Go version, browser, commit, and relevant non-secret configuration.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed credentials and personal information from this report.
+          required: true
+        - label: This report does not disclose a security vulnerability publicly.
+          required: true

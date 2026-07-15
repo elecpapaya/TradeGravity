@@ -1,0 +1,311 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:28:31Z",
+  "provider": "wits",
+  "partners": [
+    "USA",
+    "CHN"
+  ],
+  "rows": [
+    {
+      "iso3": "DEU",
+      "points": [
+        {
+          "period_type": "Y",
+          "period": "2019",
+          "usa": {
+            "available": true,
+            "export": 121799999999.99998,
+            "import": 88200000000,
+            "trade": 210000000000
+          },
+          "chn": {
+            "available": true,
+            "export": 118899999999.99998,
+            "import": 86100000000,
+            "trade": 205000000000
+          },
+          "total": 415000000000,
+          "share_cn": 0.4939759036144578,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2020",
+          "usa": {
+            "available": true,
+            "export": 124844999999.99997,
+            "import": 90404999999.99998,
+            "trade": 215249999999.99994
+          },
+          "chn": {
+            "available": true,
+            "export": 121872499999.99997,
+            "import": 88252499999.99998,
+            "trade": 210124999999.99994
+          },
+          "total": 425374999999.9999,
+          "share_cn": 0.4939759036144578,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2021",
+          "usa": {
+            "available": true,
+            "export": 127889999999.99998,
+            "import": 92610000000,
+            "trade": 220500000000
+          },
+          "chn": {
+            "available": true,
+            "export": 124844999999.99998,
+            "import": 90405000000,
+            "trade": 215250000000
+          },
+          "total": 435750000000,
+          "share_cn": 0.4939759036144578,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2022",
+          "usa": {
+            "available": true,
+            "export": 130934999999.99998,
+            "import": 94815000000,
+            "trade": 225750000000
+          },
+          "chn": {
+            "available": true,
+            "export": 127817499999.99998,
+            "import": 92557500000,
+            "trade": 220375000000
+          },
+          "total": 446125000000,
+          "share_cn": 0.4939759036144578,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2023",
+          "usa": {
+            "available": true,
+            "export": 133980000000.00002,
+            "import": 97020000000.00002,
+            "trade": 231000000000.00003
+          },
+          "chn": {
+            "available": true,
+            "export": 130790000000.00002,
+            "import": 94710000000.00002,
+            "trade": 225500000000.00003
+          },
+          "total": 456500000000.00006,
+          "share_cn": 0.4939759036144578,
+          "comparable": true
+        }
+      ]
+    },
+    {
+      "iso3": "JPN",
+      "points": [
+        {
+          "period_type": "Y",
+          "period": "2019",
+          "usa": {
+            "available": true,
+            "export": 113099999999.99998,
+            "import": 81900000000,
+            "trade": 195000000000
+          },
+          "chn": {
+            "available": true,
+            "export": 150800000000,
+            "import": 109200000000,
+            "trade": 260000000000
+          },
+          "total": 455000000000,
+          "share_cn": 0.5714285714285714,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2020",
+          "usa": {
+            "available": true,
+            "export": 115927499999.99997,
+            "import": 83947499999.99998,
+            "trade": 199874999999.99994
+          },
+          "chn": {
+            "available": true,
+            "export": 154569999999.99997,
+            "import": 111929999999.99998,
+            "trade": 266499999999.99994
+          },
+          "total": 466374999999.9999,
+          "share_cn": 0.5714285714285714,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2021",
+          "usa": {
+            "available": true,
+            "export": 118754999999.99998,
+            "import": 85995000000,
+            "trade": 204750000000
+          },
+          "chn": {
+            "available": true,
+            "export": 158340000000,
+            "import": 114660000000,
+            "trade": 273000000000
+          },
+          "total": 477750000000,
+          "share_cn": 0.5714285714285714,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2022",
+          "usa": {
+            "available": true,
+            "export": 121582499999.99998,
+            "import": 88042500000,
+            "trade": 209625000000
+          },
+          "chn": {
+            "available": true,
+            "export": 162110000000,
+            "import": 117390000000,
+            "trade": 279500000000
+          },
+          "total": 489125000000,
+          "share_cn": 0.5714285714285714,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2023",
+          "usa": {
+            "available": true,
+            "export": 124410000000.00002,
+            "import": 90090000000.00002,
+            "trade": 214500000000.00003
+          },
+          "chn": {
+            "available": true,
+            "export": 165880000000,
+            "import": 120120000000,
+            "trade": 286000000000
+          },
+          "total": 500500000000,
+          "share_cn": 0.5714285714285714,
+          "comparable": true
+        }
+      ]
+    },
+    {
+      "iso3": "KOR",
+      "points": [
+        {
+          "period_type": "Y",
+          "period": "2019",
+          "usa": {
+            "available": true,
+            "export": 95700000000,
+            "import": 69300000000,
+            "trade": 165000000000
+          },
+          "chn": {
+            "available": true,
+            "export": 142100000000,
+            "import": 102900000000,
+            "trade": 245000000000
+          },
+          "total": 410000000000,
+          "share_cn": 0.5975609756097561,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2020",
+          "usa": {
+            "available": true,
+            "export": 98092500000,
+            "import": 71032500000,
+            "trade": 169125000000
+          },
+          "chn": {
+            "available": true,
+            "export": 145652499999.99997,
+            "import": 105472499999.99998,
+            "trade": 251124999999.99994
+          },
+          "total": 420249999999.99994,
+          "share_cn": 0.5975609756097561,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2021",
+          "usa": {
+            "available": true,
+            "export": 100485000000,
+            "import": 72765000000,
+            "trade": 173250000000
+          },
+          "chn": {
+            "available": true,
+            "export": 149205000000,
+            "import": 108045000000,
+            "trade": 257250000000
+          },
+          "total": 430500000000,
+          "share_cn": 0.5975609756097561,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2022",
+          "usa": {
+            "available": true,
+            "export": 102877500000,
+            "import": 74497500000,
+            "trade": 177375000000
+          },
+          "chn": {
+            "available": true,
+            "export": 152757500000,
+            "import": 110617500000,
+            "trade": 263375000000
+          },
+          "total": 440750000000,
+          "share_cn": 0.5975609756097561,
+          "comparable": true
+        },
+        {
+          "period_type": "Y",
+          "period": "2023",
+          "usa": {
+            "available": true,
+            "export": 105270000000,
+            "import": 76230000000,
+            "trade": 181500000000
+          },
+          "chn": {
+            "available": true,
+            "export": 156310000000,
+            "import": 113190000000.00002,
+            "trade": 269500000000
+          },
+          "total": 451000000000,
+          "share_cn": 0.5975609756097561,
+          "comparable": true
+        }
+      ]
+    }
+  ]
+}

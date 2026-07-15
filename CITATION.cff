@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use TradeGravity in research, teaching, or a derived tool, please cite this software using these metadata and record the dataset generation date."
+title: "TradeGravity"
+version: "0.1.0"
+date-released: "2026-07-15"
+abstract: "A reproducible open-source pipeline and static data explorer for comparing reporter-country trade with the United States and China using WITS or UN Comtrade observations."
+authors:
+  - name: "elecpapaya"
+    website: "https://github.com/elecpapaya"
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/elecpapaya/TradeGravity"
+url: "https://elecpapaya.github.io/TradeGravity/"
+keywords:
+  - international trade
+  - open data
+  - data visualization
+  - WITS
+  - UN Comtrade
+  - reproducible research

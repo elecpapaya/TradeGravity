@@ -1,0 +1,115 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:28:31Z",
+  "primary_provider": "wits",
+  "dominant_period": "Y:2023",
+  "summary": {
+    "reporter_count": 3,
+    "comparable_reporters": 3,
+    "incomparable_reporters": 0,
+    "missing_partner_blocks": 0,
+    "stale_partner_blocks": 0,
+    "provider_comparison_count": 6
+  },
+  "reporter_issues": [],
+  "collection_runs": [
+    {
+      "run_id": "sample-comtrade-products",
+      "provider": "comtrade",
+      "mode": "products-hs2",
+      "started_at": "2026-01-01T00:02:00Z",
+      "finished_at": "2026-01-01T00:03:00Z",
+      "status": "success",
+      "reporter_count": 3,
+      "request_count": 12,
+      "success_count": 12,
+      "failure_count": 0,
+      "skipped_count": 0,
+      "stored_count": 36,
+      "errors": []
+    },
+    {
+      "run_id": "sample-wits-totals",
+      "provider": "wits",
+      "mode": "totals",
+      "started_at": "2026-01-01T00:00:00Z",
+      "finished_at": "2026-01-01T00:01:00Z",
+      "status": "success",
+      "reporter_count": 3,
+      "request_count": 12,
+      "success_count": 12,
+      "failure_count": 0,
+      "skipped_count": 0,
+      "stored_count": 60,
+      "errors": []
+    }
+  ],
+  "provider_comparison": [
+    {
+      "iso3": "DEU",
+      "partner": "CHN",
+      "period_type": "Y",
+      "period": "2023",
+      "primary_provider": "wits",
+      "secondary_provider": "comtrade",
+      "primary_trade_usd": 225500000000.00003,
+      "secondary_trade_usd": 62100000000,
+      "delta_ratio": -0.7246119733924612
+    },
+    {
+      "iso3": "DEU",
+      "partner": "USA",
+      "period_type": "Y",
+      "period": "2023",
+      "primary_provider": "wits",
+      "secondary_provider": "comtrade",
+      "primary_trade_usd": 231000000000.00003,
+      "secondary_trade_usd": 54000000000,
+      "delta_ratio": -0.7662337662337663
+    },
+    {
+      "iso3": "JPN",
+      "partner": "CHN",
+      "period_type": "Y",
+      "period": "2023",
+      "primary_provider": "wits",
+      "secondary_provider": "comtrade",
+      "primary_trade_usd": 286000000000,
+      "secondary_trade_usd": 68310000000,
+      "delta_ratio": -0.7611538461538462
+    },
+    {
+      "iso3": "JPN",
+      "partner": "USA",
+      "period_type": "Y",
+      "period": "2023",
+      "primary_provider": "wits",
+      "secondary_provider": "comtrade",
+      "primary_trade_usd": 214500000000.00003,
+      "secondary_trade_usd": 59400000000,
+      "delta_ratio": -0.7230769230769231
+    },
+    {
+      "iso3": "KOR",
+      "partner": "CHN",
+      "period_type": "Y",
+      "period": "2023",
+      "primary_provider": "wits",
+      "secondary_provider": "comtrade",
+      "primary_trade_usd": 269500000000,
+      "secondary_trade_usd": 74520000000,
+      "delta_ratio": -0.7234879406307978
+    },
+    {
+      "iso3": "KOR",
+      "partner": "USA",
+      "period_type": "Y",
+      "period": "2023",
+      "primary_provider": "wits",
+      "secondary_provider": "comtrade",
+      "primary_trade_usd": 181500000000,
+      "secondary_trade_usd": 64800000000,
+      "delta_ratio": -0.6429752066115703
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+name: Quality checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.25.12"
+          cache: true
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Check formatting
+        shell: bash
+        run: test -z "$(gofmt -l ./cmd ./internal)"
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Run vet
+        run: go vet ./...
+
+      - name: Validate offline sample dataset
+        run: go run ./cmd/validator -dir examples/sample-data -min-reporters 3
+
+      - name: Check browser JavaScript
+        run: node --check site/app.js && node --check site/security.js && node --check site/data-tools.js && node --check site/explorer-tools.js
+
+      - name: Test browser data helpers
+        run: node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/structure.test.cjs
+
+      - name: Validate citation metadata
+        run: |
+          python -m pip install --disable-pip-version-check cffconvert==2.0.0
+          cffconvert --validate
+
+      - name: Scan Go dependencies
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...

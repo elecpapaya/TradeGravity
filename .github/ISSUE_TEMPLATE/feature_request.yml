@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose an improvement grounded in a user or maintainer need.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or user need
+      description: Explain who needs this and what they cannot do today.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed outcome
+      description: Describe the desired behavior without requiring a specific implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: provenance
+    attributes:
+      label: Data provenance and compatibility
+      description: Explain any new source, data meaning, output field, or compatibility impact.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to help test or document this improvement.
+        - label: I would be willing to submit a pull request after scope is agreed.

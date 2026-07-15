@@ -327,7 +327,7 @@ func (p *Provider) doRequest(ctx context.Context, path string, params url.Values
 
 	resp, err := p.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, safeTransportError("wits: request failed", err)
 	}
 	defer resp.Body.Close()
 
@@ -341,10 +341,28 @@ func (p *Provider) doRequest(ctx context.Context, path string, params url.Values
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return nil, fmt.Errorf("wits: request failed (%s): %s", resp.Status, strings.TrimSpace(string(body)))
+		safeBody := strings.TrimSpace(string(body))
+		if strings.TrimSpace(p.config.APIKey) != "" {
+			safeBody = strings.ReplaceAll(safeBody, p.config.APIKey, "[REDACTED]")
+		}
+		return nil, fmt.Errorf("wits: request failed (%s): %s", resp.Status, safeBody)
 	}
 
 	return body, nil
+}
+
+func safeTransportError(prefix string, err error) error {
+	var urlError *url.Error
+	if errors.As(err, &urlError) && urlError.Err != nil {
+		return fmt.Errorf("%s: %w", prefix, urlError.Err)
+	}
+	if errors.Is(err, context.Canceled) {
+		return fmt.Errorf("%s: %w", prefix, context.Canceled)
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return fmt.Errorf("%s: %w", prefix, context.DeadlineExceeded)
+	}
+	return errors.New(prefix)
 }
 
 func (p *Provider) buildURL(path string, params url.Values) (string, error) {
@@ -614,6 +632,14 @@ func parseSDMXObservations(payload sdmxResponse, fallbackFlow model.Flow, report
 				flow = mappedFlow
 			}
 		}
+		productCode := "TOTAL"
+		if value, ok := dimensionValues["PRODUCT"]; ok && strings.TrimSpace(value) != "" {
+			productCode = strings.ToUpper(strings.TrimSpace(value))
+		}
+		productLevel := 0
+		if productCode != "TOTAL" && isDigits(productCode) {
+			productLevel = len(productCode)
+		}
 
 		for obsKey, obsValue := range series.Observations {
 			index, err := strconv.Atoi(obsKey)
@@ -630,12 +656,15 @@ func parseSDMXObservations(payload sdmxResponse, fallbackFlow model.Flow, report
 			}
 
 			observations = append(observations, model.Observation{
-				ReporterISO3: strings.ToUpper(reporter),
-				PartnerISO3:  strings.ToUpper(partner),
-				Flow:         flow,
-				PeriodType:   periodType,
-				Period:       period,
-				ValueUSD:     value * multiplier,
+				Classification: "WITS-TRADESTATS",
+				ProductCode:    productCode,
+				ProductLevel:   productLevel,
+				ReporterISO3:   strings.ToUpper(reporter),
+				PartnerISO3:    strings.ToUpper(partner),
+				Flow:           flow,
+				PeriodType:     periodType,
+				Period:         period,
+				ValueUSD:       value * multiplier,
 			})
 		}
 	}
@@ -760,13 +789,26 @@ func rowToObservation(row map[string]any, reporterISO3, partnerISO3 string, flow
 		partner = rowPartner
 	}
 
+	productCode, _ := getString(row, "ProductCode", "productCode", "Product", "product")
+	productCode = strings.ToUpper(strings.TrimSpace(productCode))
+	if productCode == "" {
+		productCode = "TOTAL"
+	}
+	productLevel := 0
+	if productCode != "TOTAL" && isDigits(productCode) {
+		productLevel = len(productCode)
+	}
+
 	return model.Observation{
-		ReporterISO3: strings.ToUpper(reporter),
-		PartnerISO3:  strings.ToUpper(partner),
-		Flow:         flow,
-		PeriodType:   periodType,
-		Period:       period,
-		ValueUSD:     value,
+		Classification: "WITS-TRADESTATS",
+		ProductCode:    productCode,
+		ProductLevel:   productLevel,
+		ReporterISO3:   strings.ToUpper(reporter),
+		PartnerISO3:    strings.ToUpper(partner),
+		Flow:           flow,
+		PeriodType:     periodType,
+		Period:         period,
+		ValueUSD:       value,
 	}, nil
 }
 
