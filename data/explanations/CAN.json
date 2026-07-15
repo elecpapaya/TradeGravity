@@ -1,0 +1,128 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:59:07Z",
+  "reporter_iso3": "CAN",
+  "name": "Canada",
+  "generator": {
+    "type": "rules",
+    "status": "fallback",
+    "model": "none"
+  },
+  "summary": "Canada has a larger published USA-plus-China trade relationship with USA in the current view.",
+  "statements": [
+    {
+      "text": "Trade with USA is $715,457,419,647 for 2023.",
+      "evidence_ids": [
+        "TOTAL-USA"
+      ]
+    },
+    {
+      "text": "Trade with China is $88,699,623,248 for 2023.",
+      "evidence_ids": [
+        "TOTAL-CHN"
+      ]
+    },
+    {
+      "text": "Both partner totals use the same observation period.",
+      "evidence_ids": [
+        "QUALITY-PERIOD"
+      ]
+    },
+    {
+      "text": "The largest published HS2 chapter is Top HS2 chapter: HS 27 Mineral fuels oils waxes and bituminous substances at $160,241,146,752 for 2023.",
+      "evidence_ids": [
+        "PRODUCT-TOP"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TOTAL-USA",
+      "label": "Headline trade with USA",
+      "value": 715457419646.688,
+      "display_value": "$715,457,419,647",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "TOTAL-CHN",
+      "label": "Headline trade with China",
+      "value": 88699623248.302,
+      "display_value": "$88,699,623,248",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "SHARE-CHN",
+      "label": "China share of USA-plus-China trade",
+      "value": 0.11030136965409224,
+      "display_value": "11.0%",
+      "unit": "share",
+      "period": "2023",
+      "source": "TradeGravity calculation",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "QUALITY-PERIOD",
+      "label": "USA and China observations use the same period",
+      "display_value": "comparable",
+      "period": "2023",
+      "source": "TradeGravity quality check",
+      "source_json": "../quality.json"
+    },
+    {
+      "id": "TREND-USA-FIRST",
+      "label": "First comparable annual USA trade",
+      "value": 616773728955,
+      "display_value": "$616,773,728,955",
+      "unit": "current USD",
+      "period": "2014",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-USA-LAST",
+      "label": "Latest comparable annual USA trade",
+      "value": 715457419646.688,
+      "display_value": "$715,457,419,647",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-FIRST",
+      "label": "First comparable annual China trade",
+      "value": 70513951742,
+      "display_value": "$70,513,951,742",
+      "unit": "current USD",
+      "period": "2014",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-LAST",
+      "label": "Latest comparable annual China trade",
+      "value": 88699623248.302,
+      "display_value": "$88,699,623,248",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "PRODUCT-TOP",
+      "label": "Top HS2 chapter: HS 27 Mineral fuels oils waxes and bituminous substances",
+      "value": 160241146751.584,
+      "display_value": "$160,241,146,752",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "COMTRADE",
+      "source_json": "../products/CAN.json"
+    }
+  ]
+}

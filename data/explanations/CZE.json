@@ -1,0 +1,128 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:59:07Z",
+  "reporter_iso3": "CZE",
+  "name": "Czechia",
+  "generator": {
+    "type": "rules",
+    "status": "fallback",
+    "model": "none"
+  },
+  "summary": "Czechia has a larger published USA-plus-China trade relationship with China in the current view.",
+  "statements": [
+    {
+      "text": "Trade with USA is $12,390,475,337 for 2023.",
+      "evidence_ids": [
+        "TOTAL-USA"
+      ]
+    },
+    {
+      "text": "Trade with China is $42,904,743,317 for 2023.",
+      "evidence_ids": [
+        "TOTAL-CHN"
+      ]
+    },
+    {
+      "text": "Both partner totals use the same observation period.",
+      "evidence_ids": [
+        "QUALITY-PERIOD"
+      ]
+    },
+    {
+      "text": "The largest published HS2 chapter is Top HS2 chapter: HS 85 Electrical machinery equipment and parts at $25,195,425,855 for 2023.",
+      "evidence_ids": [
+        "PRODUCT-TOP"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TOTAL-USA",
+      "label": "Headline trade with USA",
+      "value": 12390475337,
+      "display_value": "$12,390,475,337",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "TOTAL-CHN",
+      "label": "Headline trade with China",
+      "value": 42904743317,
+      "display_value": "$42,904,743,317",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "SHARE-CHN",
+      "label": "China share of USA-plus-China trade",
+      "value": 0.7759213972092018,
+      "display_value": "77.6%",
+      "unit": "share",
+      "period": "2023",
+      "source": "TradeGravity calculation",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "QUALITY-PERIOD",
+      "label": "USA and China observations use the same period",
+      "display_value": "comparable",
+      "period": "2023",
+      "source": "TradeGravity quality check",
+      "source_json": "../quality.json"
+    },
+    {
+      "id": "TREND-USA-FIRST",
+      "label": "First comparable annual USA trade",
+      "value": 7581045968,
+      "display_value": "$7,581,045,968",
+      "unit": "current USD",
+      "period": "2014",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-USA-LAST",
+      "label": "Latest comparable annual USA trade",
+      "value": 12390475337,
+      "display_value": "$12,390,475,337",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-FIRST",
+      "label": "First comparable annual China trade",
+      "value": 19464537435,
+      "display_value": "$19,464,537,435",
+      "unit": "current USD",
+      "period": "2014",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-LAST",
+      "label": "Latest comparable annual China trade",
+      "value": 42904743317,
+      "display_value": "$42,904,743,317",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "PRODUCT-TOP",
+      "label": "Top HS2 chapter: HS 85 Electrical machinery equipment and parts",
+      "value": 25195425855,
+      "display_value": "$25,195,425,855",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "COMTRADE",
+      "source_json": "../products/CZE.json"
+    }
+  ]
+}

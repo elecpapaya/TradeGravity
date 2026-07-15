@@ -1,0 +1,84 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:59:07Z",
+  "reporter_iso3": "USA",
+  "name": "United States",
+  "generator": {
+    "type": "rules",
+    "status": "fallback",
+    "model": "none"
+  },
+  "summary": "United States has a larger published USA-plus-China trade relationship with China in the current view.",
+  "statements": [
+    {
+      "text": "Trade with USA is $0 for an unavailable period.",
+      "evidence_ids": [
+        "TOTAL-USA"
+      ]
+    },
+    {
+      "text": "Trade with China is $595,822,896,380 for 2023.",
+      "evidence_ids": [
+        "TOTAL-CHN"
+      ]
+    },
+    {
+      "text": "The partner periods differ or one is missing, so the two totals are not a same-period comparison.",
+      "evidence_ids": [
+        "QUALITY-PERIOD"
+      ]
+    },
+    {
+      "text": "The largest published HS2 chapter is Top HS2 chapter: HS 85 Electrical machinery equipment and parts at $138,323,333,975 for 2023.",
+      "evidence_ids": [
+        "PRODUCT-TOP"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TOTAL-USA",
+      "label": "Headline trade with USA",
+      "display_value": "$0",
+      "unit": "current USD",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "TOTAL-CHN",
+      "label": "Headline trade with China",
+      "value": 595822896380,
+      "display_value": "$595,822,896,380",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "SHARE-CHN",
+      "label": "China share of USA-plus-China trade",
+      "value": 1,
+      "display_value": "100.0%",
+      "unit": "share",
+      "source": "TradeGravity calculation",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "QUALITY-PERIOD",
+      "label": "Partner periods differ or one is missing",
+      "display_value": "not comparable",
+      "source": "TradeGravity quality check",
+      "source_json": "../quality.json"
+    },
+    {
+      "id": "PRODUCT-TOP",
+      "label": "Top HS2 chapter: HS 85 Electrical machinery equipment and parts",
+      "value": 138323333975,
+      "display_value": "$138,323,333,975",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "COMTRADE",
+      "source_json": "../products/USA.json"
+    }
+  ]
+}

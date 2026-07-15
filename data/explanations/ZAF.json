@@ -1,0 +1,128 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:59:07Z",
+  "reporter_iso3": "ZAF",
+  "name": "South Africa",
+  "generator": {
+    "type": "rules",
+    "status": "fallback",
+    "model": "none"
+  },
+  "summary": "South Africa has a larger published USA-plus-China trade relationship with China in the current view.",
+  "statements": [
+    {
+      "text": "Trade with USA is $17,519,552,389 for 2023.",
+      "evidence_ids": [
+        "TOTAL-USA"
+      ]
+    },
+    {
+      "text": "Trade with China is $34,396,950,974 for 2023.",
+      "evidence_ids": [
+        "TOTAL-CHN"
+      ]
+    },
+    {
+      "text": "Both partner totals use the same observation period.",
+      "evidence_ids": [
+        "QUALITY-PERIOD"
+      ]
+    },
+    {
+      "text": "The largest published HS2 chapter is Top HS2 chapter: HS 26 Ores slag and ash at $8,268,698,012 for 2023.",
+      "evidence_ids": [
+        "PRODUCT-TOP"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TOTAL-USA",
+      "label": "Headline trade with USA",
+      "value": 17519552389.293,
+      "display_value": "$17,519,552,389",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "TOTAL-CHN",
+      "label": "Headline trade with China",
+      "value": 34396950973.731,
+      "display_value": "$34,396,950,974",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "SHARE-CHN",
+      "label": "China share of USA-plus-China trade",
+      "value": 0.6625436758175285,
+      "display_value": "66.3%",
+      "unit": "share",
+      "period": "2023",
+      "source": "TradeGravity calculation",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "QUALITY-PERIOD",
+      "label": "USA and China observations use the same period",
+      "display_value": "comparable",
+      "period": "2023",
+      "source": "TradeGravity quality check",
+      "source_json": "../quality.json"
+    },
+    {
+      "id": "TREND-USA-FIRST",
+      "label": "First comparable annual USA trade",
+      "value": 13085571237.83797,
+      "display_value": "$13,085,571,238",
+      "unit": "current USD",
+      "period": "2014",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-USA-LAST",
+      "label": "Latest comparable annual USA trade",
+      "value": 17519552389.293,
+      "display_value": "$17,519,552,389",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-FIRST",
+      "label": "First comparable annual China trade",
+      "value": 24213707052.67353,
+      "display_value": "$24,213,707,053",
+      "unit": "current USD",
+      "period": "2014",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-LAST",
+      "label": "Latest comparable annual China trade",
+      "value": 34396950973.731,
+      "display_value": "$34,396,950,974",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "PRODUCT-TOP",
+      "label": "Top HS2 chapter: HS 26 Ores slag and ash",
+      "value": 8268698012.309999,
+      "display_value": "$8,268,698,012",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "COMTRADE",
+      "source_json": "../products/ZAF.json"
+    }
+  ]
+}

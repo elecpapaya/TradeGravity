@@ -1,0 +1,128 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:59:07Z",
+  "reporter_iso3": "ITA",
+  "name": "Italy",
+  "generator": {
+    "type": "rules",
+    "status": "fallback",
+    "model": "none"
+  },
+  "summary": "Italy has a larger published USA-plus-China trade relationship with USA in the current view.",
+  "statements": [
+    {
+      "text": "Trade with USA is $99,960,451,443 for 2023.",
+      "evidence_ids": [
+        "TOTAL-USA"
+      ]
+    },
+    {
+      "text": "Trade with China is $72,185,931,695 for 2023.",
+      "evidence_ids": [
+        "TOTAL-CHN"
+      ]
+    },
+    {
+      "text": "Both partner totals use the same observation period.",
+      "evidence_ids": [
+        "QUALITY-PERIOD"
+      ]
+    },
+    {
+      "text": "The largest published HS2 chapter is Top HS2 chapter: HS 84 Machinery mechanical appliances boilers and parts at $29,636,516,005 for 2023.",
+      "evidence_ids": [
+        "PRODUCT-TOP"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TOTAL-USA",
+      "label": "Headline trade with USA",
+      "value": 99960451442.86,
+      "display_value": "$99,960,451,443",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "TOTAL-CHN",
+      "label": "Headline trade with China",
+      "value": 72185931695.385,
+      "display_value": "$72,185,931,695",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "SHARE-CHN",
+      "label": "China share of USA-plus-China trade",
+      "value": 0.4193287734509931,
+      "display_value": "41.9%",
+      "unit": "share",
+      "period": "2023",
+      "source": "TradeGravity calculation",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "QUALITY-PERIOD",
+      "label": "USA and China observations use the same period",
+      "display_value": "comparable",
+      "period": "2023",
+      "source": "TradeGravity quality check",
+      "source_json": "../quality.json"
+    },
+    {
+      "id": "TREND-USA-FIRST",
+      "label": "First comparable annual USA trade",
+      "value": 56080399641,
+      "display_value": "$56,080,399,641",
+      "unit": "current USD",
+      "period": "2014",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-USA-LAST",
+      "label": "Latest comparable annual USA trade",
+      "value": 99960451442.86,
+      "display_value": "$99,960,451,443",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-FIRST",
+      "label": "First comparable annual China trade",
+      "value": 47236709904,
+      "display_value": "$47,236,709,904",
+      "unit": "current USD",
+      "period": "2014",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-LAST",
+      "label": "Latest comparable annual China trade",
+      "value": 72185931695.385,
+      "display_value": "$72,185,931,695",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "PRODUCT-TOP",
+      "label": "Top HS2 chapter: HS 84 Machinery mechanical appliances boilers and parts",
+      "value": 29636516005.488,
+      "display_value": "$29,636,516,005",
+      "unit": "current USD",
+      "period": "2023",
+      "source": "COMTRADE",
+      "source_json": "../products/ITA.json"
+    }
+  ]
+}

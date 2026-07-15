@@ -1,0 +1,112 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:59:07Z",
+  "reporter_iso3": "RUS",
+  "name": "Russian Federation",
+  "generator": {
+    "type": "rules",
+    "status": "fallback",
+    "model": "none"
+  },
+  "summary": "Russian Federation has a larger published USA-plus-China trade relationship with China in the current view.",
+  "statements": [
+    {
+      "text": "Trade with USA is $35,013,254,749 for 2021.",
+      "evidence_ids": [
+        "TOTAL-USA"
+      ]
+    },
+    {
+      "text": "Trade with China is $141,372,272,953 for 2021.",
+      "evidence_ids": [
+        "TOTAL-CHN"
+      ]
+    },
+    {
+      "text": "Both partner totals use the same observation period.",
+      "evidence_ids": [
+        "QUALITY-PERIOD"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TOTAL-USA",
+      "label": "Headline trade with USA",
+      "value": 35013254749.16,
+      "display_value": "$35,013,254,749",
+      "unit": "current USD",
+      "period": "2021",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "TOTAL-CHN",
+      "label": "Headline trade with China",
+      "value": 141372272952.66,
+      "display_value": "$141,372,272,953",
+      "unit": "current USD",
+      "period": "2021",
+      "source": "WITS",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "SHARE-CHN",
+      "label": "China share of USA-plus-China trade",
+      "value": 0.8014958755099797,
+      "display_value": "80.1%",
+      "unit": "share",
+      "period": "2021",
+      "source": "TradeGravity calculation",
+      "source_json": "../latest.json"
+    },
+    {
+      "id": "QUALITY-PERIOD",
+      "label": "USA and China observations use the same period",
+      "display_value": "comparable",
+      "period": "2021",
+      "source": "TradeGravity quality check",
+      "source_json": "../quality.json"
+    },
+    {
+      "id": "TREND-USA-FIRST",
+      "label": "First comparable annual USA trade",
+      "value": 28527622005,
+      "display_value": "$28,527,622,005",
+      "unit": "current USD",
+      "period": "2012",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-USA-LAST",
+      "label": "Latest comparable annual USA trade",
+      "value": 35013254749.16,
+      "display_value": "$35,013,254,749",
+      "unit": "current USD",
+      "period": "2021",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-FIRST",
+      "label": "First comparable annual China trade",
+      "value": 87534523982,
+      "display_value": "$87,534,523,982",
+      "unit": "current USD",
+      "period": "2012",
+      "source": "WITS",
+      "source_json": "../series.json"
+    },
+    {
+      "id": "TREND-CHN-LAST",
+      "label": "Latest comparable annual China trade",
+      "value": 141372272952.66,
+      "display_value": "$141,372,272,953",
+      "unit": "current USD",
+      "period": "2021",
+      "source": "WITS",
+      "source_json": "../series.json"
+    }
+  ]
+}

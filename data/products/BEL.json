@@ -1,0 +1,1953 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:59:07Z",
+  "provider": "comtrade",
+  "classification": "HS",
+  "level": 2,
+  "reporter_iso3": "BEL",
+  "periods": [
+    "2023"
+  ],
+  "rows": [
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "30",
+      "name": "Pharmaceutical products",
+      "usa": {
+        "available": true,
+        "export": 16888425611.405,
+        "import": 12033407659.666,
+        "trade": 28921833271.071
+      },
+      "chn": {
+        "available": true,
+        "export": 2161255656.509,
+        "import": 0,
+        "trade": 2161255656.509
+      },
+      "total": 31083088927.579998,
+      "share_cn": 0.06953155979910734
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "84",
+      "name": "Machinery mechanical appliances boilers and parts",
+      "usa": {
+        "available": true,
+        "export": 2117457635.403,
+        "import": 2151804711.563,
+        "trade": 4269262346.9660006
+      },
+      "chn": {
+        "available": true,
+        "export": 783525813.59,
+        "import": 0,
+        "trade": 783525813.59
+      },
+      "total": 5052788160.556001,
+      "share_cn": 0.15506801169827433
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "29",
+      "name": "Organic chemicals",
+      "usa": {
+        "available": true,
+        "export": 1144554767.613,
+        "import": 2390575534.039,
+        "trade": 3535130301.652
+      },
+      "chn": {
+        "available": true,
+        "export": 349925090.341,
+        "import": 0,
+        "trade": 349925090.341
+      },
+      "total": 3885055391.993,
+      "share_cn": 0.09006952412111979
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "27",
+      "name": "Mineral fuels oils waxes and bituminous substances",
+      "usa": {
+        "available": true,
+        "export": 629331955.131,
+        "import": 3073947060.217,
+        "trade": 3703279015.348
+      },
+      "chn": {
+        "available": true,
+        "export": 33954212.79,
+        "import": 0,
+        "trade": 33954212.79
+      },
+      "total": 3737233228.138,
+      "share_cn": 0.009085387696533189
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "87",
+      "name": "Vehicles other than railway or tramway rolling stock",
+      "usa": {
+        "available": true,
+        "export": 2773159585.736,
+        "import": 623210315.465,
+        "trade": 3396369901.201
+      },
+      "chn": {
+        "available": true,
+        "export": 154024422.154,
+        "import": 0,
+        "trade": 154024422.154
+      },
+      "total": 3550394323.355,
+      "share_cn": 0.043382342389634135
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "90",
+      "name": "Optical photographic medical and precision instruments",
+      "usa": {
+        "available": true,
+        "export": 540210752.033,
+        "import": 1800196027.717,
+        "trade": 2340406779.75
+      },
+      "chn": {
+        "available": true,
+        "export": 551469589.556,
+        "import": 0,
+        "trade": 551469589.556
+      },
+      "total": 2891876369.3059998,
+      "share_cn": 0.19069611530051098
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "39",
+      "name": "Plastics and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 527032453.785,
+        "import": 1443397399.695,
+        "trade": 1970429853.48
+      },
+      "chn": {
+        "available": true,
+        "export": 401452147.119,
+        "import": 0,
+        "trade": 401452147.119
+      },
+      "total": 2371882000.599,
+      "share_cn": 0.16925468763522658
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "71",
+      "name": "Pearls precious stones metals jewellery and coin",
+      "usa": {
+        "available": true,
+        "export": 1311850958.543,
+        "import": 448109362.507,
+        "trade": 1759960321.05
+      },
+      "chn": {
+        "available": true,
+        "export": 117346370.156,
+        "import": 0,
+        "trade": 117346370.156
+      },
+      "total": 1877306691.2059999,
+      "share_cn": 0.06250783140852471
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "85",
+      "name": "Electrical machinery equipment and parts",
+      "usa": {
+        "available": true,
+        "export": 718381271.951,
+        "import": 532322854.818,
+        "trade": 1250704126.769
+      },
+      "chn": {
+        "available": true,
+        "export": 398949195.198,
+        "import": 0,
+        "trade": 398949195.198
+      },
+      "total": 1649653321.967,
+      "share_cn": 0.2418382031458005
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "38",
+      "name": "Miscellaneous chemical products",
+      "usa": {
+        "available": true,
+        "export": 401993760.498,
+        "import": 564664158.647,
+        "trade": 966657919.145
+      },
+      "chn": {
+        "available": true,
+        "export": 98588093.758,
+        "import": 0,
+        "trade": 98588093.758
+      },
+      "total": 1065246012.903,
+      "share_cn": 0.09254960127879616
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "28",
+      "name": "Inorganic chemicals and compounds of precious or rare-earth metals",
+      "usa": {
+        "available": true,
+        "export": 240879821.441,
+        "import": 178173585.758,
+        "trade": 419053407.199
+      },
+      "chn": {
+        "available": true,
+        "export": 121222951.435,
+        "import": 0,
+        "trade": 121222951.435
+      },
+      "total": 540276358.6340001,
+      "share_cn": 0.22437211900497053
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "72",
+      "name": "Iron and steel",
+      "usa": {
+        "available": true,
+        "export": 299160761.046,
+        "import": 69456431.763,
+        "trade": 368617192.809
+      },
+      "chn": {
+        "available": true,
+        "export": 91764442.112,
+        "import": 0,
+        "trade": 91764442.112
+      },
+      "total": 460381634.921,
+      "share_cn": 0.1993225514474453
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "74",
+      "name": "Copper and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 13235386.893,
+        "import": 261032359.075,
+        "trade": 274267745.968
+      },
+      "chn": {
+        "available": true,
+        "export": 121658569.338,
+        "import": 0,
+        "trade": 121658569.338
+      },
+      "total": 395926315.306,
+      "share_cn": 0.30727578500048325
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "40",
+      "name": "Rubber and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 67706362.87,
+        "import": 248640434.73,
+        "trade": 316346797.6
+      },
+      "chn": {
+        "available": true,
+        "export": 47078076.773,
+        "import": 0,
+        "trade": 47078076.773
+      },
+      "total": 363424874.373,
+      "share_cn": 0.129540051033165
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "33",
+      "name": "Essential oils perfumery cosmetic and toilet preparations",
+      "usa": {
+        "available": true,
+        "export": 97403103.151,
+        "import": 162152052.56,
+        "trade": 259555155.711
+      },
+      "chn": {
+        "available": true,
+        "export": 88886539.761,
+        "import": 0,
+        "trade": 88886539.761
+      },
+      "total": 348441695.472,
+      "share_cn": 0.2550973115906639
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "53",
+      "name": "Other vegetable textile fibres paper yarn and woven fabrics",
+      "usa": {
+        "available": true,
+        "export": 30023756.028,
+        "import": 99770.476,
+        "trade": 30123526.504
+      },
+      "chn": {
+        "available": true,
+        "export": 300058063.086,
+        "import": 0,
+        "trade": 300058063.086
+      },
+      "total": 330181589.59000003,
+      "share_cn": 0.9087667893857874
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "20",
+      "name": "Preparations of vegetables fruit nuts or plants",
+      "usa": {
+        "available": true,
+        "export": 287342021.81,
+        "import": 2114390.71,
+        "trade": 289456412.52
+      },
+      "chn": {
+        "available": true,
+        "export": 12407307.233,
+        "import": 0,
+        "trade": 12407307.233
+      },
+      "total": 301863719.75299996,
+      "share_cn": 0.04110234659253613
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "32",
+      "name": "Tanning dyeing extracts pigments paints inks and mastics",
+      "usa": {
+        "available": true,
+        "export": 101469833.776,
+        "import": 141723210.694,
+        "trade": 243193044.47
+      },
+      "chn": {
+        "available": true,
+        "export": 57037731.582,
+        "import": 0,
+        "trade": 57037731.582
+      },
+      "total": 300230776.052,
+      "share_cn": 0.1899796294438551
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "88",
+      "name": "Aircraft spacecraft and parts",
+      "usa": {
+        "available": true,
+        "export": 56649137.858,
+        "import": 227204150.76,
+        "trade": 283853288.618
+      },
+      "chn": {
+        "available": true,
+        "export": 15626535.86,
+        "import": 0,
+        "trade": 15626535.86
+      },
+      "total": 299479824.478,
+      "share_cn": 0.052178926868403905
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "18",
+      "name": "Cocoa and cocoa preparations",
+      "usa": {
+        "available": true,
+        "export": 185328977.902,
+        "import": 6427314.683,
+        "trade": 191756292.585
+      },
+      "chn": {
+        "available": true,
+        "export": 76765887.312,
+        "import": 0,
+        "trade": 76765887.312
+      },
+      "total": 268522179.897,
+      "share_cn": 0.28588285459862545
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "73",
+      "name": "Articles of iron or steel",
+      "usa": {
+        "available": true,
+        "export": 155558995.941,
+        "import": 56831378.795,
+        "trade": 212390374.736
+      },
+      "chn": {
+        "available": true,
+        "export": 29437513.522,
+        "import": 0,
+        "trade": 29437513.522
+      },
+      "total": 241827888.25800002,
+      "share_cn": 0.12172919233613728
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "97",
+      "name": "Works of art collectors pieces and antiques",
+      "usa": {
+        "available": true,
+        "export": 88771721.328,
+        "import": 146409652.512,
+        "trade": 235181373.83999997
+      },
+      "chn": {
+        "available": true,
+        "export": 3571181.618,
+        "import": 0,
+        "trade": 3571181.618
+      },
+      "total": 238752555.45799997,
+      "share_cn": 0.014957668667250023
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "76",
+      "name": "Aluminium and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 130526408.76,
+        "import": 69157823.647,
+        "trade": 199684232.407
+      },
+      "chn": {
+        "available": true,
+        "export": 33786349.185,
+        "import": 0,
+        "trade": 33786349.185
+      },
+      "total": 233470581.592,
+      "share_cn": 0.1447135178857057
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "31",
+      "name": "Fertilisers",
+      "usa": {
+        "available": true,
+        "export": 52832996.037,
+        "import": 57925537.771,
+        "trade": 110758533.808
+      },
+      "chn": {
+        "available": true,
+        "export": 121596928.766,
+        "import": 0,
+        "trade": 121596928.766
+      },
+      "total": 232355462.574,
+      "share_cn": 0.5233228753004854
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "44",
+      "name": "Wood and articles of wood wood charcoal",
+      "usa": {
+        "available": true,
+        "export": 60771271.919,
+        "import": 64205558.789,
+        "trade": 124976830.708
+      },
+      "chn": {
+        "available": true,
+        "export": 77973464.955,
+        "import": 0,
+        "trade": 77973464.955
+      },
+      "total": 202950295.663,
+      "share_cn": 0.38419980961483957
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "37",
+      "name": "Photographic or cinematographic goods",
+      "usa": {
+        "available": true,
+        "export": 121129863.003,
+        "import": 25263083.655,
+        "trade": 146392946.658
+      },
+      "chn": {
+        "available": true,
+        "export": 50997683.263,
+        "import": 0,
+        "trade": 50997683.263
+      },
+      "total": 197390629.921,
+      "share_cn": 0.258359190015303
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "99",
+      "name": "Special classification provisions",
+      "usa": {
+        "available": true,
+        "export": 141849897.569,
+        "import": 17882842.632,
+        "trade": 159732740.201
+      },
+      "chn": {
+        "available": true,
+        "export": 28444838.621,
+        "import": 0,
+        "trade": 28444838.621
+      },
+      "total": 188177578.822,
+      "share_cn": 0.15115955258360722
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "34",
+      "name": "Soap washing preparations lubricants waxes and candles",
+      "usa": {
+        "available": true,
+        "export": 50999360.545,
+        "import": 96284240.605,
+        "trade": 147283601.15
+      },
+      "chn": {
+        "available": true,
+        "export": 37495148.478,
+        "import": 0,
+        "trade": 37495148.478
+      },
+      "total": 184778749.62800002,
+      "share_cn": 0.20291915901306792
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "19",
+      "name": "Preparations of cereals flour starch or milk",
+      "usa": {
+        "available": true,
+        "export": 145709837.398,
+        "import": 3794045.759,
+        "trade": 149503883.157
+      },
+      "chn": {
+        "available": true,
+        "export": 26885025.772,
+        "import": 0,
+        "trade": 26885025.772
+      },
+      "total": 176388908.92900002,
+      "share_cn": 0.15241902642995397
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "54",
+      "name": "Man-made filaments",
+      "usa": {
+        "available": true,
+        "export": 34115279.9,
+        "import": 126501922.622,
+        "trade": 160617202.52199998
+      },
+      "chn": {
+        "available": true,
+        "export": 13914864.106,
+        "import": 0,
+        "trade": 13914864.106
+      },
+      "total": 174532066.628,
+      "share_cn": 0.07972669077286715
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "22",
+      "name": "Beverages spirits and vinegar",
+      "usa": {
+        "available": true,
+        "export": 54463262.395,
+        "import": 16735491.555,
+        "trade": 71198753.95
+      },
+      "chn": {
+        "available": true,
+        "export": 72489659.274,
+        "import": 0,
+        "trade": 72489659.274
+      },
+      "total": 143688413.224,
+      "share_cn": 0.5044920299940524
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "48",
+      "name": "Paper paperboard and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 32352556.369,
+        "import": 81265604.868,
+        "trade": 113618161.237
+      },
+      "chn": {
+        "available": true,
+        "export": 22312478.529,
+        "import": 0,
+        "trade": 22312478.529
+      },
+      "total": 135930639.766,
+      "share_cn": 0.16414605689644496
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "70",
+      "name": "Glass and glassware",
+      "usa": {
+        "available": true,
+        "export": 81201815.174,
+        "import": 32289324.224,
+        "trade": 113491139.398
+      },
+      "chn": {
+        "available": true,
+        "export": 17045777.385,
+        "import": 0,
+        "trade": 17045777.385
+      },
+      "total": 130536916.783,
+      "share_cn": 0.1305820438009602
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "56",
+      "name": "Wadding felt nonwovens special yarn twine cordage and ropes",
+      "usa": {
+        "available": true,
+        "export": 14025622.962,
+        "import": 112691995.72,
+        "trade": 126717618.682
+      },
+      "chn": {
+        "available": true,
+        "export": 2677583.073,
+        "import": 0,
+        "trade": 2677583.073
+      },
+      "total": 129395201.755,
+      "share_cn": 0.02069306308644891
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "95",
+      "name": "Toys games sports equipment and parts",
+      "usa": {
+        "available": true,
+        "export": 45206903.303,
+        "import": 55523774.377,
+        "trade": 100730677.68
+      },
+      "chn": {
+        "available": true,
+        "export": 12001250.231,
+        "import": 0,
+        "trade": 12001250.231
+      },
+      "total": 112731927.91100001,
+      "share_cn": 0.10645830736146718
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "81",
+      "name": "Other base metals and cermets",
+      "usa": {
+        "available": true,
+        "export": 31765706.911,
+        "import": 67427815.183,
+        "trade": 99193522.094
+      },
+      "chn": {
+        "available": true,
+        "export": 9264704.987,
+        "import": 0,
+        "trade": 9264704.987
+      },
+      "total": 108458227.081,
+      "share_cn": 0.0854218738065931
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "11",
+      "name": "Milling products malt starches inulin and wheat gluten",
+      "usa": {
+        "available": true,
+        "export": 80867908.458,
+        "import": 456687.573,
+        "trade": 81324596.031
+      },
+      "chn": {
+        "available": true,
+        "export": 14362503.726,
+        "import": 0,
+        "trade": 14362503.726
+      },
+      "total": 95687099.757,
+      "share_cn": 0.15009864195355455
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "04",
+      "name": "Dairy produce eggs honey and edible animal products",
+      "usa": {
+        "available": true,
+        "export": 13348857.251,
+        "import": 326024.867,
+        "trade": 13674882.118
+      },
+      "chn": {
+        "available": true,
+        "export": 79427002.49,
+        "import": 0,
+        "trade": 79427002.49
+      },
+      "total": 93101884.608,
+      "share_cn": 0.8531191696540056
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "75",
+      "name": "Nickel and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 26114899.871,
+        "import": 56197794.394,
+        "trade": 82312694.265
+      },
+      "chn": {
+        "available": true,
+        "export": 8048861.074,
+        "import": 0,
+        "trade": 8048861.074
+      },
+      "total": 90361555.339,
+      "share_cn": 0.08907395455737707
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "94",
+      "name": "Furniture bedding lamps prefabricated buildings",
+      "usa": {
+        "available": true,
+        "export": 63974649.198,
+        "import": 16083716.054,
+        "trade": 80058365.252
+      },
+      "chn": {
+        "available": true,
+        "export": 6476547.363,
+        "import": 0,
+        "trade": 6476547.363
+      },
+      "total": 86534912.61500001,
+      "share_cn": 0.07484317216352457
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "55",
+      "name": "Man-made staple fibres",
+      "usa": {
+        "available": true,
+        "export": 23853525.621,
+        "import": 49422676.258,
+        "trade": 73276201.87900001
+      },
+      "chn": {
+        "available": true,
+        "export": 9798085.743,
+        "import": 0,
+        "trade": 9798085.743
+      },
+      "total": 83074287.62200001,
+      "share_cn": 0.11794366251544286
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "35",
+      "name": "Albuminoidal substances modified starches glues and enzymes",
+      "usa": {
+        "available": true,
+        "export": 57522317.046,
+        "import": 19009286.922,
+        "trade": 76531603.968
+      },
+      "chn": {
+        "available": true,
+        "export": 5932723.728,
+        "import": 0,
+        "trade": 5932723.728
+      },
+      "total": 82464327.696,
+      "share_cn": 0.07194291027110104
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "23",
+      "name": "Food industry residues and prepared animal fodder",
+      "usa": {
+        "available": true,
+        "export": 31817541.452,
+        "import": 36880534.234,
+        "trade": 68698075.68599999
+      },
+      "chn": {
+        "available": true,
+        "export": 9136575.027,
+        "import": 0,
+        "trade": 9136575.027
+      },
+      "total": 77834650.71299998,
+      "share_cn": 0.11738441610908398
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "21",
+      "name": "Miscellaneous edible preparations",
+      "usa": {
+        "available": true,
+        "export": 47068651.771,
+        "import": 13754058.417,
+        "trade": 60822710.18799999
+      },
+      "chn": {
+        "available": true,
+        "export": 10886877.104,
+        "import": 0,
+        "trade": 10886877.104
+      },
+      "total": 71709587.292,
+      "share_cn": 0.15181898983282188
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "07",
+      "name": "Edible vegetables and certain roots and tubers",
+      "usa": {
+        "available": true,
+        "export": 61607589.282,
+        "import": 3557881.235,
+        "trade": 65165470.517
+      },
+      "chn": {
+        "available": true,
+        "export": 1746201.416,
+        "import": 0,
+        "trade": 1746201.416
+      },
+      "total": 66911671.933,
+      "share_cn": 0.02609711229078996
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "82",
+      "name": "Tools implements cutlery and parts of base metal",
+      "usa": {
+        "available": true,
+        "export": 17915151.201,
+        "import": 43753263.159,
+        "trade": 61668414.36
+      },
+      "chn": {
+        "available": true,
+        "export": 3065753.377,
+        "import": 0,
+        "trade": 3065753.377
+      },
+      "total": 64734167.736999996,
+      "share_cn": 0.04735912245686774
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "15",
+      "name": "Animal vegetable or microbial fats and oils",
+      "usa": {
+        "available": true,
+        "export": 6572410.316,
+        "import": 1332838.475,
+        "trade": 7905248.790999999
+      },
+      "chn": {
+        "available": true,
+        "export": 52241355.768,
+        "import": 0,
+        "trade": 52241355.768
+      },
+      "total": 60146604.559,
+      "share_cn": 0.8685669981046819
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "26",
+      "name": "Ores slag and ash",
+      "usa": {
+        "available": true,
+        "export": 117257.839,
+        "import": 54179769.595,
+        "trade": 54297027.434
+      },
+      "chn": {
+        "available": true,
+        "export": 3864686.201,
+        "import": 0,
+        "trade": 3864686.201
+      },
+      "total": 58161713.635,
+      "share_cn": 0.06644725472246653
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "12",
+      "name": "Oil seeds oleaginous fruits and miscellaneous grains",
+      "usa": {
+        "available": true,
+        "export": 1463398.932,
+        "import": 49689138.872,
+        "trade": 51152537.804000005
+      },
+      "chn": {
+        "available": true,
+        "export": 6680173.449,
+        "import": 0,
+        "trade": 6680173.449
+      },
+      "total": 57832711.253000006,
+      "share_cn": 0.11550856434477597
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "57",
+      "name": "Carpets and other textile floor coverings",
+      "usa": {
+        "available": true,
+        "export": 47594408.219,
+        "import": 1087833.941,
+        "trade": 48682242.16
+      },
+      "chn": {
+        "available": true,
+        "export": 3331390.706,
+        "import": 0,
+        "trade": 3331390.706
+      },
+      "total": 52013632.866,
+      "share_cn": 0.06404841427981944
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "01",
+      "name": "Live animals",
+      "usa": {
+        "available": true,
+        "export": 45021605.946,
+        "import": 1684959.919,
+        "trade": 46706565.865
+      },
+      "chn": {
+        "available": true,
+        "export": 1884285.132,
+        "import": 0,
+        "trade": 1884285.132
+      },
+      "total": 48590850.997,
+      "share_cn": 0.03877859912592055
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "59",
+      "name": "Impregnated coated covered or laminated textile fabrics",
+      "usa": {
+        "available": true,
+        "export": 28920467.827,
+        "import": 3892227.105,
+        "trade": 32812694.932
+      },
+      "chn": {
+        "available": true,
+        "export": 14826938.255,
+        "import": 0,
+        "trade": 14826938.255
+      },
+      "total": 47639633.187,
+      "share_cn": 0.3112311590813425
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "79",
+      "name": "Zinc and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 42532166.592,
+        "import": 3778848.496,
+        "trade": 46311015.088
+      },
+      "chn": {
+        "available": true,
+        "export": 508558.3,
+        "import": 0,
+        "trade": 508558.3
+      },
+      "total": 46819573.388,
+      "share_cn": 0.010862087439061226
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "49",
+      "name": "Printed books newspapers pictures and printing products",
+      "usa": {
+        "available": true,
+        "export": 30998812.391,
+        "import": 10671424.88,
+        "trade": 41670237.271
+      },
+      "chn": {
+        "available": true,
+        "export": 4837571.854,
+        "import": 0,
+        "trade": 4837571.854
+      },
+      "total": 46507809.125,
+      "share_cn": 0.10401633499866568
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "17",
+      "name": "Sugars and sugar confectionery",
+      "usa": {
+        "available": true,
+        "export": 27415863.152,
+        "import": 1974468.816,
+        "trade": 29390331.968
+      },
+      "chn": {
+        "available": true,
+        "export": 16019765.082,
+        "import": 0,
+        "trade": 16019765.082
+      },
+      "total": 45410097.05,
+      "share_cn": 0.35277980279057786
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "83",
+      "name": "Miscellaneous articles of base metal",
+      "usa": {
+        "available": true,
+        "export": 16443338.133,
+        "import": 11963464.982,
+        "trade": 28406803.115000002
+      },
+      "chn": {
+        "available": true,
+        "export": 16280977.102,
+        "import": 0,
+        "trade": 16280977.102
+      },
+      "total": 44687780.217,
+      "share_cn": 0.3643272729802416
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "62",
+      "name": "Non-knitted apparel and clothing accessories",
+      "usa": {
+        "available": true,
+        "export": 21962767.27,
+        "import": 6548870.287,
+        "trade": 28511637.557
+      },
+      "chn": {
+        "available": true,
+        "export": 14324939.886,
+        "import": 0,
+        "trade": 14324939.886
+      },
+      "total": 42836577.443,
+      "share_cn": 0.33440906676219206
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "08",
+      "name": "Edible fruit nuts and peel of citrus fruit or melons",
+      "usa": {
+        "available": true,
+        "export": 840079.418,
+        "import": 36677176.025,
+        "trade": 37517255.442999996
+      },
+      "chn": {
+        "available": true,
+        "export": 4917011.691,
+        "import": 0,
+        "trade": 4917011.691
+      },
+      "total": 42434267.133999996,
+      "share_cn": 0.11587360930431381
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "47",
+      "name": "Pulp of wood recovered paper or paperboard",
+      "usa": {
+        "available": true,
+        "export": 515760.126,
+        "import": 31656966.21,
+        "trade": 32172726.336
+      },
+      "chn": {
+        "available": true,
+        "export": 4175135.141,
+        "import": 0,
+        "trade": 4175135.141
+      },
+      "total": 36347861.477,
+      "share_cn": 0.11486604634613563
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "68",
+      "name": "Articles of stone plaster cement asbestos mica or similar materials",
+      "usa": {
+        "available": true,
+        "export": 21028103.631,
+        "import": 12695988.632,
+        "trade": 33724092.263
+      },
+      "chn": {
+        "available": true,
+        "export": 1783617.367,
+        "import": 0,
+        "trade": 1783617.367
+      },
+      "total": 35507709.629999995,
+      "share_cn": 0.05023183375063553
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "25",
+      "name": "Salt sulphur earths stone plastering materials lime and cement",
+      "usa": {
+        "available": true,
+        "export": 9455528.556,
+        "import": 13330566.835,
+        "trade": 22786095.391000003
+      },
+      "chn": {
+        "available": true,
+        "export": 7154345.201,
+        "import": 0,
+        "trade": 7154345.201
+      },
+      "total": 29940440.592000004,
+      "share_cn": 0.23895256915195898
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "80",
+      "name": "Tin and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 13194471.945,
+        "import": 13163780.397,
+        "trade": 26358252.342
+      },
+      "chn": {
+        "available": true,
+        "export": 327.092,
+        "import": 0,
+        "trade": 327.092
+      },
+      "total": 26358579.434,
+      "share_cn": 0.000012409318219102627
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "63",
+      "name": "Other made-up textile articles sets worn clothing and rags",
+      "usa": {
+        "available": true,
+        "export": 9805071.635,
+        "import": 15398567.804,
+        "trade": 25203639.439
+      },
+      "chn": {
+        "available": true,
+        "export": 547032.491,
+        "import": 0,
+        "trade": 547032.491
+      },
+      "total": 25750671.93,
+      "share_cn": 0.021243425899216916
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "96",
+      "name": "Miscellaneous manufactured articles",
+      "usa": {
+        "available": true,
+        "export": 9403651.047,
+        "import": 10956031.754,
+        "trade": 20359682.801
+      },
+      "chn": {
+        "available": true,
+        "export": 1048592.1,
+        "import": 0,
+        "trade": 1048592.1
+      },
+      "total": 21408274.901,
+      "share_cn": 0.048980691104215004
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "86",
+      "name": "Railway or tramway locomotives rolling stock and parts",
+      "usa": {
+        "available": true,
+        "export": 4606846.154,
+        "import": 12142560.967,
+        "trade": 16749407.121
+      },
+      "chn": {
+        "available": true,
+        "export": 3852657.332,
+        "import": 0,
+        "trade": 3852657.332
+      },
+      "total": 20602064.452999998,
+      "share_cn": 0.18700345981293104
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "61",
+      "name": "Knitted or crocheted apparel and clothing accessories",
+      "usa": {
+        "available": true,
+        "export": 11626487.214,
+        "import": 2335902.982,
+        "trade": 13962390.195999999
+      },
+      "chn": {
+        "available": true,
+        "export": 3216056.635,
+        "import": 0,
+        "trade": 3216056.635
+      },
+      "total": 17178446.831,
+      "share_cn": 0.1872146339328155
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "93",
+      "name": "Arms ammunition and parts thereof",
+      "usa": {
+        "available": true,
+        "export": 2370269.785,
+        "import": 14781865.603,
+        "trade": 17152135.388
+      },
+      "chn": {
+        "available": false,
+        "export": 0,
+        "import": 0,
+        "trade": 0
+      },
+      "total": 17152135.388,
+      "share_cn": 0
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "69",
+      "name": "Ceramic products",
+      "usa": {
+        "available": true,
+        "export": 8181386.937,
+        "import": 4622193.487,
+        "trade": 12803580.423999999
+      },
+      "chn": {
+        "available": true,
+        "export": 3692857.265,
+        "import": 0,
+        "trade": 3692857.265
+      },
+      "total": 16496437.689,
+      "share_cn": 0.2238578615953211
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "42",
+      "name": "Articles of leather saddlery travel goods and animal gut articles",
+      "usa": {
+        "available": true,
+        "export": 5093467.883,
+        "import": 6820520.802,
+        "trade": 11913988.685
+      },
+      "chn": {
+        "available": true,
+        "export": 4215367.078,
+        "import": 0,
+        "trade": 4215367.078
+      },
+      "total": 16129355.763,
+      "share_cn": 0.261347516908881
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "51",
+      "name": "Wool animal hair and horsehair yarn and fabric",
+      "usa": {
+        "available": true,
+        "export": 9848737.706,
+        "import": 149744.171,
+        "trade": 9998481.877
+      },
+      "chn": {
+        "available": true,
+        "export": 5871118.221,
+        "import": 0,
+        "trade": 5871118.221
+      },
+      "total": 15869600.098000001,
+      "share_cn": 0.3699600610440032
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "24",
+      "name": "Tobacco and manufactured tobacco substitutes",
+      "usa": {
+        "available": true,
+        "export": 7851364.357,
+        "import": 6842498.881,
+        "trade": 14693863.238
+      },
+      "chn": {
+        "available": true,
+        "export": 278993.307,
+        "import": 0,
+        "trade": 278993.307
+      },
+      "total": 14972856.545,
+      "share_cn": 0.01863327189180653
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "58",
+      "name": "Special woven fabrics lace tapestries trimmings and embroidery",
+      "usa": {
+        "available": true,
+        "export": 8457965.37,
+        "import": 734453.076,
+        "trade": 9192418.445999999
+      },
+      "chn": {
+        "available": true,
+        "export": 3719530.351,
+        "import": 0,
+        "trade": 3719530.351
+      },
+      "total": 12911948.796999998,
+      "share_cn": 0.2880688585029246
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "10",
+      "name": "Cereals",
+      "usa": {
+        "available": true,
+        "export": 92925.954,
+        "import": 12438207.378,
+        "trade": 12531133.332
+      },
+      "chn": {
+        "available": true,
+        "export": 660.594,
+        "import": 0,
+        "trade": 660.594
+      },
+      "total": 12531793.926,
+      "share_cn": 0.00005271344261649966
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "13",
+      "name": "Lac gums resins and other vegetable saps and extracts",
+      "usa": {
+        "available": true,
+        "export": 3236141.508,
+        "import": 8211810.761,
+        "trade": 11447952.269
+      },
+      "chn": {
+        "available": true,
+        "export": 619710.015,
+        "import": 0,
+        "trade": 619710.015
+      },
+      "total": 12067662.284,
+      "share_cn": 0.05135294644611054
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "91",
+      "name": "Clocks watches and parts thereof",
+      "usa": {
+        "available": true,
+        "export": 11005878.297,
+        "import": 703201.165,
+        "trade": 11709079.462000001
+      },
+      "chn": {
+        "available": true,
+        "export": 194701.022,
+        "import": 0,
+        "trade": 194701.022
+      },
+      "total": 11903780.484000001,
+      "share_cn": 0.016356234245221486
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "05",
+      "name": "Products of animal origin not elsewhere specified",
+      "usa": {
+        "available": true,
+        "export": 6939811.297,
+        "import": 4034894.137,
+        "trade": 10974705.434
+      },
+      "chn": {
+        "available": true,
+        "export": 21066.093,
+        "import": 0,
+        "trade": 21066.093
+      },
+      "total": 10995771.527,
+      "share_cn": 0.0019158358236411545
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "41",
+      "name": "Raw hides skins and leather",
+      "usa": {
+        "available": true,
+        "export": 1459958.67,
+        "import": 96485.615,
+        "trade": 1556444.285
+      },
+      "chn": {
+        "available": true,
+        "export": 8198970.574,
+        "import": 0,
+        "trade": 8198970.574
+      },
+      "total": 9755414.859,
+      "share_cn": 0.8404532961953864
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "89",
+      "name": "Ships boats and floating structures",
+      "usa": {
+        "available": true,
+        "export": 4121614.379,
+        "import": 5307021.853,
+        "trade": 9428636.232
+      },
+      "chn": {
+        "available": true,
+        "export": 9513.938,
+        "import": 0,
+        "trade": 9513.938
+      },
+      "total": 9438150.17,
+      "share_cn": 0.0010080299453425628
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "64",
+      "name": "Footwear gaiters and related articles",
+      "usa": {
+        "available": true,
+        "export": 6118459.126,
+        "import": 616815.353,
+        "trade": 6735274.479
+      },
+      "chn": {
+        "available": true,
+        "export": 492820.627,
+        "import": 0,
+        "trade": 492820.627
+      },
+      "total": 7228095.106000001,
+      "share_cn": 0.06818125934603605
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "09",
+      "name": "Coffee tea maté and spices",
+      "usa": {
+        "available": true,
+        "export": 5755877.436,
+        "import": 519891.696,
+        "trade": 6275769.131999999
+      },
+      "chn": {
+        "available": true,
+        "export": 503322.371,
+        "import": 0,
+        "trade": 503322.371
+      },
+      "total": 6779091.503,
+      "share_cn": 0.07424628665614871
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "92",
+      "name": "Musical instruments and parts thereof",
+      "usa": {
+        "available": true,
+        "export": 1604179.267,
+        "import": 4518843.517,
+        "trade": 6123022.784
+      },
+      "chn": {
+        "available": true,
+        "export": 52506.746,
+        "import": 0,
+        "trade": 52506.746
+      },
+      "total": 6175529.53,
+      "share_cn": 0.008502387648691236
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "16",
+      "name": "Preparations of meat fish crustaceans or molluscs",
+      "usa": {
+        "available": true,
+        "export": 963721.408,
+        "import": 3576010.046,
+        "trade": 4539731.454
+      },
+      "chn": {
+        "available": true,
+        "export": 105613.509,
+        "import": 0,
+        "trade": 105613.509
+      },
+      "total": 4645344.9629999995,
+      "share_cn": 0.02273534255070564
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "65",
+      "name": "Headgear and parts thereof",
+      "usa": {
+        "available": true,
+        "export": 2414673.503,
+        "import": 438198.841,
+        "trade": 2852872.344
+      },
+      "chn": {
+        "available": true,
+        "export": 184773.542,
+        "import": 0,
+        "trade": 184773.542
+      },
+      "total": 3037645.886,
+      "share_cn": 0.06082787425999529
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "03",
+      "name": "Fish crustaceans and aquatic invertebrates",
+      "usa": {
+        "available": true,
+        "export": 229089.108,
+        "import": 2651222.959,
+        "trade": 2880312.067
+      },
+      "chn": {
+        "available": true,
+        "export": 35798.265,
+        "import": 0,
+        "trade": 35798.265
+      },
+      "total": 2916110.332,
+      "share_cn": 0.0122760324282545
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "36",
+      "name": "Explosives pyrotechnics matches and combustible preparations",
+      "usa": {
+        "available": true,
+        "export": 795707.417,
+        "import": 1325459.082,
+        "trade": 2121166.499
+      },
+      "chn": {
+        "available": true,
+        "export": 112817.898,
+        "import": 0,
+        "trade": 112817.898
+      },
+      "total": 2233984.397,
+      "share_cn": 0.050500754683650555
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "66",
+      "name": "Umbrellas walking sticks whips and parts thereof",
+      "usa": {
+        "available": true,
+        "export": 2109582.769,
+        "import": 64390.136,
+        "trade": 2173972.905
+      },
+      "chn": {
+        "available": true,
+        "export": 43424.307,
+        "import": 0,
+        "trade": 43424.307
+      },
+      "total": 2217397.212,
+      "share_cn": 0.01958345882505782
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "60",
+      "name": "Knitted or crocheted fabrics",
+      "usa": {
+        "available": true,
+        "export": 832145.626,
+        "import": 590646.696,
+        "trade": 1422792.3220000002
+      },
+      "chn": {
+        "available": true,
+        "export": 267181.125,
+        "import": 0,
+        "trade": 267181.125
+      },
+      "total": 1689973.4470000002,
+      "share_cn": 0.15809782424350716
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "78",
+      "name": "Lead and articles thereof",
+      "usa": {
+        "available": true,
+        "export": 31902.31,
+        "import": 1406965.757,
+        "trade": 1438868.067
+      },
+      "chn": {
+        "available": true,
+        "export": 6123.95,
+        "import": 0,
+        "trade": 6123.95
+      },
+      "total": 1444992.017,
+      "share_cn": 0.004238051095060133
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "52",
+      "name": "Cotton",
+      "usa": {
+        "available": true,
+        "export": 1069942.992,
+        "import": 232436.378,
+        "trade": 1302379.37
+      },
+      "chn": {
+        "available": true,
+        "export": 40932.066,
+        "import": 0,
+        "trade": 40932.066
+      },
+      "total": 1343311.4360000002,
+      "share_cn": 0.030471017295798555
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "02",
+      "name": "Meat and edible meat offal",
+      "usa": {
+        "available": true,
+        "export": 93577.717,
+        "import": 38858.698,
+        "trade": 132436.415
+      },
+      "chn": {
+        "available": true,
+        "export": 752455.04,
+        "import": 0,
+        "trade": 752455.04
+      },
+      "total": 884891.4550000001,
+      "share_cn": 0.8503359770832005
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "06",
+      "name": "Live trees plants bulbs roots and cut flowers",
+      "usa": {
+        "available": true,
+        "export": 444490.96,
+        "import": 154369.736,
+        "trade": 598860.696
+      },
+      "chn": {
+        "available": true,
+        "export": 76920.164,
+        "import": 0,
+        "trade": 76920.164
+      },
+      "total": 675780.86,
+      "share_cn": 0.11382412340000278
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "67",
+      "name": "Prepared feathers artificial flowers and articles of human hair",
+      "usa": {
+        "available": true,
+        "export": 154821.679,
+        "import": 415737.146,
+        "trade": 570558.825
+      },
+      "chn": {
+        "available": true,
+        "export": 20050.289,
+        "import": 0,
+        "trade": 20050.289
+      },
+      "total": 590609.114,
+      "share_cn": 0.03394849236952344
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "43",
+      "name": "Furskins and artificial fur",
+      "usa": {
+        "available": true,
+        "export": 190334.916,
+        "import": 186559.538,
+        "trade": 376894.454
+      },
+      "chn": {
+        "available": true,
+        "export": 83749.356,
+        "import": 0,
+        "trade": 83749.356
+      },
+      "total": 460643.81000000006,
+      "share_cn": 0.18180935938333784
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "45",
+      "name": "Cork and articles of cork",
+      "usa": {
+        "available": true,
+        "export": 141006.126,
+        "import": 38660.785,
+        "trade": 179666.911
+      },
+      "chn": {
+        "available": true,
+        "export": 16793.939,
+        "import": 0,
+        "trade": 16793.939
+      },
+      "total": 196460.84999999998,
+      "share_cn": 0.0854823696426031
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "46",
+      "name": "Manufactures of straw esparto or basketware",
+      "usa": {
+        "available": true,
+        "export": 98448.437,
+        "import": 25691.43,
+        "trade": 124139.867
+      },
+      "chn": {
+        "available": true,
+        "export": 7746.641,
+        "import": 0,
+        "trade": 7746.641
+      },
+      "total": 131886.508,
+      "share_cn": 0.05873717575417191
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "14",
+      "name": "Vegetable plaiting materials and other vegetable products",
+      "usa": {
+        "available": true,
+        "export": 85176.446,
+        "import": 2495.229,
+        "trade": 87671.675
+      },
+      "chn": {
+        "available": true,
+        "export": 8177.213,
+        "import": 0,
+        "trade": 8177.213
+      },
+      "total": 95848.888,
+      "share_cn": 0.08531359278784746
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "50",
+      "name": "Silk",
+      "usa": {
+        "available": true,
+        "export": 33982.754,
+        "import": 6781.797,
+        "trade": 40764.551
+      },
+      "chn": {
+        "available": true,
+        "export": 9071.645,
+        "import": 0,
+        "trade": 9071.645
+      },
+      "total": 49836.195999999996,
+      "share_cn": 0.1820292423603118
+    }
+  ]
+}
