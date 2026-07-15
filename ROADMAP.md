@@ -33,6 +33,7 @@ TradeGravity is maintained as a small, inspectable public-data pipeline. The roa
 - Publish reported UN Comtrade multi-partner matrices and selected-country partner networks without route claims.
 - Connect published MFN tariffs and HS6 import baselines to the transparent scenario sensitivity lab.
 - Publish the reviewed [`v0.1.0` release](https://github.com/elecpapaya/TradeGravity/releases/tag/v0.1.0) using the documented checklist.
+- Add a first-visit guide, in-context definitions and limits, PNG/CSV/summary exports, explicit data-health and multi-clock notices, small-screen layout improvements, and restorable scenario URLs.
 
 ## Near term: adoption evidence and release operations
 

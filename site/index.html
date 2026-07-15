@@ -12,6 +12,7 @@
   <script src="./data-tools.js"></script>
   <script src="./explorer-tools.js"></script>
   <script src="./intelligence-tools.js"></script>
+  <script src="./experience-tools.js"></script>
   <script src="./news-tools.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 </head>
@@ -102,6 +103,14 @@
     </div>
   </header>
 
+  <section id="dataHealthBanner" class="dataHealthBanner is-loading" role="status" aria-live="polite" aria-label="Published data status">
+    <div class="dataHealthCopy">
+      <span id="dataHealthBadge" class="dataHealthBadge">Checking data</span>
+      <span id="dataHealthText">Validating publication coverage and refresh status…</span>
+    </div>
+    <button id="retryData" class="textButton" type="button" hidden>Retry data load</button>
+  </section>
+
   <nav class="tabBar" aria-label="Dashboard sections">
     <div id="dashboardTabs" class="tabList" role="tablist" aria-label="TradeGravity dashboard">
       <button id="tabButton-overview" class="tabButton is-active" type="button" role="tab" aria-selected="true" aria-controls="tab-overview" data-tab="overview">Overview</button>
@@ -111,6 +120,22 @@
       <button id="tabButton-lab" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-lab" data-tab="lab" tabindex="-1">Scenario Lab</button>
     </div>
   </nav>
+
+  <section class="viewUtility" aria-label="Active view context and export tools">
+    <div class="viewContext" aria-live="polite">
+      <div><span class="contextLabel">Metric</span><b id="metricContext">Total trade</b><span id="metricContextDefinition">Exports plus imports reported by each country for the selected partner.</span></div>
+      <div><span class="contextLabel">Observation</span><b id="periodContext">Loading periods…</b><span>Observation period is not the pipeline refresh time.</span></div>
+      <div><span class="contextLabel">Filters</span><b id="filterContext">All reporters</b><span id="filterContextDetail">Same-period comparison · no country selected.</span></div>
+      <div><span class="contextLabel">Limit</span><b id="scopeContext">Two-anchor scope</b><span id="scopeContextLimit">USA/China observations are not complete world trade.</span></div>
+    </div>
+    <div class="viewActions">
+      <button id="openOnboarding" class="btn" type="button">30-sec guide</button>
+      <button id="openMethodology" class="btn" type="button">Definitions &amp; limits</button>
+      <button id="exportPNG" class="btn" type="button">PNG snapshot</button>
+      <button id="exportCSV" class="btn" type="button">CSV data</button>
+      <button id="exportReport" class="btn" type="button">Summary report</button>
+    </div>
+  </section>
 
   <div id="mainContent" tabindex="-1">
   <section id="tab-overview" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-overview" data-tab-panel="overview">
@@ -323,6 +348,42 @@
     </div>
   </section>
   </div>
+
+  <dialog id="onboardingDialog" class="appDialog onboardingDialog" aria-labelledby="onboardingTitle">
+    <div class="dialogHeader">
+      <div><span class="eyebrow">30-second orientation</span><h2 id="onboardingTitle">Turn a country into a reproducible trade view</h2></div>
+      <button class="iconButton" type="button" data-close-dialog="onboardingDialog" aria-label="Close onboarding">×</button>
+    </div>
+    <div class="onboardingSteps">
+      <article><span>01</span><h3>Choose a reporter</h3><p>Select a country tile. USA and China are partner anchors, not inferred shipment routes.</p></article>
+      <article><span>02</span><h3>Check the clocks</h3><p>Read each observation period and comparison quality. Pipeline refresh and recent headlines use different dates.</p></article>
+      <article><span>03</span><h3>Inspect and reproduce</h3><p>Use Intelligence, Products, and Data &amp; Quality, then export or copy the exact view URL.</p></article>
+    </div>
+    <div class="dialogCallout"><b>Interpretation rule:</b> TradeGravity surfaces descriptive exposure signals. It does not prove causality, physical rerouting, fraud, or investment outcomes.</div>
+    <div class="dialogActions">
+      <button id="dismissOnboarding" class="btn" type="button">Explore on my own</button>
+      <button id="startSampleView" class="btn primaryBtn" type="button">Start with Viet Nam</button>
+    </div>
+  </dialog>
+
+  <dialog id="methodologyDialog" class="appDialog methodologyDialog" aria-labelledby="methodologyTitle">
+    <div class="dialogHeader">
+      <div><span class="eyebrow">Definitions at a glance</span><h2 id="methodologyTitle">What this view means—and does not mean</h2></div>
+      <button class="iconButton" type="button" data-close-dialog="methodologyDialog" aria-label="Close definitions and limits">×</button>
+    </div>
+    <div class="definitionGrid">
+      <article><h3>Total trade</h3><p>Reporter exports plus reporter imports with the selected partner.</p></article>
+      <article><h3>Exports / imports</h3><p>Flows are recorded from each reporter country's perspective, with USA or China as partner.</p></article>
+      <article><h3>China share</h3><p>China divided by USA plus China in this two-anchor view. It is not a whole-world market share.</p></article>
+      <article><h3>Two-partner HHI</h3><p>Concentration across the two published anchors only. It is not whole-world supplier concentration.</p></article>
+      <article><h3>Latest by reporter</h3><p>Uses each reporter's latest published observations. Select an exact period for cross-country comparisons.</p></article>
+      <article><h3>Growth</h3><p>Change from the published previous period shown for that observation; missing baselines remain unavailable.</p></article>
+      <article><h3>Normalized values</h3><p>Per-capita and GDP-share views combine trade with the published World Bank country context and its own year.</p></article>
+      <article><h3>Headlines</h3><p>Recent GDELT headlines are optional context. Their rolling window is not aligned to historical trade periods.</p></article>
+    </div>
+    <div id="methodologyCurrentView" class="dialogCallout">Loading the active view definition…</div>
+    <div class="dialogActions"><button class="btn primaryBtn" type="button" data-close-dialog="methodologyDialog">Got it</button></div>
+  </dialog>
 
   <div id="tooltip" class="tooltip" role="status" aria-live="polite" style="display:none;"></div>
   <script src="./app.js"></script>

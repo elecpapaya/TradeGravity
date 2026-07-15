@@ -170,6 +170,84 @@ select option{background:#fff;color:#111}
 }
 .btn:hover{background: rgba(255,255,255,.06)}
 
+.dataHealthBanner{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  min-height:38px;
+  padding:8px 24px;
+  border-bottom:1px solid var(--border);
+  background:rgba(134,231,176,.055);
+  color:var(--muted);
+  font-size:11px;
+}
+.dataHealthBanner.is-partial{background:rgba(231,211,124,.065)}
+.dataHealthBanner.is-failed{background:rgba(255,123,107,.075)}
+.dataHealthCopy{display:flex;align-items:center;gap:9px;min-width:0}
+.dataHealthBadge{
+  flex:none;
+  padding:4px 7px;
+  border:1px solid rgba(134,231,176,.3);
+  border-radius:999px;
+  color:var(--growth-pos);
+  font:700 9px/1 var(--mono);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.is-partial .dataHealthBadge{border-color:rgba(231,211,124,.35);color:var(--hi)}
+.is-failed .dataHealthBadge{border-color:rgba(255,123,107,.4);color:var(--growth-neg)}
+.textButton{border:0;background:transparent;color:var(--text);font:700 11px inherit;text-decoration:underline;cursor:pointer}
+
+.viewUtility{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:16px;
+  align-items:center;
+  padding:10px 24px;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.018);
+}
+.viewContext{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-width:0}
+.viewContext > div{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 7px;min-width:0}
+.viewContext .contextLabel{color:var(--muted2);font:700 9px/1.2 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+.viewContext b{overflow:hidden;color:var(--text);font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.viewContext div > span:last-child{grid-column:1/-1;overflow:hidden;color:var(--muted2);font-size:9px;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
+.viewActions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.viewActions .btn{height:32px;padding:0 10px;font-size:10px;white-space:nowrap}
+
+.appDialog{
+  width:min(860px,calc(100vw - 28px));
+  max-height:calc(100vh - 28px);
+  padding:0;
+  overflow:auto;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:18px;
+  background:#11161e;
+  color:var(--text);
+  box-shadow:0 28px 100px rgba(0,0,0,.72);
+}
+.appDialog::backdrop{background:rgba(4,6,9,.76);backdrop-filter:blur(6px)}
+.dialogHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:22px 24px;border-bottom:1px solid var(--border)}
+.dialogHeader h2{margin:6px 0 0;font-size:22px;line-height:1.2}
+.iconButton{width:34px;height:34px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03);color:var(--text);font-size:22px;line-height:1;cursor:pointer}
+.iconButton:hover{background:rgba(255,255,255,.07)}
+.onboardingSteps,.definitionGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:20px 24px}
+.onboardingSteps article,.definitionGrid article{padding:15px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.025)}
+.onboardingSteps article > span{color:var(--hi);font:700 11px var(--mono)}
+.onboardingSteps h3,.definitionGrid h3{margin:9px 0 6px;font-size:13px}
+.onboardingSteps p,.definitionGrid p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+.definitionGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.definitionGrid h3{margin-top:0}
+.dialogCallout{margin:0 24px;padding:12px 14px;border-left:3px solid var(--hi);background:rgba(231,211,124,.055);color:var(--muted);font-size:11px;line-height:1.5}
+.dialogCallout b{color:var(--text)}
+.dialogActions{display:flex;justify-content:flex-end;gap:8px;padding:18px 24px 22px}
+
+.temporalNotice{margin:10px 0;padding:10px;border:1px solid rgba(231,211,124,.18);border-radius:9px;background:rgba(231,211,124,.045)}
+.temporalNotice b,.temporalNotice span{display:block}
+.temporalNotice b{color:var(--hi);font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.temporalNotice span{margin-top:4px;color:var(--muted);font-size:10px;line-height:1.45}
+
 .layout{
   display:grid;
   grid-template-columns: 1fr 360px;
@@ -611,4 +689,49 @@ select option{background:#fff;color:#111}
   .scenarioForm label:first-child{grid-column:auto}
   .scenarioSource{grid-column:auto}
   .catalogItem{grid-template-columns:1fr}
+}
+
+@media (max-width: 1100px){
+  .viewUtility{grid-template-columns:1fr}
+  .viewActions{justify-content:flex-start}
+}
+
+@media (max-width: 650px){
+  .topbar{padding:12px 10px;gap:12px}
+  .topbar .brand{min-width:0}
+  .brand .title{font-size:22px}
+  .brand .subtitle{font-size:12px;line-height:1.45}
+  .datasetMeta{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+  .datasetMeta > *{flex:none}
+  .controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .controls .field:has(.segmented){grid-column:1/-1}
+  .dataHealthBanner{align-items:flex-start;padding:9px 10px}
+  .dataHealthCopy{align-items:flex-start}
+  .viewUtility{padding:10px;gap:10px}
+  .viewContext{grid-template-columns:1fr;gap:7px}
+  .viewContext div > span:last-child{white-space:normal}
+  .viewActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+  .viewActions .btn{width:100%;min-width:0}
+  .viewActions .btn:last-child{grid-column:1/-1}
+  .layout{padding:10px;gap:10px}
+  .canvas{height:900px}
+  .analysisBody{min-height:0;padding:12px}
+  .analysisGrid{padding:10px;gap:10px}
+  .networkChart{height:290px}
+  .signalMetrics,.scenarioResults{grid-template-columns:1fr}
+  .tooltip{max-width:calc(100vw - 20px)}
+  .dialogHeader{padding:18px}
+  .dialogHeader h2{font-size:18px}
+  .onboardingSteps,.definitionGrid{grid-template-columns:1fr;padding:16px 18px}
+  .dialogCallout{margin:0 18px}
+  .dialogActions{padding:16px 18px 18px;flex-direction:column-reverse}
+  .dialogActions .btn{width:100%}
+}
+
+@media (max-width: 420px){
+  .controls{grid-template-columns:1fr}
+  .controls .field:has(.segmented){grid-column:auto}
+  .viewActions{grid-template-columns:1fr}
+  .viewActions .btn:last-child{grid-column:auto}
+  .canvas{height:820px}
 }

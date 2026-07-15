@@ -22,10 +22,11 @@ go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
 node --check site/app.js
 node --check site/security.js
 node --check site/data-tools.js
+node --check site/experience-tools.js
 node --check site/explorer-tools.js
 node --check site/intelligence-tools.js
 node --check site/news-tools.js
-node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
+node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/experience-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
 python -m pip install --disable-pip-version-check cffconvert==2.0.0
 cffconvert --validate
 go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7

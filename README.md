@@ -57,10 +57,12 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 - Linked US/China treemaps with hover highlighting and flag overlays.
 - Same-period comparison by default, explicit stale/missing warnings, and a data-quality dashboard.
 - Region, income, ASEAN/EU, per-capita, and GDP-share filters.
-- Shareable view URLs plus spreadsheet-safe CSV and filtered JSON export.
+- Restorable view URLs plus spreadsheet-safe CSV, filtered JSON, PNG analysis snapshots, and Markdown summary reports.
+- A first-visit 30-second guide, always-visible metric/period/scope context, and an on-demand definitions and limitations guide.
+- Global current/partial/degraded publication status with retry guidance, plus explicit separation of trade-observation, pipeline-refresh, and recent-headline clocks.
 - Searchable accessible data table and selected-country 5–10 year trend.
 - HS2 product mix for the selected reporter, kept separate from WITS headline totals.
-- Shareable Overview, Intelligence, Products, Data & Quality, and Scenario Lab tabs with one synchronized filter and country state.
+- Shareable Overview, Intelligence, Products, Data & Quality, and Scenario Lab tabs with synchronized filters, country, product, tariff, and scenario-assumption state.
 - Two-anchor concentration, balance, growth-divergence, and ranking views whose USA/China-only scope is visible in the UI, plus a selected-country multi-partner network when its matrix exists.
 - An illustrative HS6 tariff sensitivity lab that can load a published MFN rate and product import baseline while exposing elasticity, pass-through, fallback, and source assumptions.
 - A machine-readable `catalog.json` that separates ready, partial, and planned resources. Strategic HS6, tariffs, and bilateral matrices are published; reconciliation, value-added, and versioned scenario outputs remain planned.
@@ -168,7 +170,7 @@ To run the automated checks:
 ```bash
 go test ./...
 go vet ./...
-node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
+node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/experience-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
 ```
 
 ## Collector configuration

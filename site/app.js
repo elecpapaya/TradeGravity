@@ -30,6 +30,10 @@ const intelligenceTools = globalThis.TradeGravityIntelligenceTools;
 if (!intelligenceTools) {
   throw new Error("TradeGravity intelligence helpers failed to load.");
 }
+const experienceTools = globalThis.TradeGravityExperienceTools;
+if (!experienceTools) {
+  throw new Error("TradeGravity experience helpers failed to load.");
+}
 const newsTools = globalThis.TradeGravityNewsTools;
 if (!newsTools) {
   throw new Error("TradeGravity news helpers failed to load.");
@@ -53,6 +57,12 @@ const {
   rankExposureRows,
   selectPreferredTariffs,
 } = intelligenceTools;
+const {
+  buildSummaryReport,
+  deriveDataHealth,
+  metricDefinition,
+  tabLimitation,
+} = experienceTools;
 const {
   DEFAULT_MAX_ITEMS: NEWS_MAX,
   DEFAULT_WINDOW_DAYS: NEWS_WINDOW_DAYS,
@@ -117,6 +127,27 @@ const els = {
   scenarioPassThrough: document.getElementById("scenarioPassThrough"),
   scenarioTariffSource: document.getElementById("scenarioTariffSource"),
   scenarioResult: document.getElementById("scenarioResult"),
+  dataHealthBanner: document.getElementById("dataHealthBanner"),
+  dataHealthBadge: document.getElementById("dataHealthBadge"),
+  dataHealthText: document.getElementById("dataHealthText"),
+  retryData: document.getElementById("retryData"),
+  metricContext: document.getElementById("metricContext"),
+  metricContextDefinition: document.getElementById("metricContextDefinition"),
+  periodContext: document.getElementById("periodContext"),
+  filterContext: document.getElementById("filterContext"),
+  filterContextDetail: document.getElementById("filterContextDetail"),
+  scopeContext: document.getElementById("scopeContext"),
+  scopeContextLimit: document.getElementById("scopeContextLimit"),
+  openOnboarding: document.getElementById("openOnboarding"),
+  openMethodology: document.getElementById("openMethodology"),
+  exportPNG: document.getElementById("exportPNG"),
+  exportCSV: document.getElementById("exportCSV"),
+  exportReport: document.getElementById("exportReport"),
+  onboardingDialog: document.getElementById("onboardingDialog"),
+  methodologyDialog: document.getElementById("methodologyDialog"),
+  methodologyCurrentView: document.getElementById("methodologyCurrentView"),
+  dismissOnboarding: document.getElementById("dismissOnboarding"),
+  startSampleView: document.getElementById("startSampleView"),
 };
 
 let state = {
@@ -153,7 +184,12 @@ let state = {
   normalization: "raw",
   tab: "overview",
   strategicSector: "all",
+  resourceStates: [],
+  dataHealth: null,
+  preserveScenarioInputs: false,
 };
+
+const ONBOARDING_STORAGE_KEY = "tradegravity:onboarding:v1";
 
 // Minimal ISO3->ISO2 fallback map (overridden by iso3_to_iso2.json if present).
 const FALLBACK_ISO3_TO_ISO2 = {
@@ -275,6 +311,79 @@ function renderDatasetStatus(latest, metadata){
     };
     els.sourceLink.href = sources[provider] || "https://wits.worldbank.org/";
     els.sourceLink.textContent = provider === "unknown" ? "Data source" : `${provider.toUpperCase()} source`;
+  }
+}
+
+function renderDataHealth(coreReady = true){
+  const health = deriveDataHealth({
+    coreReady,
+    metadata: state.meta || { generated_at: state.generatedAt, provider: state.provider },
+    quality: state.quality,
+    resources: state.resourceStates,
+    generatedAt: state.generatedAt,
+  });
+  state.dataHealth = health;
+  if (!els.dataHealthBanner) return health;
+  els.dataHealthBanner.classList.remove("is-loading", "is-current", "is-partial", "is-failed");
+  els.dataHealthBanner.classList.add(`is-${health.level}`);
+  if (els.dataHealthBadge) els.dataHealthBadge.textContent = health.label;
+  if (els.dataHealthText) {
+    els.dataHealthText.textContent = health.summary;
+    els.dataHealthText.title = health.details.join(" ");
+  }
+  if (els.retryData) els.retryData.hidden = health.level === "current";
+  return health;
+}
+
+function activePeriodLabel(){
+  if (state.period && state.period !== "latest") return state.period.replace(":", " ");
+  const periods = new Set();
+  for (const row of state.rows) {
+    for (const side of ["usa", "chn"]) {
+      const block = row?.[side];
+      if (block?.period) periods.add(`${block.period_type || "?"} ${block.period}`);
+    }
+  }
+  if (periods.size === 0) return "Latest by reporter · period unavailable";
+  if (periods.size === 1) return `Latest by reporter · ${Array.from(periods)[0]}`;
+  return `Latest by reporter · ${periods.size} observation periods`;
+}
+
+function activeFilterLabel(){
+  const filters = [];
+  if (state.group) filters.push(`group ${state.group}`);
+  if (state.region) filters.push(`region ${state.region}`);
+  if (state.income) filters.push(`income ${state.income}`);
+  if (state.tableQuery) filters.push(`search “${state.tableQuery}”`);
+  return filters.length > 0 ? filters.join(" · ") : "All reporters";
+}
+
+function activeTabLabel(){
+  return {
+    overview: "Overview",
+    intelligence: "Intelligence",
+    products: "Products",
+    quality: "Data & Quality",
+    lab: "Scenario Lab",
+  }[state.tab] || "Overview";
+}
+
+function renderViewContext(){
+  const definition = metricDefinition(state.metric, state.normalization);
+  const limit = tabLimitation(state.tab);
+  if (els.metricContext) els.metricContext.textContent = metricLabel();
+  if (els.metricContextDefinition) els.metricContextDefinition.textContent = definition;
+  if (els.periodContext) els.periodContext.textContent = activePeriodLabel();
+  if (els.filterContext) els.filterContext.textContent = activeFilterLabel();
+  if (els.filterContextDetail) {
+    const comparison = state.comparisonMode === "comparable" ? "Same-period comparison" : "All available periods";
+    const country = state.selectedRow ? `${state.selectedRow.name} selected` : "no country selected";
+    els.filterContextDetail.textContent = `${state.rows.length} reporters · ${comparison} · ${country}.`;
+  }
+  if (els.scopeContext) els.scopeContext.textContent = activeTabLabel();
+  if (els.scopeContextLimit) els.scopeContextLimit.textContent = limit;
+  if (els.methodologyCurrentView) {
+    els.methodologyCurrentView.innerHTML = `<b>Active view:</b> ${escapeHTML(metricLabel())} · ${escapeHTML(activePeriodLabel())}. ${escapeHTML(definition)} ${escapeHTML(limit)}`;
   }
 }
 
@@ -435,6 +544,7 @@ function selectCountry(row){
   state.selectedRow = row;
   state.highlightKey = row.iso3;
   syncURL();
+  renderViewContext();
   applyHighlight(row.iso3);
   setSelection(row);
   setIndicators(row);
@@ -538,6 +648,351 @@ function downloadFilteredJSON(){
   setTimeout(() => URL.revokeObjectURL(objectURL), 0);
 }
 
+function downloadBlob(blob, filename){
+  const objectURL = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectURL;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(objectURL), 0);
+}
+
+function exportFilename(extension){
+  const country = state.selectedRow?.iso3 ? `-${state.selectedRow.iso3.toLowerCase()}` : "";
+  const period = String(state.period || "latest").replace(/[^A-Za-z0-9-]/g, "-").toLowerCase();
+  return `tradegravity-${state.tab}-${period}${country}.${extension}`;
+}
+
+function reportModel(){
+  syncURL();
+  const rows = filteredTableRows();
+  const selected = state.selectedRow;
+  const selectedUSA = selected ? getMetricValue(selected, "usa") : 0;
+  const selectedCHN = selected ? getMetricValue(selected, "chn") : 0;
+  const comparisonQuality = selected?.same_period
+    ? `Same period (${selected.comparison_period || selected.usa?.period || selected.chn?.period || "unknown"})`
+    : "Mixed or missing periods";
+  return {
+    exportedAt: new Date().toISOString(),
+    generatedAt: state.generatedAt,
+    provider: state.provider,
+    tabLabel: activeTabLabel(),
+    metricLabel: metricLabel(),
+    periodLabel: activePeriodLabel(),
+    comparisonLabel: state.comparisonMode === "comparable" ? "Same-period only" : "All available periods",
+    filterLabel: activeFilterLabel(),
+    metricDefinition: metricDefinition(state.metric, state.normalization),
+    health: state.dataHealth || renderDataHealth(true),
+    selected: selected ? {
+      name: selected.name,
+      iso3: selected.iso3,
+      usaValue: formatMetricValue(selectedUSA),
+      chnValue: formatMetricValue(selectedCHN),
+      combinedValue: formatMetricValue(selectedUSA + selectedCHN),
+      usaPeriod: selected.usa?.period || "",
+      chnPeriod: selected.chn?.period || "",
+      chinaShare: selectedUSA + selectedCHN > 0 ? `${(selectedCHN / (selectedUSA + selectedCHN) * 100).toFixed(1)}%` : "—",
+      comparisonQuality,
+    } : null,
+    topRows: rows.slice(0, 10).map(row => {
+      const usa = getMetricValue(row, "usa");
+      const chn = getMetricValue(row, "chn");
+      return {
+        name: row.name,
+        iso3: row.iso3,
+        usaValue: formatMetricValue(usa),
+        chnValue: formatMetricValue(chn),
+        combinedValue: formatMetricValue(usa + chn),
+        periodQuality: row.same_period ? `Same period (${row.comparison_period || row.usa?.period || row.chn?.period || "unknown"})` : "Mixed/missing",
+      };
+    }),
+    limit: tabLimitation(state.tab),
+    viewURL: window.location.href,
+  };
+}
+
+function downloadSummaryReport(){
+  const report = buildSummaryReport(reportModel());
+  downloadBlob(new Blob([report], { type: "text/markdown;charset=utf-8" }), exportFilename("md"));
+}
+
+function copyFormState(source, clone){
+  const sourceFields = source.querySelectorAll("input, select, textarea");
+  const cloneFields = clone.querySelectorAll("input, select, textarea");
+  sourceFields.forEach((field, index) => {
+    const target = cloneFields[index];
+    if (!target) return;
+    if (target.tagName === "SELECT") {
+      Array.from(target.options).forEach(option => option.toggleAttribute("selected", option.value === field.value));
+    } else {
+      target.setAttribute("value", field.value);
+      target.textContent = field.value;
+    }
+  });
+}
+
+function snapshotStyleText(){
+  let styles = "";
+  for (const sheet of Array.from(document.styleSheets)) {
+    try {
+      styles += Array.from(sheet.cssRules || []).map(rule => rule.cssText).join("\n");
+    } catch {
+      // Cross-origin styles are not required for the first-party dashboard snapshot.
+    }
+  }
+  return styles;
+}
+
+function imageFromDataURL(url){
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Snapshot image could not be rendered."));
+    image.src = url;
+  });
+}
+
+function canvasBlob(canvas){
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("PNG encoding failed.")), "image/png");
+  });
+}
+
+function wrapCanvasText(context, text, x, y, maxWidth, lineHeight, maxLines = 3){
+  const words = String(text || "").split(/\s+/).filter(Boolean);
+  let line = "";
+  let lineCount = 0;
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (context.measureText(candidate).width > maxWidth && line) {
+      context.fillText(line, x, y + lineCount * lineHeight);
+      line = word;
+      lineCount++;
+      if (lineCount >= maxLines) return y + lineCount * lineHeight;
+    } else {
+      line = candidate;
+    }
+  }
+  if (line && lineCount < maxLines) {
+    context.fillText(line, x, y + lineCount * lineHeight);
+    lineCount++;
+  }
+  return y + lineCount * lineHeight;
+}
+
+async function fallbackSnapshotBlob(){
+  const model = reportModel();
+  const canvas = document.createElement("canvas");
+  canvas.width = 1600;
+  canvas.height = 1000;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#0b0d12";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  gradient.addColorStop(0, "rgba(90,162,255,.16)");
+  gradient.addColorStop(1, "rgba(255,107,87,.10)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, 180);
+  ctx.fillStyle = "#f2f4f8";
+  ctx.font = "700 38px system-ui, sans-serif";
+  ctx.fillText("TradeGravity", 70, 68);
+  ctx.font = "700 25px system-ui, sans-serif";
+  ctx.fillText(`${model.tabLabel} · ${model.metricLabel}`, 70, 112);
+  ctx.fillStyle = "rgba(255,255,255,.67)";
+  ctx.font = "18px system-ui, sans-serif";
+  ctx.fillText(`${model.periodLabel} · ${model.comparisonLabel} · ${model.filterLabel}`, 70, 148);
+
+  ctx.fillStyle = "#e7d37c";
+  ctx.font = "700 15px ui-monospace, monospace";
+  ctx.fillText((model.health.label || "DATA STATUS").toUpperCase(), 70, 224);
+  ctx.fillStyle = "rgba(255,255,255,.68)";
+  ctx.font = "17px system-ui, sans-serif";
+  wrapCanvasText(ctx, model.health.summary, 70, 254, 1460, 24, 2);
+
+  let top = 330;
+  if (model.selected) {
+    ctx.fillStyle = "#f2f4f8";
+    ctx.font = "700 26px system-ui, sans-serif";
+    ctx.fillText(`${model.selected.name} (${model.selected.iso3})`, 70, top);
+    ctx.font = "700 22px ui-monospace, monospace";
+    ctx.fillStyle = "#5aa2ff";
+    ctx.fillText(`USA ${model.selected.usaValue}`, 70, top + 42);
+    ctx.fillStyle = "#ff7b6b";
+    ctx.fillText(`CHN ${model.selected.chnValue}`, 430, top + 42);
+    ctx.fillStyle = "#e7d37c";
+    ctx.fillText(`Combined ${model.selected.combinedValue}`, 790, top + 42);
+    top += 105;
+  }
+
+  ctx.fillStyle = "rgba(255,255,255,.76)";
+  ctx.font = "700 17px system-ui, sans-serif";
+  ctx.fillText("Leading reporters in the filtered view", 70, top);
+  top += 35;
+  ctx.font = "15px ui-monospace, monospace";
+  for (const [index, row] of model.topRows.slice(0, 8).entries()) {
+    const y = top + index * 54;
+    ctx.fillStyle = "rgba(255,255,255,.1)";
+    ctx.fillRect(70, y - 22, 1460, 42);
+    ctx.fillStyle = "rgba(255,255,255,.88)";
+    ctx.fillText(`${String(index + 1).padStart(2, "0")}  ${row.name} (${row.iso3})`, 88, y + 5);
+    ctx.fillStyle = "#5aa2ff";
+    ctx.fillText(`USA ${row.usaValue}`, 700, y + 5);
+    ctx.fillStyle = "#ff7b6b";
+    ctx.fillText(`CHN ${row.chnValue}`, 1010, y + 5);
+    ctx.fillStyle = "#e7d37c";
+    ctx.fillText(row.combinedValue, 1360, y + 5);
+  }
+  ctx.fillStyle = "rgba(255,255,255,.55)";
+  ctx.font = "15px system-ui, sans-serif";
+  wrapCanvasText(ctx, model.limit, 70, 930, 1460, 21, 2);
+  return canvasBlob(canvas);
+}
+
+async function activeViewSnapshotBlob(){
+  const panel = document.querySelector(`[data-tab-panel="${state.tab}"]`);
+  if (!panel) return fallbackSnapshotBlob();
+  const stage = document.createElement("div");
+  stage.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+  stage.style.cssText = "position:fixed;left:-100000px;top:0;width:1440px;background:#0b0d12;color:rgba(255,255,255,.92);overflow:hidden;";
+  const style = document.createElement("style");
+  style.textContent = `${snapshotStyleText()} body{overflow:visible!important}.tabPanel{display:block!important}.viewUtility{grid-template-columns:1fr!important}.viewActions{display:none!important}`;
+  stage.appendChild(style);
+  const brand = document.querySelector(".brand")?.cloneNode(true);
+  if (brand) {
+    const header = document.createElement("header");
+    header.className = "topbar";
+    header.appendChild(brand);
+    stage.appendChild(header);
+  }
+  const health = els.dataHealthBanner?.cloneNode(true);
+  if (health) {
+    health.querySelectorAll("button").forEach(button => button.remove());
+    stage.appendChild(health);
+  }
+  const context = document.querySelector(".viewUtility")?.cloneNode(true);
+  if (context) {
+    context.querySelector(".viewActions")?.remove();
+    stage.appendChild(context);
+  }
+  const panelClone = panel.cloneNode(true);
+  panelClone.removeAttribute("hidden");
+  copyFormState(panel, panelClone);
+  panelClone.querySelectorAll("img, image").forEach(image => image.remove());
+  stage.appendChild(panelClone);
+  document.body.appendChild(stage);
+  try {
+    if (document.fonts?.ready) await document.fonts.ready;
+    const width = 1440;
+    const height = Math.max(720, Math.min(2400, stage.scrollHeight));
+    stage.style.cssText = `position:relative;left:0;top:0;width:${width}px;height:${height}px;background:#0b0d12;color:rgba(255,255,255,.92);overflow:hidden;`;
+    const serialized = new XMLSerializer().serializeToString(stage);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${serialized}</foreignObject></svg>`;
+    const image = await imageFromDataURL(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#0b0d12";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0);
+    return await canvasBlob(canvas);
+  } catch (error) {
+    console.warn("[TradeGravity] active-view PNG capture fell back to summary snapshot.", error);
+    return fallbackSnapshotBlob();
+  } finally {
+    stage.remove();
+  }
+}
+
+async function downloadPNGSnapshot(){
+  if (!els.exportPNG) return;
+  const original = els.exportPNG.textContent;
+  els.exportPNG.disabled = true;
+  els.exportPNG.textContent = "Preparing PNG…";
+  try {
+    const blob = await activeViewSnapshotBlob();
+    downloadBlob(blob, exportFilename("png"));
+    els.exportPNG.textContent = "PNG ready";
+  } catch (error) {
+    console.error(error);
+    els.exportPNG.textContent = "PNG failed";
+  } finally {
+    setTimeout(() => {
+      els.exportPNG.disabled = false;
+      els.exportPNG.textContent = original;
+    }, 1400);
+  }
+}
+
+function rememberOnboarding(){
+  try { localStorage.setItem(ONBOARDING_STORAGE_KEY, "seen"); } catch { /* Storage can be unavailable in privacy modes. */ }
+}
+
+function onboardingWasSeen(){
+  try { return localStorage.getItem(ONBOARDING_STORAGE_KEY) === "seen"; } catch { return true; }
+}
+
+function openAppDialog(dialog){
+  if (!dialog || dialog.open) return;
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
+}
+
+function closeAppDialog(dialog){
+  if (!dialog?.open) return;
+  if (dialog === els.onboardingDialog) rememberOnboarding();
+  if (typeof dialog.close === "function") dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+function startVietNamSample(){
+  const periods = availablePeriods(state.seriesRows).map(item => item.key);
+  state.period = periods.includes("Y:2023") ? "Y:2023" : "latest";
+  const hasASEAN = state.latestRows.some(row => (row.groups || []).includes("ASEAN"));
+  state.group = hasASEAN ? "ASEAN" : "";
+  state.region = "";
+  state.income = "";
+  state.tableQuery = "";
+  state.comparisonMode = "comparable";
+  state.normalization = "raw";
+  syncExplorerControls();
+  refreshRows({ syncURL: false });
+  const sample = state.rows.find(row => row.iso3 === "VNM") || state.rows[0] || null;
+  setActiveTab("overview", { syncURL: false });
+  if (sample) selectCountry(sample);
+  else syncURL();
+  rememberOnboarding();
+  closeAppDialog(els.onboardingDialog);
+}
+
+function initializeExperienceControls(){
+  els.openOnboarding?.addEventListener("click", () => openAppDialog(els.onboardingDialog));
+  els.openMethodology?.addEventListener("click", () => {
+    renderViewContext();
+    openAppDialog(els.methodologyDialog);
+  });
+  els.dismissOnboarding?.addEventListener("click", () => {
+    rememberOnboarding();
+    closeAppDialog(els.onboardingDialog);
+  });
+  els.startSampleView?.addEventListener("click", startVietNamSample);
+  document.querySelectorAll("[data-close-dialog]").forEach(button => {
+    button.addEventListener("click", () => closeAppDialog(document.getElementById(button.dataset.closeDialog)));
+  });
+  for (const dialog of [els.onboardingDialog, els.methodologyDialog]) {
+    dialog?.addEventListener("click", event => {
+      if (event.target === dialog) closeAppDialog(dialog);
+    });
+  }
+  els.exportPNG?.addEventListener("click", downloadPNGSnapshot);
+  els.exportCSV?.addEventListener("click", downloadTableCSV);
+  els.exportReport?.addEventListener("click", downloadSummaryReport);
+  els.retryData?.addEventListener("click", () => window.location.reload());
+  if (!onboardingWasSeen()) setTimeout(() => openAppDialog(els.onboardingDialog), 250);
+}
+
 function setSelection(row){
   if (!row){
     els.selection.innerHTML = "<span class='subtle'>Click a country tile to view details.</span>";
@@ -599,8 +1054,11 @@ function showTooltip(ev, row, side){
     </div>
   `;
   const pad = 12;
-  const x = Math.min(window.innerWidth - 340, ev.clientX + pad);
-  const y = Math.min(window.innerHeight - 180, ev.clientY + pad);
+  const rect = els.tooltip.getBoundingClientRect();
+  const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+  const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+  const x = Math.max(8, Math.min(viewportWidth - rect.width - 8, ev.clientX + pad));
+  const y = Math.max(8, Math.min(viewportHeight - rect.height - 8, ev.clientY + pad));
   els.tooltip.style.left = x + "px";
   els.tooltip.style.top = y + "px";
 }
@@ -794,6 +1252,11 @@ function buildTreemap(svgEl, side, rows){
     });
 }
 
+function boundedInputValue(element, fallback, minimum, maximum){
+  const value = Number(element?.value);
+  return Number.isFinite(value) ? Math.max(minimum, Math.min(maximum, value)) : fallback;
+}
+
 function currentViewState(){
   return {
     metric: state.metric,
@@ -809,6 +1272,12 @@ function currentViewState(){
     query: state.tableQuery,
     tab: state.tab,
     sector: state.strategicSector,
+    scenarioPartner: els.scenarioPartner?.value || "usa",
+    scenarioProduct: els.scenarioProduct?.value || "",
+    tariffBase: boundedInputValue(els.scenarioTariffBase, 0, 0, 300),
+    tariffChange: boundedInputValue(els.scenarioTariffChange, 10, -100, 300),
+    elasticity: boundedInputValue(els.scenarioElasticity, -1.5, -10, -0.05),
+    passThrough: boundedInputValue(els.scenarioPassThrough, 1, 0, 1),
   };
 }
 
@@ -816,6 +1285,28 @@ function syncURL(){
   const query = serializeViewState(currentViewState());
   const next = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
   window.history.replaceState(null, "", next);
+}
+
+async function copyTextToClipboard(text){
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.left = "-9999px";
+    document.body.appendChild(field);
+    field.select();
+    let copied = false;
+    try {
+      copied = document.execCommand("copy");
+    } finally {
+      field.remove();
+    }
+    return copied;
+  }
 }
 
 function refreshRows(options = {}){
@@ -882,6 +1373,19 @@ function populateExplorerControls(){
   fillSelect(els.groupFilter, groups, "All groups");
 }
 
+function reconcileExplorerState(){
+  for (const [element, property, fallback] of [
+    [els.periodFilter, "period", "latest"],
+    [els.regionFilter, "region", ""],
+    [els.incomeFilter, "income", ""],
+    [els.groupFilter, "group", ""],
+  ]) {
+    if (!element) continue;
+    const values = Array.from(element.options).map(option => option.value);
+    if (!values.includes(state[property])) state[property] = fallback;
+  }
+}
+
 function populateStrategicControls(){
   if (!els.strategicSectorFilter) return;
   const sectors = Array.isArray(state.strategicIndex?.sectors) ? state.strategicIndex.sectors : [];
@@ -934,6 +1438,20 @@ function syncExplorerControls(){
   if (els.normalization) els.normalization.value = state.normalization;
   if (els.topN) els.topN.value = String(state.topN);
   if (els.tableSearch) els.tableSearch.value = state.tableQuery;
+}
+
+function syncScenarioControls(view){
+  if (!view) return;
+  state.preserveScenarioInputs = true;
+  if (els.scenarioPartner) els.scenarioPartner.value = view.scenarioPartner || "usa";
+  if (els.scenarioProduct) {
+    const available = Array.from(els.scenarioProduct.options).some(option => option.value === view.scenarioProduct);
+    els.scenarioProduct.value = available ? view.scenarioProduct : "";
+  }
+  if (els.scenarioTariffBase) els.scenarioTariffBase.value = String(view.tariffBase ?? 0);
+  if (els.scenarioTariffChange) els.scenarioTariffChange.value = String(view.tariffChange ?? 10);
+  if (els.scenarioElasticity) els.scenarioElasticity.value = String(view.elasticity ?? -1.5);
+  if (els.scenarioPassThrough) els.scenarioPassThrough.value = String(view.passThrough ?? 1);
 }
 
 function seriesMetricValue(point, side, selected){
@@ -1553,9 +2071,11 @@ async function renderScenarioBaseline(){
   if (!context || state.selectedRow?.iso3 !== requestedISO3) return;
   const partnerName = context.side === "chn" ? "China" : "the United States";
   const productName = context.productCode ? `${context.productCode} ${context.product?.label || "strategic product"}` : "all products";
-  if (context.productCode && els.scenarioTariffBase) {
+  if (context.productCode && els.scenarioTariffBase && !state.preserveScenarioInputs) {
     els.scenarioTariffBase.value = context.tariffRow ? String(Number(context.tariffRow.rate_percent).toFixed(2)) : "0";
   }
+  state.preserveScenarioInputs = false;
+  syncURL();
   if (els.scenarioTariffSource) {
     if (context.tariffRow) {
       els.scenarioTariffSource.textContent = `Default: ${tariffRateLabel(context.tariffRow)} · ${context.tariffRow.classification}/${context.tariffRow.nomenclature} · ${context.tariffPartition.partition.year} · ${String(context.tariffPartition.file.provider || "").toUpperCase()} · WLD/MFN schedule.`;
@@ -1612,6 +2132,7 @@ function setActiveTab(tab, options = {}){
     panel.hidden = panel.dataset.tabPanel !== state.tab;
   });
   if (options.syncURL !== false) syncURL();
+  renderViewContext();
   if (state.tab === "overview") {
     requestAnimationFrame(() => {
       buildTreemap(els.svgUSA, "usa", state.rows);
@@ -1646,6 +2167,7 @@ function initializeTabs(){
 
 function renderAll(){
   const rows = state.rows;
+  renderViewContext();
   buildTreemap(els.svgUSA, "usa", rows);
   buildTreemap(els.svgCHN, "chn", rows);
 
@@ -1799,6 +2321,12 @@ function renderSnapshotHTML(indicators, news){
     sections.push(`<div class="subtle">No indicator data available.</div>`);
   }
 
+  const selected = state.selectedRow;
+  const usaPeriod = selected?.usa?.period ? `${selected.usa.period_type || "?"} ${selected.usa.period}` : "unavailable";
+  const chnPeriod = selected?.chn?.period ? `${selected.chn.period_type || "?"} ${selected.chn.period}` : "unavailable";
+  const tradeClock = usaPeriod === chnPeriod ? usaPeriod : `USA ${usaPeriod} · China ${chnPeriod}`;
+  const newsWindow = Number(news?.windowDays) || NEWS_WINDOW_DAYS;
+  sections.push(`<div class="temporalNotice"><b>Different clocks</b><span>Trade observation: ${escapeHTML(tradeClock)}. Headlines: rolling ${newsWindow}-day window at the time this panel loads. They are not same-period evidence.</span></div>`);
   sections.push(`<div class="subSectionTitle">Trade &amp; supply-chain headlines <span class="experimentalBadge">Experimental</span></div>`);
   sections.push(renderNewsHTML(news));
 
@@ -1878,6 +2406,16 @@ async function main(){
 	state.matrixIndex = matrixIndex;
   state.catalog = catalog;
   state.meta = metadata;
+  state.resourceStates = [
+    { label: "metadata", ready: Boolean(metadata) },
+    { label: "time series", ready: Boolean(series) },
+    { label: "quality report", ready: Boolean(quality) },
+    { label: "HS2 index", ready: Boolean(productIndex) },
+    { label: "strategic HS6 index", ready: Boolean(strategicIndex) },
+    { label: "tariff index", ready: Boolean(tariffIndex) },
+    { label: "bilateral matrix index", ready: Boolean(matrixIndex) },
+    { label: "data catalog", ready: Boolean(catalog) },
+  ];
   const initialView = parseViewState(window.location.search);
   state.metric = initialView.metric;
   state.colorMode = initialView.color;
@@ -1892,9 +2430,11 @@ async function main(){
   state.tab = initialView.tab;
   state.strategicSector = initialView.sector;
   populateStrategicControls();
+  syncScenarioControls(initialView);
   initializeTabs();
   setActiveTab(state.tab, { syncURL: false });
   populateExplorerControls();
+  reconcileExplorerState();
   syncExplorerControls();
   refreshRows({ syncURL: false });
   if (initialView.country) {
@@ -1905,6 +2445,8 @@ async function main(){
     }
   }
   renderDatasetStatus(data, metadata);
+  renderDataHealth(true);
+  initializeExperienceControls();
   console.info('[TradeGravity] loaded rows=', state.latestRows.length, 'generated_at=', state.generatedAt);
 
   if (els.metric) {
@@ -1945,7 +2487,10 @@ async function main(){
   if (els.topN){
     els.topN.addEventListener("input", () => {
       const v = parseInt(els.topN.value, 10);
-      if (Number.isFinite(v)) state.topN = v;
+      if (Number.isFinite(v)) {
+        state.topN = Math.max(5, Math.min(200, v));
+        if (String(state.topN) !== els.topN.value) els.topN.value = String(state.topN);
+      }
       syncURL();
       renderAll();
     });
@@ -1979,20 +2524,34 @@ async function main(){
   if (els.copyShareURL) {
     els.copyShareURL.addEventListener("click", async () => {
       syncURL();
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        els.copyShareURL.textContent = "Copied";
-      } catch {
-        window.prompt("Copy this view URL", window.location.href);
-      }
+      const copied = await copyTextToClipboard(window.location.href);
+      els.copyShareURL.textContent = copied ? "Copied" : "URL ready in address bar";
       setTimeout(() => { els.copyShareURL.textContent = "Copy view URL"; }, 1500);
     });
   }
   if (els.scenarioPartner) {
-    els.scenarioPartner.addEventListener("change", renderScenarioBaseline);
+    els.scenarioPartner.addEventListener("change", () => {
+      syncURL();
+      renderScenarioBaseline();
+    });
   }
   if (els.scenarioProduct) {
-    els.scenarioProduct.addEventListener("change", renderScenarioBaseline);
+    els.scenarioProduct.addEventListener("change", () => {
+      syncURL();
+      renderScenarioBaseline();
+    });
+  }
+  for (const [element, property] of [
+    [els.scenarioTariffBase, "tariffBase"],
+    [els.scenarioTariffChange, "tariffChange"],
+    [els.scenarioElasticity, "elasticity"],
+    [els.scenarioPassThrough, "passThrough"],
+  ]) {
+    element?.addEventListener("input", syncURL);
+    element?.addEventListener("change", () => {
+      element.value = String(currentViewState()[property]);
+      syncURL();
+    });
   }
   if (els.scenarioForm) {
     els.scenarioForm.addEventListener("submit", event => {
@@ -2025,6 +2584,7 @@ async function main(){
     state.highlightKey = null;
     syncExplorerControls();
     populateStrategicControls();
+    syncScenarioControls(view);
     refreshRows({ syncURL: false });
     setActiveTab(view.tab, { syncURL: false });
     const selected = state.rows.find(row => row.iso3 === view.country);
@@ -2071,6 +2631,11 @@ function syncColorLegend(){
 
 main().catch(err => {
   console.error(err);
+  renderDataHealth(false);
+  els.retryData?.addEventListener("click", () => window.location.reload(), { once: true });
+  if (els.dataStatus) {
+    els.dataStatus.textContent = "Headline trade dataset unavailable.";
+  }
   if (els.indicators) {
     els.indicators.textContent = "Failed to load data: " + String(err);
   }

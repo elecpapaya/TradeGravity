@@ -12,10 +12,11 @@ test("index loads trusted helpers before the application and keeps D3 pinned", (
   const dataToolsIndex = html.indexOf('src="./data-tools.js"');
   const explorerToolsIndex = html.indexOf('src="./explorer-tools.js"');
   const intelligenceToolsIndex = html.indexOf('src="./intelligence-tools.js"');
+  const experienceToolsIndex = html.indexOf('src="./experience-tools.js"');
   const newsToolsIndex = html.indexOf('src="./news-tools.js"');
   const d3Index = html.indexOf('src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"');
   const appIndex = html.indexOf('src="./app.js"');
-  assert.ok(securityIndex >= 0 && dataToolsIndex > securityIndex && explorerToolsIndex > dataToolsIndex && intelligenceToolsIndex > explorerToolsIndex && newsToolsIndex > intelligenceToolsIndex && d3Index > newsToolsIndex && appIndex > d3Index);
+  assert.ok(securityIndex >= 0 && dataToolsIndex > securityIndex && explorerToolsIndex > dataToolsIndex && intelligenceToolsIndex > explorerToolsIndex && experienceToolsIndex > intelligenceToolsIndex && newsToolsIndex > experienceToolsIndex && d3Index > newsToolsIndex && appIndex > d3Index);
   assert.match(html, /integrity="sha384-[A-Za-z0-9+/=]+"/);
   assert.match(html, /Content-Security-Policy/);
 });
@@ -26,6 +27,40 @@ test("the experimental news panel exposes scope and trust caveats", () => {
   assert.match(app, /does not affect trade metrics/i);
   assert.match(app, /keyword-filtered and deduplicated/i);
   assert.match(app, /temporarily unavailable from GDELT/i);
+  assert.match(app, /Different clocks/);
+  assert.match(app, /They are not same-period evidence/);
+});
+
+test("first-visit onboarding, inline definitions, and export actions are wired once", () => {
+  for (const id of [
+    "dataHealthBanner", "dataHealthBadge", "dataHealthText", "retryData",
+    "metricContext", "metricContextDefinition", "periodContext", "filterContext", "filterContextDetail", "scopeContext", "scopeContextLimit",
+    "openOnboarding", "openMethodology", "exportPNG", "exportCSV", "exportReport",
+    "onboardingDialog", "methodologyDialog", "dismissOnboarding", "startSampleView",
+  ]) {
+    assert.equal((html.match(new RegExp(`id=["']${id}["']`, "g")) || []).length, 1, `expected one #${id}`);
+  }
+  assert.match(html, /30-second orientation/);
+  assert.match(html, /Pipeline refresh and recent headlines use different dates/);
+  assert.match(html, /China divided by USA plus China in this two-anchor view/);
+  assert.match(app, /tradegravity:onboarding:v1/);
+  assert.match(app, /function startVietNamSample/);
+  assert.match(app, /function downloadPNGSnapshot/);
+  assert.match(app, /function downloadSummaryReport/);
+  assert.match(app, /async function copyTextToClipboard/);
+  assert.match(app, /document\.execCommand\("copy"\)/);
+});
+
+test("data health and mobile layout expose degraded states without hiding recovery", () => {
+  assert.match(app, /function renderDataHealth/);
+  assert.match(app, /renderDataHealth\(false\)/);
+  assert.match(app, /retryData.*window\.location\.reload/);
+  assert.match(app, /document\.documentElement\.clientWidth \|\| window\.innerWidth/);
+  assert.match(app, /document\.documentElement\.clientHeight \|\| window\.innerHeight/);
+  assert.match(css, /\.dataHealthBanner\.is-partial/);
+  assert.match(css, /\.dataHealthBanner\.is-failed/);
+  assert.match(css, /@media \(max-width: 650px\)[\s\S]*\.viewActions[\s\S]*grid-template-columns:repeat\(2/);
+  assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.viewActions[\s\S]*grid-template-columns:1fr/);
 });
 
 test("accessible table controls and targets appear exactly once", () => {

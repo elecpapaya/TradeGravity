@@ -4,6 +4,19 @@ All notable changes to TradeGravity will be documented in this file. The project
 
 ## Unreleased
 
+### Added
+
+- A first-visit 30-second onboarding guide with a ready-made Viet Nam view.
+- Global PNG snapshot, CSV, and Markdown summary-report exports for the active analysis view.
+- Always-visible metric, observation-period, scope, and limitation context plus a definitions dialog.
+- Current, partial, and degraded publication-health states with recovery guidance.
+
+### Changed
+
+- Recent headline panels now state their rolling window beside the selected historical trade periods and explicitly warn that the clocks are not aligned.
+- Share URLs now restore scenario partner, HS6 product, tariff, elasticity, and pass-through assumptions in addition to the existing filters and country selection.
+- Narrow layouts use compact context, stacked cards, bounded tooltips, and touch-friendly export and dialog controls.
+
 ## [0.1.1] - 2026-07-16
 
 ### Added
