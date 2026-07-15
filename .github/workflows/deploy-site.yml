@@ -1,0 +1,44 @@
+name: Deploy TradeGravity site
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tradegravity-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Check out latest published dataset
+        uses: actions/checkout@v7
+        with:
+          ref: gh-pages
+          path: .published-site
+          persist-credentials: false
+
+      - name: Reuse latest validated dataset
+        shell: bash
+        run: |
+          test -s .published-site/data/latest.json
+          test -s .published-site/data/meta.json
+          rm -rf site/data
+          cp -a .published-site/data site/data
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

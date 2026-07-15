@@ -231,7 +231,9 @@ This repository reads operating-system environment variables and does not load a
 - Local SQLite database: `tradegravity.db`
 - Published JSON: `meta.json`, `catalog.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, `strategic-hs6/`, `tariffs/`, `bilateral-matrix/`, and `explanations/` under `site/data/`
 
-Generated data and the local database are intentionally not committed to the default branch. The daily workflow runs the collector and publisher, then deploys `site/` to the `gh-pages` branch.
+Generated data and the local database are intentionally not committed to the default branch. The scheduled or manually dispatched data workflow runs the collectors and publisher, validates the result, and deploys `site/` to the `gh-pages` branch. A `main` push uses the latest validated `data/` directory from `gh-pages` and redeploys the site without calling WITS, UN Comtrade, WITS/TRAINS, or World Bank APIs. This keeps code-only deployments fast while the daily refresh remains the source of new published observations.
+
+The fast deployment intentionally fails if `gh-pages` does not contain `data/latest.json` and `data/meta.json`. Bootstrap or repair the published dataset by manually running the **Update TradeGravity** workflow before retrying the site deployment.
 
 Before deployment, `cmd/validator` checks provenance across every artifact, reporter uniqueness, periods, non-negative finite values, totals and shares, matrix availability/count identities, tariff rate identities, product keys, context coverage, and explanation evidence references.
 
