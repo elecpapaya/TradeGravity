@@ -3,15 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Explore reproducible public trade data comparing reporter countries' trade with the United States and China." />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagcdn.com; connect-src 'self' https://api.worldbank.org https://api.gdeltproject.org; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
   <title>TradeGravity – US/CN Trade Treemap</title>
   <link rel="stylesheet" href="./styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="./security.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
       <div class="title">TradeGravity</div>
       <div class="subtitle">Compare each country's trade with the United States and China. Tiles scale by trade/export/import, with flags and linked highlights on hover. Exports/imports are from each country's perspective; USA/CHN are the partner side.</div>
+      <div class="datasetMeta">
+        <span id="dataStatus">Loading dataset metadata…</span>
+        <a id="sourceLink" href="https://wits.worldbank.org/" target="_blank" rel="noopener noreferrer">Data source</a>
+        <a href="./data/latest.json" target="_blank" rel="noopener noreferrer">Latest JSON</a>
+        <a href="./data/meta.json" target="_blank" rel="noopener noreferrer">Metadata JSON</a>
+        <a href="https://github.com/elecpapaya/TradeGravity" target="_blank" rel="noopener noreferrer">Source code</a>
+      </div>
     </div>
 
     <div class="controls">
@@ -53,7 +64,7 @@
             <div class="cardTitle">USA</div>
             <div class="cardHint">Countries sized by selected metric with USA</div>
           </div>
-          <svg id="svg-usa" class="treemap"></svg>
+          <svg id="svg-usa" class="treemap" role="img" aria-label="Treemap of reporter countries trading with the United States"></svg>
         </div>
 
         <div class="card" id="card-chn">
@@ -61,30 +72,30 @@
             <div class="cardTitle">CHN</div>
             <div class="cardHint">Countries sized by selected metric with China</div>
           </div>
-          <svg id="svg-chn" class="treemap"></svg>
+          <svg id="svg-chn" class="treemap" role="img" aria-label="Treemap of reporter countries trading with China"></svg>
         </div>
       </div>
 
       <div class="footerNote">
         Each big rectangle is an anchor card (USA/CHN). Inside: sub-rectangles per country, sized by the selected metric. Exports/imports are recorded from each country's side with USA/CHN as the partner.
-        Flags are loaded from a CDN (optional). Hover highlights the same country on both sides.
+        Flags are loaded from a CDN (optional). Hover or keyboard focus highlights the same country on both sides. Pipeline refresh time and source observation periods are different concepts; always check the period shown for each value.
       </div>
     </section>
 
     <aside class="side">
       <div class="panel">
         <div class="panelTitle">Selection</div>
-        <div id="selection" class="panelBody subtle">Click a country tile to view details.</div>
+        <div id="selection" class="panelBody subtle" aria-live="polite">Click a country tile to view details.</div>
       </div>
 
       <div class="panel">
         <div class="panelTitle">Country Snapshot</div>
-        <div id="indicators" class="panelBody subtle">Click a country tile to load key economic indicators.</div>
+        <div id="indicators" class="panelBody subtle" aria-live="polite">Click a country tile to load key economic indicators.</div>
       </div>
     </aside>
   </main>
 
-  <div id="tooltip" class="tooltip" style="display:none;"></div>
+  <div id="tooltip" class="tooltip" role="status" aria-live="polite" style="display:none;"></div>
   <script src="./app.js"></script>
 </body>
 </html>

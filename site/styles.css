@@ -46,6 +46,9 @@ body{
 
 .brand .title{font-size:20px;font-weight:800;letter-spacing:.2px}
 .brand .subtitle{font-size:13px;color:var(--muted);margin-top:2px}
+.datasetMeta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:7px;font-size:11px;color:var(--muted2)}
+.datasetMeta a{color:var(--muted);text-decoration:none;border-bottom:1px dotted rgba(255,255,255,.3)}
+.datasetMeta a:hover,.datasetMeta a:focus-visible{color:var(--text);border-bottom-color:var(--text)}
 
 .controls{
   display:flex;
@@ -95,6 +98,7 @@ select option{background:#fff;color:#111}
   border-color: rgba(255,255,255,.18);
 }
 .segBtn:hover{color:var(--text)}
+.segBtn:focus-visible,.tile:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
 
 .controls .field{
   min-width:0;

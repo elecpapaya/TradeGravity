@@ -6,6 +6,12 @@
 // If no ISO2 found, skip flag.
 
 const DATA_URL = "./data/latest.json";
+const META_URL = "./data/meta.json";
+const security = globalThis.TradeGravitySecurity;
+if (!security) {
+  throw new Error("TradeGravity security helpers failed to load.");
+}
+const { escapeHTML, normalizeISO2, normalizeISO3, safeHTTPSURL } = security;
 
 const els = {
   svgUSA: document.getElementById("svg-usa"),
@@ -18,6 +24,8 @@ const els = {
   tooltip: document.getElementById("tooltip"),
   topN: document.getElementById("topN"),
   growthLegend: document.getElementById("growthLegend"),
+  dataStatus: document.getElementById("dataStatus"),
+  sourceLink: document.getElementById("sourceLink"),
 };
 
 let state = {
@@ -27,6 +35,7 @@ let state = {
   highlightKey: null, // ISO3
   selectedRow: null,
   topN: 25,
+  meta: null,
 };
 
 // Minimal ISO3->ISO2 fallback map (overridden by iso3_to_iso2.json if present).
@@ -63,18 +72,94 @@ const growthScale = d3.scaleLinear()
   .clamp(true);
 
 function iso2FromRow(row){
-  const iso2 = (row.iso2 || row.ISO2 || "").trim();
-  if (iso2) return iso2.toUpperCase();
-  const iso3 = (row.iso3 || row.ISO3 || "").toUpperCase();
-  return ISO3_TO_ISO2[iso3] || "";
+  const iso2 = normalizeISO2(row.iso2 || row.ISO2);
+  if (iso2) return iso2;
+  const iso3 = normalizeISO3(row.iso3 || row.ISO3);
+  return normalizeISO2(ISO3_TO_ISO2[iso3]);
 }
 
 // Flag CDN URL. Uses PNG (20px height).
 // Docs: https://flagcdn.com/
 function flagURL(iso2){
-  if (!iso2) return "";
-  const cc = iso2.toLowerCase();
+  const normalized = normalizeISO2(iso2);
+  if (!normalized) return "";
+  const cc = normalized.toLowerCase();
   return `https://flagcdn.com/h20/${cc}.png`;
+}
+
+let regionNames = null;
+try {
+  regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+} catch {
+  // Older browsers fall back to the ISO3 label.
+}
+
+function displayCountryName(iso2, fallback){
+  const normalized = normalizeISO2(iso2);
+  if (normalized && regionNames) {
+    const name = regionNames.of(normalized);
+    if (name && name !== normalized) return name;
+  }
+  return String(fallback || "").trim().slice(0, 100);
+}
+
+function formatPipelineTime(value){
+  const parsed = new Date(value);
+  if (!Number.isFinite(parsed.getTime())) return "unknown refresh time";
+  return new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  }).format(parsed) + " UTC";
+}
+
+function calculateCoverage(rows){
+  const periodCounts = new Map();
+  let available = 0;
+  for (const row of rows) {
+    for (const side of ["usa", "chn"]) {
+      const block = row[side] || {};
+      if (!block.period) continue;
+      available++;
+      const key = `${block.period_type || "?"}:${block.period}`;
+      periodCounts.set(key, (periodCounts.get(key) || 0) + 1);
+    }
+  }
+  return {
+    available,
+    expected: rows.length * 2,
+    periodCounts: Object.fromEntries(periodCounts),
+  };
+}
+
+function periodSummary(periodCounts){
+  const entries = Object.entries(periodCounts || {});
+  if (entries.length === 0) return "periods unavailable";
+  return entries
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([key, count]) => `${key.replace(":", " ")} (${count})`)
+    .join(", ");
+}
+
+function renderDatasetStatus(latest, metadata){
+  if (!els.dataStatus) return;
+  const fallback = calculateCoverage(state.rows);
+  const provider = String(metadata?.provider || latest?.provider || "unknown").trim().toLowerCase();
+  const available = Number(metadata?.available_partner_blocks ?? fallback.available);
+  const expected = Number(metadata?.expected_partner_blocks ?? fallback.expected);
+  const periods = metadata?.period_counts || fallback.periodCounts;
+  const generatedAt = metadata?.generated_at || latest?.generated_at;
+
+  els.dataStatus.textContent = `Pipeline refreshed ${formatPipelineTime(generatedAt)} · ${provider.toUpperCase()} · coverage ${available}/${expected} partner blocks · observations ${periodSummary(periods)}`;
+
+  if (els.sourceLink) {
+    const sources = {
+      wits: "https://wits.worldbank.org/",
+      comtrade: "https://comtradeplus.un.org/",
+    };
+    els.sourceLink.href = sources[provider] || "https://wits.worldbank.org/";
+    els.sourceLink.textContent = provider === "unknown" ? "Data source" : `${provider.toUpperCase()} source`;
+  }
 }
 
 function fmt(n){
@@ -135,7 +220,8 @@ function getMetricValue(row, side){
 
 function normalizeRows(rows){
   return (rows || []).map(r => {
-    const iso3 = (r.iso3 || r.ISO3 || "").toUpperCase();
+    const iso3 = normalizeISO3(r.iso3 || r.ISO3);
+    if (!iso3) return null;
     const usa = r.usa || {};
     const chn = r.chn || {};
     const usaGrowth = normalizeGrowth(usa.growth);
@@ -147,14 +233,14 @@ function normalizeRows(rows){
     const iso2 = iso2FromRow(r);
     return {
       iso3,
-      name: r.name || iso3,
+      name: String(r.name || displayCountryName(iso2, iso3)).trim().slice(0, 100),
       iso2,
       usa: { ...usa, trade: trade_us, growth: usaGrowth },
       chn: { ...chn, trade: trade_cn, growth: chnGrowth },
       total,
       share_cn
     };
-  });
+  }).filter(Boolean);
 }
 
 function setSelection(row){
@@ -164,20 +250,24 @@ function setSelection(row){
   }
   const us = row.usa || {};
   const cn = row.chn || {};
+  const name = escapeHTML(row.name);
+  const iso3 = escapeHTML(row.iso3);
+  const flag = flagURL(row.iso2);
+  const metric = escapeHTML(state.metric);
   const html = `
     <div style="font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:10px;">
-      ${row.iso2 ? `<img alt="" src="${flagURL(row.iso2)}" style="width:22px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,.12)"/>` : ""}
-      <div>${row.name} <span style="color:rgba(255,255,255,.55); font-family:var(--mono); font-size:12px;">(${row.iso3})</span></div>
+      ${flag ? `<img alt="Flag of ${name}" src="${flag}" style="width:22px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,.12)"/>` : ""}
+      <div>${name} <span style="color:rgba(255,255,255,.55); font-family:var(--mono); font-size:12px;">(${iso3})</span></div>
     </div>
-    <div class="kv"><span>USA period</span><b>${us.period || "-"}</b></div>
-    <div class="kv"><span>USA ${state.metric}</span><b>${fmt(us[state.metric] ?? 0)}</b></div>
-    <div class="kv"><span>USA prev period</span><b>${us.prev_period || "-"}</b></div>
-    <div class="kv"><span>USA growth (${growthBasisLabel(us)})</span><b>${fmtPct(getGrowthValue(row, "usa"))}</b></div>
+    <div class="kv"><span>USA period</span><b>${escapeHTML(us.period || "-")}</b></div>
+    <div class="kv"><span>USA ${metric}</span><b>${fmt(us[state.metric] ?? 0)}</b></div>
+    <div class="kv"><span>USA prev period</span><b>${escapeHTML(us.prev_period || "-")}</b></div>
+    <div class="kv"><span>USA growth (${escapeHTML(growthBasisLabel(us))})</span><b>${fmtPct(getGrowthValue(row, "usa"))}</b></div>
     <div style="height:8px"></div>
-    <div class="kv"><span>CHN period</span><b>${cn.period || "-"}</b></div>
-    <div class="kv"><span>CHN ${state.metric}</span><b>${fmt(cn[state.metric] ?? 0)}</b></div>
-    <div class="kv"><span>CHN prev period</span><b>${cn.prev_period || "-"}</b></div>
-    <div class="kv"><span>CHN growth (${growthBasisLabel(cn)})</span><b>${fmtPct(getGrowthValue(row, "chn"))}</b></div>
+    <div class="kv"><span>CHN period</span><b>${escapeHTML(cn.period || "-")}</b></div>
+    <div class="kv"><span>CHN ${metric}</span><b>${fmt(cn[state.metric] ?? 0)}</b></div>
+    <div class="kv"><span>CHN prev period</span><b>${escapeHTML(cn.prev_period || "-")}</b></div>
+    <div class="kv"><span>CHN growth (${escapeHTML(growthBasisLabel(cn))})</span><b>${fmtPct(getGrowthValue(row, "chn"))}</b></div>
     <div style="height:10px"></div>
     <div class="kv"><span>share_cn</span><b>${(row.share_cn*100).toFixed(1)}%</b></div>
     <div class="kv"><span>total(trade_us+trade_cn)</span><b>${fmt(row.total)}</b></div>
@@ -187,17 +277,22 @@ function setSelection(row){
 
 function showTooltip(ev, row, side){
   const o = row[side] || {};
+  const name = escapeHTML(row.name);
+  const iso3 = escapeHTML(row.iso3);
+  const flag = flagURL(row.iso2);
+  const sideLabel = escapeHTML(side.toUpperCase());
+  const metric = escapeHTML(state.metric);
   els.tooltip.style.display = "block";
   els.tooltip.innerHTML = `
     <div class="t1" style="display:flex;align-items:center;gap:10px;">
-      ${row.iso2 ? `<img alt="" src="${flagURL(row.iso2)}" style="width:20px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,.10)"/>` : ""}
-      <div>${row.name} <span style="color:rgba(255,255,255,.55); font-family:var(--mono); font-size:12px;">(${row.iso3})</span></div>
+      ${flag ? `<img alt="Flag of ${name}" src="${flag}" style="width:20px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,.10)"/>` : ""}
+      <div>${name} <span style="color:rgba(255,255,255,.55); font-family:var(--mono); font-size:12px;">(${iso3})</span></div>
     </div>
     <div class="t2">
-      <div class="kv"><span>${side.toUpperCase()} period</span><b>${o.period || "-"}</b></div>
-      <div class="kv"><span>${side.toUpperCase()} ${state.metric}</span><b>${fmt(o[state.metric] ?? 0)}</b></div>
-      <div class="kv"><span>${side.toUpperCase()} prev</span><b>${o.prev_period || "-"}</b></div>
-      <div class="kv"><span>${side.toUpperCase()} growth (${growthBasisLabel(o)})</span><b>${fmtPct(getGrowthValue(row, side))}</b></div>
+      <div class="kv"><span>${sideLabel} period</span><b>${escapeHTML(o.period || "-")}</b></div>
+      <div class="kv"><span>${sideLabel} ${metric}</span><b>${fmt(o[state.metric] ?? 0)}</b></div>
+      <div class="kv"><span>${sideLabel} prev</span><b>${escapeHTML(o.prev_period || "-")}</b></div>
+      <div class="kv"><span>${sideLabel} growth (${escapeHTML(growthBasisLabel(o))})</span><b>${fmtPct(getGrowthValue(row, side))}</b></div>
       <div class="kv"><span>share_cn</span><b>${(row.share_cn*100).toFixed(1)}%</b></div>
     </div>
   `;
@@ -290,6 +385,9 @@ function buildTreemap(svgEl, side, rows){
     .append("g")
     .attr("class","tile")
     .attr("data-iso3", d => d.data.iso3)
+    .attr("tabindex", 0)
+    .attr("role", "button")
+    .attr("aria-label", d => `${d.data.name}, ${side.toUpperCase()} ${state.metric} ${fmt(d.data.value)}`)
     .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
   // Clip path per tile so flag doesn't spill out
@@ -370,6 +468,19 @@ function buildTreemap(svgEl, side, rows){
       applyHighlight(state.highlightKey);
     })
     .on("click", (ev, d) => {
+      const row = d.data.row;
+      state.selectedRow = row;
+      state.highlightKey = row.iso3;
+      applyHighlight(state.highlightKey);
+      setSelection(row);
+      setIndicators(row);
+    })
+    .on("focus", (ev, d) => {
+      applyHighlight(d.data.row.iso3);
+    })
+    .on("keydown", (ev, d) => {
+      if (ev.key !== "Enter" && ev.key !== " ") return;
+      ev.preventDefault();
       const row = d.data.row;
       state.selectedRow = row;
       state.highlightKey = row.iso3;
@@ -468,8 +579,8 @@ async function fetchIndicator(iso2, indicatorId){
 function renderIndicatorHTML(summary){
   const rows = summary.items.map(item => {
     const value = formatIndicatorValue(item.value, item.format);
-    const year = item.year || "-";
-    return `<div class="kv"><span>${item.label} (${year})</span><b>${value}</b></div>`;
+    const year = escapeHTML(item.year || "-");
+    return `<div class="kv"><span>${escapeHTML(item.label)} (${year})</span><b>${escapeHTML(value)}</b></div>`;
   });
   return rows.join("");
 }
@@ -530,9 +641,14 @@ function renderNewsHTML(news){
     return `<div class="subtle">No recent news found. (Source: GDELT, by source country)</div>`;
   }
   const rows = news.items.map(item => {
-    const domain = item.domain ? `<span class="subtle"> · ${item.domain}</span>` : "";
-    const seen = item.seen ? `<span class="subtle"> · ${item.seen}</span>` : "";
-    return `<div class="newsItem"><a href="${item.url}" target="_blank" rel="noopener">${item.title}</a>${domain}${seen}</div>`;
+    const title = escapeHTML(item.title || "Untitled");
+    const domain = item.domain ? `<span class="subtle"> · ${escapeHTML(item.domain)}</span>` : "";
+    const seen = item.seen ? `<span class="subtle"> · ${escapeHTML(item.seen)}</span>` : "";
+    const url = safeHTTPSURL(item.url);
+    const headline = url
+      ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer nofollow">${title}</a>`
+      : `<span>${title}</span>`;
+    return `<div class="newsItem">${headline}${domain}${seen}</div>`;
   });
   rows.push(`<div class="subtle" style="margin-top:6px;font-size:11px;">Source: GDELT (by source country)</div>`);
   return rows.join("");
@@ -558,11 +674,21 @@ async function main(){
     console.warn("[TradeGravity] iso3_to_iso2.json not loaded, using fallback map.", err);
   }
 
-  const res = await fetch(DATA_URL, { cache: "no-store" });
+  const [res, metaRes] = await Promise.all([
+    fetch(DATA_URL, { cache: "no-store" }),
+    fetch(META_URL, { cache: "no-store" }).catch(() => null),
+  ]);
+  if (!res.ok) throw new Error(`Dataset request failed (${res.status})`);
   const data = await res.json();
+  let metadata = null;
+  if (metaRes?.ok) {
+    metadata = await metaRes.json().catch(() => null);
+  }
 
   state.generatedAt = data.generated_at || data.generatedAt || "-";
   state.rows = normalizeRows(data.rows || []);
+  state.meta = metadata;
+  renderDatasetStatus(data, metadata);
   console.info('[TradeGravity] loaded rows=', state.rows.length, 'generated_at=', state.generatedAt);
 
   if (els.metric) {
@@ -626,6 +752,7 @@ function syncMetricButtons(){
   buttons.forEach(btn => {
     const value = btn.getAttribute("data-value");
     btn.classList.toggle("is-active", value === state.metric);
+    btn.setAttribute("aria-pressed", String(value === state.metric));
   });
 }
 
@@ -635,6 +762,7 @@ function syncColorButtons(){
   buttons.forEach(btn => {
     const value = btn.getAttribute("data-value");
     btn.classList.toggle("is-active", value === state.colorMode);
+    btn.setAttribute("aria-pressed", String(value === state.colorMode));
   });
 }
 

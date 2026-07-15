@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -18,13 +19,27 @@ import (
 	"tradegravity/internal/model"
 )
 
+const schemaVersion = "1.0"
+
 type metaFile struct {
-	GeneratedAt string `json:"generated_at"`
+	SchemaVersion          string         `json:"schema_version"`
+	GeneratedAt            string         `json:"generated_at"`
+	Provider               string         `json:"provider"`
+	Partners               []string       `json:"partners"`
+	ReporterCount          int            `json:"reporter_count"`
+	ObservationCount       int            `json:"observation_count"`
+	ExpectedPartnerBlocks  int            `json:"expected_partner_blocks"`
+	AvailablePartnerBlocks int            `json:"available_partner_blocks"`
+	MissingPartnerBlocks   int            `json:"missing_partner_blocks"`
+	PeriodCounts           map[string]int `json:"period_counts"`
 }
 
 type latestFile struct {
-	GeneratedAt string        `json:"generated_at"`
-	Rows        []latestEntry `json:"rows"`
+	SchemaVersion string        `json:"schema_version"`
+	GeneratedAt   string        `json:"generated_at"`
+	Provider      string        `json:"provider"`
+	Partners      []string      `json:"partners"`
+	Rows          []latestEntry `json:"rows"`
 }
 
 type latestEntry struct {
@@ -97,12 +112,6 @@ func build(args []string) {
 		os.Exit(1)
 	}
 
-	now := time.Now().UTC().Format(time.RFC3339)
-	if err := writeJSON(filepath.Join(*outDir, "meta.json"), metaFile{GeneratedAt: now}); err != nil {
-		fmt.Fprintln(os.Stderr, "failed to write meta.json:", err)
-		os.Exit(1)
-	}
-
 	partners := parseList(*partnersCSV)
 	if err := ensureRequiredPartners(partners, []string{"USA", "CHN"}); err != nil {
 		fmt.Fprintln(os.Stderr, "invalid partners:", err)
@@ -115,8 +124,22 @@ func build(args []string) {
 		os.Exit(1)
 	}
 
+	now := time.Now().UTC().Format(time.RFC3339)
 	latest := buildLatest(rows)
-	if err := writeJSON(filepath.Join(*outDir, "latest.json"), latestFile{GeneratedAt: now, Rows: latest}); err != nil {
+	metadata := buildMeta(now, *provider, partners, rows, latest)
+	if err := writeJSON(filepath.Join(*outDir, "meta.json"), metadata); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write meta.json:", err)
+		os.Exit(1)
+	}
+
+	output := latestFile{
+		SchemaVersion: schemaVersion,
+		GeneratedAt:   now,
+		Provider:      strings.ToLower(strings.TrimSpace(*provider)),
+		Partners:      partners,
+		Rows:          latest,
+	}
+	if err := writeJSON(filepath.Join(*outDir, "latest.json"), output); err != nil {
 		fmt.Fprintln(os.Stderr, "failed to write latest.json:", err)
 		os.Exit(1)
 	}
@@ -261,7 +284,44 @@ func buildLatest(rows []observationRow) []latestEntry {
 		})
 	}
 
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].ISO3 < results[j].ISO3
+	})
 	return results
+}
+
+func buildMeta(generatedAt, provider string, partners []string, observations []observationRow, latest []latestEntry) metaFile {
+	periodCounts := make(map[string]int)
+	availableBlocks := 0
+	for _, entry := range latest {
+		for _, block := range []partnerBlock{entry.USA, entry.CHN} {
+			if strings.TrimSpace(block.Period) == "" {
+				continue
+			}
+			availableBlocks++
+			key := string(block.PeriodType) + ":" + block.Period
+			periodCounts[key]++
+		}
+	}
+
+	expectedBlocks := len(latest) * len(partners)
+	missingBlocks := expectedBlocks - availableBlocks
+	if missingBlocks < 0 {
+		missingBlocks = 0
+	}
+
+	return metaFile{
+		SchemaVersion:          schemaVersion,
+		GeneratedAt:            generatedAt,
+		Provider:               strings.ToLower(strings.TrimSpace(provider)),
+		Partners:               append([]string(nil), partners...),
+		ReporterCount:          len(latest),
+		ObservationCount:       len(observations),
+		ExpectedPartnerBlocks:  expectedBlocks,
+		AvailablePartnerBlocks: availableBlocks,
+		MissingPartnerBlocks:   missingBlocks,
+		PeriodCounts:           periodCounts,
+	}
 }
 
 type partnerSummary struct {
@@ -563,11 +623,23 @@ func parseList(value string) []string {
 func ensureRequiredPartners(partners []string, required []string) error {
 	set := make(map[string]struct{}, len(partners))
 	for _, partner := range partners {
-		set[strings.ToUpper(partner)] = struct{}{}
+		normalized := strings.ToUpper(partner)
+		if _, exists := set[normalized]; exists {
+			return fmt.Errorf("duplicate partner %s", normalized)
+		}
+		set[normalized] = struct{}{}
 	}
+	requiredSet := make(map[string]struct{}, len(required))
 	for _, req := range required {
-		if _, ok := set[req]; !ok {
-			return fmt.Errorf("missing partner %s", req)
+		normalized := strings.ToUpper(req)
+		requiredSet[normalized] = struct{}{}
+		if _, ok := set[normalized]; !ok {
+			return fmt.Errorf("missing partner %s", normalized)
+		}
+	}
+	for partner := range set {
+		if _, ok := requiredSet[partner]; !ok {
+			return fmt.Errorf("unsupported partner %s (viewer supports USA,CHN)", partner)
 		}
 	}
 	return nil

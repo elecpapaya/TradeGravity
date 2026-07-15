@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-15T00:00:00Z",
+  "provider": "wits",
+  "partners": [
+    "USA",
+    "CHN"
+  ],
+  "rows": [
+    {
+      "iso3": "KOR",
+      "usa": {
+        "period": "2023",
+        "period_type": "Y",
+        "export": 40,
+        "import": 60,
+        "trade": 100
+      },
+      "chn": {
+        "period": "2023",
+        "period_type": "Y",
+        "export": 20,
+        "import": 80,
+        "trade": 100
+      },
+      "total": 200,
+      "share_cn": 0.5
+    }
+  ]
+}
