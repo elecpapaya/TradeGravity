@@ -12,11 +12,20 @@ test("index loads trusted helpers before the application and keeps D3 pinned", (
   const dataToolsIndex = html.indexOf('src="./data-tools.js"');
   const explorerToolsIndex = html.indexOf('src="./explorer-tools.js"');
   const intelligenceToolsIndex = html.indexOf('src="./intelligence-tools.js"');
+  const newsToolsIndex = html.indexOf('src="./news-tools.js"');
   const d3Index = html.indexOf('src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"');
   const appIndex = html.indexOf('src="./app.js"');
-  assert.ok(securityIndex >= 0 && dataToolsIndex > securityIndex && explorerToolsIndex > dataToolsIndex && intelligenceToolsIndex > explorerToolsIndex && d3Index > intelligenceToolsIndex && appIndex > d3Index);
+  assert.ok(securityIndex >= 0 && dataToolsIndex > securityIndex && explorerToolsIndex > dataToolsIndex && intelligenceToolsIndex > explorerToolsIndex && newsToolsIndex > intelligenceToolsIndex && d3Index > newsToolsIndex && appIndex > d3Index);
   assert.match(html, /integrity="sha384-[A-Za-z0-9+/=]+"/);
   assert.match(html, /Content-Security-Policy/);
+});
+
+test("the experimental news panel exposes scope and trust caveats", () => {
+  assert.match(app, /Trade &amp; supply-chain headlines/);
+  assert.match(app, /publisher source country/);
+  assert.match(app, /does not affect trade metrics/i);
+  assert.match(app, /keyword-filtered and deduplicated/i);
+  assert.match(app, /temporarily unavailable from GDELT/i);
 });
 
 test("accessible table controls and targets appear exactly once", () => {
