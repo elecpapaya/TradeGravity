@@ -19,17 +19,58 @@
     return Number.isFinite(value) ? value : null;
   }
 
+  function previousValue(current, growth) {
+    if (!(current >= 0) || growth == null || growth <= -1) return null;
+    return current / (1 + growth);
+  }
+
+  function exposureMetrics(usaValue, chinaValue, previousUSAValue = null, previousChinaValue = null) {
+    const total = Math.max(0, finite(usaValue)) + Math.max(0, finite(chinaValue));
+    const usaShare = total > 0 ? Math.max(0, finite(usaValue)) / total : 0;
+    const chinaShare = total > 0 ? Math.max(0, finite(chinaValue)) / total : 0;
+    const exposureBalance = total > 0 ? usaShare - chinaShare : 0;
+    const dualDependency = total > 0 ? 2 * Math.min(usaShare, chinaShare) : 0;
+    const previousTotal = previousUSAValue != null && previousChinaValue != null
+      ? Math.max(0, finite(previousUSAValue)) + Math.max(0, finite(previousChinaValue))
+      : 0;
+    const previousBalance = previousTotal > 0
+      ? (Math.max(0, finite(previousUSAValue)) - Math.max(0, finite(previousChinaValue))) / previousTotal
+      : null;
+    const directionShift = previousBalance == null ? null : exposureBalance - previousBalance;
+    const position = total <= 0 ? "unavailable"
+      : exposureBalance >= 0.1 ? "US-leaning"
+        : exposureBalance <= -0.1 ? "China-leaning" : "balanced";
+    const direction = directionShift == null ? "unavailable"
+      : directionShift >= 0.03 ? "toward USA"
+        : directionShift <= -0.03 ? "toward China" : "stable";
+    return {
+      total,
+      usaShare,
+      chinaShare,
+      exposureBalance,
+      dualDependency,
+      previousBalance,
+      directionShift,
+      position,
+      direction,
+    };
+  }
+
   function buildIntelligenceProfile(row, metric = "trade") {
     const usaValue = metricValue(row, "usa", metric);
     const chinaValue = metricValue(row, "chn", metric);
-    const total = usaValue + chinaValue;
-    const usaShare = total > 0 ? usaValue / total : 0;
-    const chinaShare = total > 0 ? chinaValue / total : 0;
+    const usaGrowth = growthValue(row, "usa", metric);
+    const chinaGrowth = growthValue(row, "chn", metric);
+    const exposure = exposureMetrics(
+      usaValue,
+      chinaValue,
+      previousValue(usaValue, usaGrowth),
+      previousValue(chinaValue, chinaGrowth),
+    );
+    const { total, usaShare, chinaShare } = exposure;
     const concentration = total > 0 ? (usaShare * usaShare) + (chinaShare * chinaShare) : 0;
     const exports = metricValue(row, "usa", "export") + metricValue(row, "chn", "export");
     const imports = metricValue(row, "usa", "import") + metricValue(row, "chn", "import");
-    const usaGrowth = growthValue(row, "usa", metric);
-    const chinaGrowth = growthValue(row, "chn", metric);
     const signals = [];
 
     if (!row?.same_period) signals.push({ level: "warning", label: "Mixed observation periods" });
@@ -43,6 +84,9 @@
     if (usaGrowth != null && chinaGrowth != null && Math.abs(chinaGrowth - usaGrowth) >= 0.2) {
       signals.push({ level: "attention", label: "Partner growth paths diverge by at least 20pp" });
     }
+    if (exposure.directionShift != null && Math.abs(exposure.directionShift) >= 0.1) {
+      signals.push({ level: "attention", label: `Two-anchor position moved ${exposure.direction}` });
+    }
     if (signals.length === 0) signals.push({ level: "neutral", label: "No threshold signal in the current view" });
 
     return {
@@ -54,11 +98,17 @@
       chinaValue,
       usaShare,
       chinaShare,
+      exposureBalance: exposure.exposureBalance,
+      dualDependency: exposure.dualDependency,
+      previousBalance: exposure.previousBalance,
+      directionShift: exposure.directionShift,
+      position: exposure.position,
+      direction: exposure.direction,
       concentration,
       netBalance: exports - imports,
       usaGrowth,
       chinaGrowth,
-      growthDivergence: usaGrowth != null && chinaGrowth != null ? chinaGrowth - usaGrowth : null,
+      growthDivergence: usaGrowth != null && chinaGrowth != null ? usaGrowth - chinaGrowth : null,
       signals,
       scope: "USA and China partner observations only",
     };
@@ -157,6 +207,7 @@
     buildAnchorNetwork,
 	buildPartnerNetwork,
     buildIntelligenceProfile,
+    exposureMetrics,
     estimateTariffScenario,
     rankExposureRows,
     selectPreferredTariffs,

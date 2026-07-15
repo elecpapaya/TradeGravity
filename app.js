@@ -13,7 +13,10 @@ const PRODUCTS_INDEX_URL = "./data/products/index.json";
 const STRATEGIC_INDEX_URL = "./data/strategic-hs6/index.json";
 const TARIFF_INDEX_URL = "./data/tariffs/index.json";
 const MATRIX_INDEX_URL = "./data/bilateral-matrix/index.json";
+const MIRROR_INDEX_URL = "./data/mirror/index.json";
 const CATALOG_URL = "./data/catalog.json";
+const SEMICONDUCTOR_REFERENCE_URL = "./data/semiconductors/reference.json";
+const SEMICONDUCTOR_MONTHLY_INDEX_URL = "./data/semiconductors/monthly/index.json";
 const security = globalThis.TradeGravitySecurity;
 if (!security) {
   throw new Error("TradeGravity security helpers failed to load.");
@@ -29,6 +32,14 @@ if (!explorerTools) {
 const intelligenceTools = globalThis.TradeGravityIntelligenceTools;
 if (!intelligenceTools) {
   throw new Error("TradeGravity intelligence helpers failed to load.");
+}
+const semiconductorTools = globalThis.TradeGravitySemiconductorTools;
+if (!semiconductorTools) {
+  throw new Error("TradeGravity semiconductor helpers failed to load.");
+}
+const experienceTools = globalThis.TradeGravityExperienceTools;
+if (!experienceTools) {
+  throw new Error("TradeGravity experience helpers failed to load.");
 }
 const newsTools = globalThis.TradeGravityNewsTools;
 if (!newsTools) {
@@ -53,6 +64,21 @@ const {
   rankExposureRows,
   selectPreferredTariffs,
 } = intelligenceTools;
+const {
+  countryProfile: buildChipCountryProfile,
+  coverageGate: buildChipCoverageGate,
+  estimateStageShock,
+  filterPolicyEvents,
+  sourceIndex: buildChipSourceIndex,
+  summarizeStages: summarizeChipStages,
+  summarizeMonthly: summarizeChipMonthly,
+} = semiconductorTools;
+const {
+  buildSummaryReport,
+  deriveDataHealth,
+  metricDefinition,
+  tabLimitation,
+} = experienceTools;
 const {
   DEFAULT_MAX_ITEMS: NEWS_MAX,
   DEFAULT_WINDOW_DAYS: NEWS_WINDOW_DAYS,
@@ -99,7 +125,28 @@ const els = {
 	networkDescription: document.getElementById("networkDescription"),
 	networkNote: document.getElementById("networkNote"),
 	intelligenceScopeBadge: document.getElementById("intelligenceScopeBadge"),
+  mirrorDiagnostics: document.getElementById("mirrorDiagnostics"),
   exposureRankingBody: document.getElementById("exposureRankingBody"),
+  chipCoverageBadge: document.getElementById("chipCoverageBadge"),
+  chipCoverageSummary: document.getElementById("chipCoverageSummary"),
+  chipStageFilter: document.getElementById("chipStageFilter"),
+  chipCountryFilter: document.getElementById("chipCountryFilter"),
+  chipDownloadCSV: document.getElementById("chipDownloadCSV"),
+  chipTrends: document.getElementById("chipTrends"),
+  chipValueChain: document.getElementById("chipValueChain"),
+  chipRoleLandscape: document.getElementById("chipRoleLandscape"),
+  chipDistribution: document.getElementById("chipDistribution"),
+  chipCountryProfile: document.getElementById("chipCountryProfile"),
+  chipTimeline: document.getElementById("chipTimeline"),
+  chipCapacitySignals: document.getElementById("chipCapacitySignals"),
+  chipScenarioForm: document.getElementById("chipScenarioForm"),
+  chipDisruption: document.getElementById("chipDisruption"),
+  chipSubstitution: document.getElementById("chipSubstitution"),
+  chipScenarioBaseline: document.getElementById("chipScenarioBaseline"),
+  chipScenarioResult: document.getElementById("chipScenarioResult"),
+  chipSources: document.getElementById("chipSources"),
+  chipCaveats: document.getElementById("chipCaveats"),
+  chipMonthlySignals: document.getElementById("chipMonthlySignals"),
   productAvailability: document.getElementById("productAvailability"),
   strategicSectorFilter: document.getElementById("strategicSectorFilter"),
   strategicProducts: document.getElementById("strategicProducts"),
@@ -117,6 +164,27 @@ const els = {
   scenarioPassThrough: document.getElementById("scenarioPassThrough"),
   scenarioTariffSource: document.getElementById("scenarioTariffSource"),
   scenarioResult: document.getElementById("scenarioResult"),
+  dataHealthBanner: document.getElementById("dataHealthBanner"),
+  dataHealthBadge: document.getElementById("dataHealthBadge"),
+  dataHealthText: document.getElementById("dataHealthText"),
+  retryData: document.getElementById("retryData"),
+  metricContext: document.getElementById("metricContext"),
+  metricContextDefinition: document.getElementById("metricContextDefinition"),
+  periodContext: document.getElementById("periodContext"),
+  filterContext: document.getElementById("filterContext"),
+  filterContextDetail: document.getElementById("filterContextDetail"),
+  scopeContext: document.getElementById("scopeContext"),
+  scopeContextLimit: document.getElementById("scopeContextLimit"),
+  openOnboarding: document.getElementById("openOnboarding"),
+  openMethodology: document.getElementById("openMethodology"),
+  exportPNG: document.getElementById("exportPNG"),
+  exportCSV: document.getElementById("exportCSV"),
+  exportReport: document.getElementById("exportReport"),
+  onboardingDialog: document.getElementById("onboardingDialog"),
+  methodologyDialog: document.getElementById("methodologyDialog"),
+  methodologyCurrentView: document.getElementById("methodologyCurrentView"),
+  dismissOnboarding: document.getElementById("dismissOnboarding"),
+  startSampleView: document.getElementById("startSampleView"),
 };
 
 let state = {
@@ -129,11 +197,24 @@ let state = {
   strategicIndex: null,
   tariffIndex: null,
 	matrixIndex: null,
+  mirrorIndex: null,
+  semiconductorReference: null,
+  semiconductorMonthlyIndex: null,
+  semiconductorMonthlyFileCache: {},
+  semiconductorMonthlyFile: null,
+  semiconductorMonthlyLoading: false,
+  semiconductorFiles: [],
+  semiconductorFileCache: {},
+  semiconductorLoading: false,
+  semiconductorLoaded: false,
+  semiconductorLoadKey: "",
   productCache: {},
   strategicCache: {},
   tariffCache: {},
 	matrixCache: {},
 	matrixPromises: {},
+  mirrorCache: {},
+  mirrorPromises: {},
   explanationCache: {},
   metric: "trade",
   colorMode: "value",
@@ -153,7 +234,14 @@ let state = {
   normalization: "raw",
   tab: "overview",
   strategicSector: "all",
+  chipStage: "all",
+  chipCountry: "KOR",
+  resourceStates: [],
+  dataHealth: null,
+  preserveScenarioInputs: false,
 };
+
+const ONBOARDING_STORAGE_KEY = "tradegravity:onboarding:v1";
 
 // Minimal ISO3->ISO2 fallback map (overridden by iso3_to_iso2.json if present).
 const FALLBACK_ISO3_TO_ISO2 = {
@@ -162,7 +250,7 @@ const FALLBACK_ISO3_TO_ISO2 = {
   SAU:"SA", ARE:"AE", ZAF:"ZA", EGY:"EG", NGA:"NG", ARG:"AR", CHL:"CL", COL:"CO", PER:"PE",
   NLD:"NL", BEL:"BE", SWE:"SE", NOR:"NO", DNK:"DK", FIN:"FI", POL:"PL", CZE:"CZ", HUN:"HU",
   ISR:"IL", IRL:"IE", PRT:"PT", CHE:"CH", AUT:"AT", GRC:"GR", UKR:"UA", THA:"TH", MYS:"MY",
-  SGP:"SG", PHL:"PH", PAK:"PK", BGD:"BD", NZL:"NZ", KAZ:"KZ"
+  SGP:"SG", PHL:"PH", PAK:"PK", BGD:"BD", NZL:"NZ", KAZ:"KZ", TWN:"TW"
 };
 let ISO3_TO_ISO2 = { ...FALLBACK_ISO3_TO_ISO2 };
 const INDICATORS = [
@@ -275,6 +363,80 @@ function renderDatasetStatus(latest, metadata){
     };
     els.sourceLink.href = sources[provider] || "https://wits.worldbank.org/";
     els.sourceLink.textContent = provider === "unknown" ? "Data source" : `${provider.toUpperCase()} source`;
+  }
+}
+
+function renderDataHealth(coreReady = true){
+  const health = deriveDataHealth({
+    coreReady,
+    metadata: state.meta || { generated_at: state.generatedAt, provider: state.provider },
+    quality: state.quality,
+    resources: state.resourceStates,
+    generatedAt: state.generatedAt,
+  });
+  state.dataHealth = health;
+  if (!els.dataHealthBanner) return health;
+  els.dataHealthBanner.classList.remove("is-loading", "is-current", "is-partial", "is-failed");
+  els.dataHealthBanner.classList.add(`is-${health.level}`);
+  if (els.dataHealthBadge) els.dataHealthBadge.textContent = health.label;
+  if (els.dataHealthText) {
+    els.dataHealthText.textContent = health.summary;
+    els.dataHealthText.title = health.details.join(" ");
+  }
+  if (els.retryData) els.retryData.hidden = health.level === "current";
+  return health;
+}
+
+function activePeriodLabel(){
+  if (state.period && state.period !== "latest") return state.period.replace(":", " ");
+  const periods = new Set();
+  for (const row of state.rows) {
+    for (const side of ["usa", "chn"]) {
+      const block = row?.[side];
+      if (block?.period) periods.add(`${block.period_type || "?"} ${block.period}`);
+    }
+  }
+  if (periods.size === 0) return "Latest by reporter · period unavailable";
+  if (periods.size === 1) return `Latest by reporter · ${Array.from(periods)[0]}`;
+  return `Latest by reporter · ${periods.size} observation periods`;
+}
+
+function activeFilterLabel(){
+  const filters = [];
+  if (state.group) filters.push(`group ${state.group}`);
+  if (state.region) filters.push(`region ${state.region}`);
+  if (state.income) filters.push(`income ${state.income}`);
+  if (state.tableQuery) filters.push(`search “${state.tableQuery}”`);
+  return filters.length > 0 ? filters.join(" · ") : "All reporters";
+}
+
+function activeTabLabel(){
+  return {
+    overview: "Overview",
+    intelligence: "US–China Lens",
+    semiconductors: "US–China Chip Lens",
+    products: "Products",
+    quality: "Data & Quality",
+    lab: "Scenario Lab",
+  }[state.tab] || "Overview";
+}
+
+function renderViewContext(){
+  const definition = metricDefinition(state.metric, state.normalization);
+  const limit = tabLimitation(state.tab);
+  if (els.metricContext) els.metricContext.textContent = metricLabel();
+  if (els.metricContextDefinition) els.metricContextDefinition.textContent = definition;
+  if (els.periodContext) els.periodContext.textContent = activePeriodLabel();
+  if (els.filterContext) els.filterContext.textContent = activeFilterLabel();
+  if (els.filterContextDetail) {
+    const comparison = state.comparisonMode === "comparable" ? "Same-period comparison" : "All available periods";
+    const country = state.selectedRow ? `${state.selectedRow.name} selected` : "no country selected";
+    els.filterContextDetail.textContent = `${state.rows.length} reporters · ${comparison} · ${country}.`;
+  }
+  if (els.scopeContext) els.scopeContext.textContent = activeTabLabel();
+  if (els.scopeContextLimit) els.scopeContextLimit.textContent = limit;
+  if (els.methodologyCurrentView) {
+    els.methodologyCurrentView.innerHTML = `<b>Active view:</b> ${escapeHTML(metricLabel())} · ${escapeHTML(activePeriodLabel())}. ${escapeHTML(definition)} ${escapeHTML(limit)}`;
   }
 }
 
@@ -435,6 +597,7 @@ function selectCountry(row){
   state.selectedRow = row;
   state.highlightKey = row.iso3;
   syncURL();
+  renderViewContext();
   applyHighlight(row.iso3);
   setSelection(row);
   setIndicators(row);
@@ -538,6 +701,351 @@ function downloadFilteredJSON(){
   setTimeout(() => URL.revokeObjectURL(objectURL), 0);
 }
 
+function downloadBlob(blob, filename){
+  const objectURL = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectURL;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(objectURL), 0);
+}
+
+function exportFilename(extension){
+  const country = state.selectedRow?.iso3 ? `-${state.selectedRow.iso3.toLowerCase()}` : "";
+  const period = String(state.period || "latest").replace(/[^A-Za-z0-9-]/g, "-").toLowerCase();
+  return `tradegravity-${state.tab}-${period}${country}.${extension}`;
+}
+
+function reportModel(){
+  syncURL();
+  const rows = filteredTableRows();
+  const selected = state.selectedRow;
+  const selectedUSA = selected ? getMetricValue(selected, "usa") : 0;
+  const selectedCHN = selected ? getMetricValue(selected, "chn") : 0;
+  const comparisonQuality = selected?.same_period
+    ? `Same period (${selected.comparison_period || selected.usa?.period || selected.chn?.period || "unknown"})`
+    : "Mixed or missing periods";
+  return {
+    exportedAt: new Date().toISOString(),
+    generatedAt: state.generatedAt,
+    provider: state.provider,
+    tabLabel: activeTabLabel(),
+    metricLabel: metricLabel(),
+    periodLabel: activePeriodLabel(),
+    comparisonLabel: state.comparisonMode === "comparable" ? "Same-period only" : "All available periods",
+    filterLabel: activeFilterLabel(),
+    metricDefinition: metricDefinition(state.metric, state.normalization),
+    health: state.dataHealth || renderDataHealth(true),
+    selected: selected ? {
+      name: selected.name,
+      iso3: selected.iso3,
+      usaValue: formatMetricValue(selectedUSA),
+      chnValue: formatMetricValue(selectedCHN),
+      combinedValue: formatMetricValue(selectedUSA + selectedCHN),
+      usaPeriod: selected.usa?.period || "",
+      chnPeriod: selected.chn?.period || "",
+      chinaShare: selectedUSA + selectedCHN > 0 ? `${(selectedCHN / (selectedUSA + selectedCHN) * 100).toFixed(1)}%` : "—",
+      comparisonQuality,
+    } : null,
+    topRows: rows.slice(0, 10).map(row => {
+      const usa = getMetricValue(row, "usa");
+      const chn = getMetricValue(row, "chn");
+      return {
+        name: row.name,
+        iso3: row.iso3,
+        usaValue: formatMetricValue(usa),
+        chnValue: formatMetricValue(chn),
+        combinedValue: formatMetricValue(usa + chn),
+        periodQuality: row.same_period ? `Same period (${row.comparison_period || row.usa?.period || row.chn?.period || "unknown"})` : "Mixed/missing",
+      };
+    }),
+    limit: tabLimitation(state.tab),
+    viewURL: window.location.href,
+  };
+}
+
+function downloadSummaryReport(){
+  const report = buildSummaryReport(reportModel());
+  downloadBlob(new Blob([report], { type: "text/markdown;charset=utf-8" }), exportFilename("md"));
+}
+
+function copyFormState(source, clone){
+  const sourceFields = source.querySelectorAll("input, select, textarea");
+  const cloneFields = clone.querySelectorAll("input, select, textarea");
+  sourceFields.forEach((field, index) => {
+    const target = cloneFields[index];
+    if (!target) return;
+    if (target.tagName === "SELECT") {
+      Array.from(target.options).forEach(option => option.toggleAttribute("selected", option.value === field.value));
+    } else {
+      target.setAttribute("value", field.value);
+      target.textContent = field.value;
+    }
+  });
+}
+
+function snapshotStyleText(){
+  let styles = "";
+  for (const sheet of Array.from(document.styleSheets)) {
+    try {
+      styles += Array.from(sheet.cssRules || []).map(rule => rule.cssText).join("\n");
+    } catch {
+      // Cross-origin styles are not required for the first-party dashboard snapshot.
+    }
+  }
+  return styles;
+}
+
+function imageFromDataURL(url){
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Snapshot image could not be rendered."));
+    image.src = url;
+  });
+}
+
+function canvasBlob(canvas){
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("PNG encoding failed.")), "image/png");
+  });
+}
+
+function wrapCanvasText(context, text, x, y, maxWidth, lineHeight, maxLines = 3){
+  const words = String(text || "").split(/\s+/).filter(Boolean);
+  let line = "";
+  let lineCount = 0;
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (context.measureText(candidate).width > maxWidth && line) {
+      context.fillText(line, x, y + lineCount * lineHeight);
+      line = word;
+      lineCount++;
+      if (lineCount >= maxLines) return y + lineCount * lineHeight;
+    } else {
+      line = candidate;
+    }
+  }
+  if (line && lineCount < maxLines) {
+    context.fillText(line, x, y + lineCount * lineHeight);
+    lineCount++;
+  }
+  return y + lineCount * lineHeight;
+}
+
+async function fallbackSnapshotBlob(){
+  const model = reportModel();
+  const canvas = document.createElement("canvas");
+  canvas.width = 1600;
+  canvas.height = 1000;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#0b0d12";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  gradient.addColorStop(0, "rgba(90,162,255,.16)");
+  gradient.addColorStop(1, "rgba(255,107,87,.10)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, 180);
+  ctx.fillStyle = "#f2f4f8";
+  ctx.font = "700 38px system-ui, sans-serif";
+  ctx.fillText("TradeGravity", 70, 68);
+  ctx.font = "700 25px system-ui, sans-serif";
+  ctx.fillText(`${model.tabLabel} · ${model.metricLabel}`, 70, 112);
+  ctx.fillStyle = "rgba(255,255,255,.67)";
+  ctx.font = "18px system-ui, sans-serif";
+  ctx.fillText(`${model.periodLabel} · ${model.comparisonLabel} · ${model.filterLabel}`, 70, 148);
+
+  ctx.fillStyle = "#e7d37c";
+  ctx.font = "700 15px ui-monospace, monospace";
+  ctx.fillText((model.health.label || "DATA STATUS").toUpperCase(), 70, 224);
+  ctx.fillStyle = "rgba(255,255,255,.68)";
+  ctx.font = "17px system-ui, sans-serif";
+  wrapCanvasText(ctx, model.health.summary, 70, 254, 1460, 24, 2);
+
+  let top = 330;
+  if (model.selected) {
+    ctx.fillStyle = "#f2f4f8";
+    ctx.font = "700 26px system-ui, sans-serif";
+    ctx.fillText(`${model.selected.name} (${model.selected.iso3})`, 70, top);
+    ctx.font = "700 22px ui-monospace, monospace";
+    ctx.fillStyle = "#5aa2ff";
+    ctx.fillText(`USA ${model.selected.usaValue}`, 70, top + 42);
+    ctx.fillStyle = "#ff7b6b";
+    ctx.fillText(`CHN ${model.selected.chnValue}`, 430, top + 42);
+    ctx.fillStyle = "#e7d37c";
+    ctx.fillText(`Combined ${model.selected.combinedValue}`, 790, top + 42);
+    top += 105;
+  }
+
+  ctx.fillStyle = "rgba(255,255,255,.76)";
+  ctx.font = "700 17px system-ui, sans-serif";
+  ctx.fillText("Leading reporters in the filtered view", 70, top);
+  top += 35;
+  ctx.font = "15px ui-monospace, monospace";
+  for (const [index, row] of model.topRows.slice(0, 8).entries()) {
+    const y = top + index * 54;
+    ctx.fillStyle = "rgba(255,255,255,.1)";
+    ctx.fillRect(70, y - 22, 1460, 42);
+    ctx.fillStyle = "rgba(255,255,255,.88)";
+    ctx.fillText(`${String(index + 1).padStart(2, "0")}  ${row.name} (${row.iso3})`, 88, y + 5);
+    ctx.fillStyle = "#5aa2ff";
+    ctx.fillText(`USA ${row.usaValue}`, 700, y + 5);
+    ctx.fillStyle = "#ff7b6b";
+    ctx.fillText(`CHN ${row.chnValue}`, 1010, y + 5);
+    ctx.fillStyle = "#e7d37c";
+    ctx.fillText(row.combinedValue, 1360, y + 5);
+  }
+  ctx.fillStyle = "rgba(255,255,255,.55)";
+  ctx.font = "15px system-ui, sans-serif";
+  wrapCanvasText(ctx, model.limit, 70, 930, 1460, 21, 2);
+  return canvasBlob(canvas);
+}
+
+async function activeViewSnapshotBlob(){
+  const panel = document.querySelector(`[data-tab-panel="${state.tab}"]`);
+  if (!panel) return fallbackSnapshotBlob();
+  const stage = document.createElement("div");
+  stage.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+  stage.style.cssText = "position:fixed;left:-100000px;top:0;width:1440px;background:#0b0d12;color:rgba(255,255,255,.92);overflow:hidden;";
+  const style = document.createElement("style");
+  style.textContent = `${snapshotStyleText()} body{overflow:visible!important}.tabPanel{display:block!important}.viewUtility{grid-template-columns:1fr!important}.viewActions{display:none!important}`;
+  stage.appendChild(style);
+  const brand = document.querySelector(".brand")?.cloneNode(true);
+  if (brand) {
+    const header = document.createElement("header");
+    header.className = "topbar";
+    header.appendChild(brand);
+    stage.appendChild(header);
+  }
+  const health = els.dataHealthBanner?.cloneNode(true);
+  if (health) {
+    health.querySelectorAll("button").forEach(button => button.remove());
+    stage.appendChild(health);
+  }
+  const context = document.querySelector(".viewUtility")?.cloneNode(true);
+  if (context) {
+    context.querySelector(".viewActions")?.remove();
+    stage.appendChild(context);
+  }
+  const panelClone = panel.cloneNode(true);
+  panelClone.removeAttribute("hidden");
+  copyFormState(panel, panelClone);
+  panelClone.querySelectorAll("img, image").forEach(image => image.remove());
+  stage.appendChild(panelClone);
+  document.body.appendChild(stage);
+  try {
+    if (document.fonts?.ready) await document.fonts.ready;
+    const width = 1440;
+    const height = Math.max(720, Math.min(2400, stage.scrollHeight));
+    stage.style.cssText = `position:relative;left:0;top:0;width:${width}px;height:${height}px;background:#0b0d12;color:rgba(255,255,255,.92);overflow:hidden;`;
+    const serialized = new XMLSerializer().serializeToString(stage);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${serialized}</foreignObject></svg>`;
+    const image = await imageFromDataURL(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#0b0d12";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0);
+    return await canvasBlob(canvas);
+  } catch (error) {
+    console.warn("[TradeGravity] active-view PNG capture fell back to summary snapshot.", error);
+    return fallbackSnapshotBlob();
+  } finally {
+    stage.remove();
+  }
+}
+
+async function downloadPNGSnapshot(){
+  if (!els.exportPNG) return;
+  const original = els.exportPNG.textContent;
+  els.exportPNG.disabled = true;
+  els.exportPNG.textContent = "Preparing PNG…";
+  try {
+    const blob = await activeViewSnapshotBlob();
+    downloadBlob(blob, exportFilename("png"));
+    els.exportPNG.textContent = "PNG ready";
+  } catch (error) {
+    console.error(error);
+    els.exportPNG.textContent = "PNG failed";
+  } finally {
+    setTimeout(() => {
+      els.exportPNG.disabled = false;
+      els.exportPNG.textContent = original;
+    }, 1400);
+  }
+}
+
+function rememberOnboarding(){
+  try { localStorage.setItem(ONBOARDING_STORAGE_KEY, "seen"); } catch { /* Storage can be unavailable in privacy modes. */ }
+}
+
+function onboardingWasSeen(){
+  try { return localStorage.getItem(ONBOARDING_STORAGE_KEY) === "seen"; } catch { return true; }
+}
+
+function openAppDialog(dialog){
+  if (!dialog || dialog.open) return;
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
+}
+
+function closeAppDialog(dialog){
+  if (!dialog?.open) return;
+  if (dialog === els.onboardingDialog) rememberOnboarding();
+  if (typeof dialog.close === "function") dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+function startVietNamSample(){
+  const periods = availablePeriods(state.seriesRows).map(item => item.key);
+  state.period = periods.includes("Y:2023") ? "Y:2023" : "latest";
+  const hasASEAN = state.latestRows.some(row => (row.groups || []).includes("ASEAN"));
+  state.group = hasASEAN ? "ASEAN" : "";
+  state.region = "";
+  state.income = "";
+  state.tableQuery = "";
+  state.comparisonMode = "comparable";
+  state.normalization = "raw";
+  syncExplorerControls();
+  refreshRows({ syncURL: false });
+  const sample = state.rows.find(row => row.iso3 === "VNM") || state.rows[0] || null;
+  setActiveTab("overview", { syncURL: false });
+  if (sample) selectCountry(sample);
+  else syncURL();
+  rememberOnboarding();
+  closeAppDialog(els.onboardingDialog);
+}
+
+function initializeExperienceControls(){
+  els.openOnboarding?.addEventListener("click", () => openAppDialog(els.onboardingDialog));
+  els.openMethodology?.addEventListener("click", () => {
+    renderViewContext();
+    openAppDialog(els.methodologyDialog);
+  });
+  els.dismissOnboarding?.addEventListener("click", () => {
+    rememberOnboarding();
+    closeAppDialog(els.onboardingDialog);
+  });
+  els.startSampleView?.addEventListener("click", startVietNamSample);
+  document.querySelectorAll("[data-close-dialog]").forEach(button => {
+    button.addEventListener("click", () => closeAppDialog(document.getElementById(button.dataset.closeDialog)));
+  });
+  for (const dialog of [els.onboardingDialog, els.methodologyDialog]) {
+    dialog?.addEventListener("click", event => {
+      if (event.target === dialog) closeAppDialog(dialog);
+    });
+  }
+  els.exportPNG?.addEventListener("click", downloadPNGSnapshot);
+  els.exportCSV?.addEventListener("click", downloadTableCSV);
+  els.exportReport?.addEventListener("click", downloadSummaryReport);
+  els.retryData?.addEventListener("click", () => window.location.reload());
+  if (!onboardingWasSeen()) setTimeout(() => openAppDialog(els.onboardingDialog), 250);
+}
+
 function setSelection(row){
   if (!row){
     els.selection.innerHTML = "<span class='subtle'>Click a country tile to view details.</span>";
@@ -599,8 +1107,11 @@ function showTooltip(ev, row, side){
     </div>
   `;
   const pad = 12;
-  const x = Math.min(window.innerWidth - 340, ev.clientX + pad);
-  const y = Math.min(window.innerHeight - 180, ev.clientY + pad);
+  const rect = els.tooltip.getBoundingClientRect();
+  const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+  const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+  const x = Math.max(8, Math.min(viewportWidth - rect.width - 8, ev.clientX + pad));
+  const y = Math.max(8, Math.min(viewportHeight - rect.height - 8, ev.clientY + pad));
   els.tooltip.style.left = x + "px";
   els.tooltip.style.top = y + "px";
 }
@@ -794,6 +1305,11 @@ function buildTreemap(svgEl, side, rows){
     });
 }
 
+function boundedInputValue(element, fallback, minimum, maximum){
+  const value = Number(element?.value);
+  return Number.isFinite(value) ? Math.max(minimum, Math.min(maximum, value)) : fallback;
+}
+
 function currentViewState(){
   return {
     metric: state.metric,
@@ -809,6 +1325,14 @@ function currentViewState(){
     query: state.tableQuery,
     tab: state.tab,
     sector: state.strategicSector,
+    chipStage: state.chipStage,
+    chipCountry: state.chipCountry,
+    scenarioPartner: els.scenarioPartner?.value || "usa",
+    scenarioProduct: els.scenarioProduct?.value || "",
+    tariffBase: boundedInputValue(els.scenarioTariffBase, 0, 0, 300),
+    tariffChange: boundedInputValue(els.scenarioTariffChange, 10, -100, 300),
+    elasticity: boundedInputValue(els.scenarioElasticity, -1.5, -10, -0.05),
+    passThrough: boundedInputValue(els.scenarioPassThrough, 1, 0, 1),
   };
 }
 
@@ -816,6 +1340,28 @@ function syncURL(){
   const query = serializeViewState(currentViewState());
   const next = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
   window.history.replaceState(null, "", next);
+}
+
+async function copyTextToClipboard(text){
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.left = "-9999px";
+    document.body.appendChild(field);
+    field.select();
+    let copied = false;
+    try {
+      copied = document.execCommand("copy");
+    } finally {
+      field.remove();
+    }
+    return copied;
+  }
 }
 
 function refreshRows(options = {}){
@@ -882,6 +1428,19 @@ function populateExplorerControls(){
   fillSelect(els.groupFilter, groups, "All groups");
 }
 
+function reconcileExplorerState(){
+  for (const [element, property, fallback] of [
+    [els.periodFilter, "period", "latest"],
+    [els.regionFilter, "region", ""],
+    [els.incomeFilter, "income", ""],
+    [els.groupFilter, "group", ""],
+  ]) {
+    if (!element) continue;
+    const values = Array.from(element.options).map(option => option.value);
+    if (!values.includes(state[property])) state[property] = fallback;
+  }
+}
+
 function populateStrategicControls(){
   if (!els.strategicSectorFilter) return;
   const sectors = Array.isArray(state.strategicIndex?.sectors) ? state.strategicIndex.sectors : [];
@@ -934,6 +1493,20 @@ function syncExplorerControls(){
   if (els.normalization) els.normalization.value = state.normalization;
   if (els.topN) els.topN.value = String(state.topN);
   if (els.tableSearch) els.tableSearch.value = state.tableQuery;
+}
+
+function syncScenarioControls(view){
+  if (!view) return;
+  state.preserveScenarioInputs = true;
+  if (els.scenarioPartner) els.scenarioPartner.value = view.scenarioPartner || "usa";
+  if (els.scenarioProduct) {
+    const available = Array.from(els.scenarioProduct.options).some(option => option.value === view.scenarioProduct);
+    els.scenarioProduct.value = available ? view.scenarioProduct : "";
+  }
+  if (els.scenarioTariffBase) els.scenarioTariffBase.value = String(view.tariffBase ?? 0);
+  if (els.scenarioTariffChange) els.scenarioTariffChange.value = String(view.tariffChange ?? 10);
+  if (els.scenarioElasticity) els.scenarioElasticity.value = String(view.elasticity ?? -1.5);
+  if (els.scenarioPassThrough) els.scenarioPassThrough.value = String(view.passThrough ?? 1);
 }
 
 function seriesMetricValue(point, side, selected){
@@ -1241,20 +1814,23 @@ function renderIntelligenceSummary(rows){
     return;
   }
   const profile = buildIntelligenceProfile(selected, state.metric);
-  const divergence = profile.growthDivergence == null ? "—" : `${(profile.growthDivergence * 100).toFixed(1)}pp`;
+  const divergence = profile.growthDivergence == null ? "—" : `${profile.growthDivergence >= 0 ? "+" : ""}${(profile.growthDivergence * 100).toFixed(1)}pp USA–China`;
+  const balance = profile.total > 0 ? `${profile.exposureBalance >= 0 ? "+" : ""}${(profile.exposureBalance * 100).toFixed(1)}pp` : "—";
+  const shift = profile.directionShift == null ? "—" : `${profile.directionShift >= 0 ? "+" : ""}${(profile.directionShift * 100).toFixed(1)}pp`;
   const signals = profile.signals.map(signal => `<div class="signalItem ${escapeHTML(signal.level)}">${escapeHTML(signal.label)}</div>`).join("");
   els.intelligenceSummary.innerHTML = `
+    <div class="positionHeadline"><span class="statusPill ${profile.position === "balanced" ? "planned" : "warning"}">${escapeHTML(profile.position)}</span><strong>${escapeHTML(profile.direction)}</strong><small>Positive balance/shift means toward USA; negative means toward China.</small></div>
     <div class="signalMetrics">
       <div class="signalMetric"><span>Observed ${escapeHTML(metricLabel())}</span><b>${formatMetricValue(profile.total)}</b></div>
-      <div class="signalMetric"><span>China share</span><b>${(profile.chinaShare * 100).toFixed(1)}%</b></div>
-      <div class="signalMetric"><span>Two-partner HHI</span><b>${profile.concentration.toFixed(3)}</b></div>
-      <div class="signalMetric"><span>Net balance</span><b>${formatMetricValue(profile.netBalance)}</b></div>
+      <div class="signalMetric"><span>USA / China share</span><b>${(profile.usaShare * 100).toFixed(1)}% / ${(profile.chinaShare * 100).toFixed(1)}%</b></div>
+      <div class="signalMetric"><span>Exposure balance</span><b>${escapeHTML(balance)}</b></div>
+      <div class="signalMetric"><span>Position shift</span><b>${escapeHTML(shift)}</b></div>
+      <div class="signalMetric"><span>Dual exposure</span><b>${(profile.dualDependency * 100).toFixed(1)}%</b></div>
       <div class="signalMetric"><span>Growth divergence</span><b>${escapeHTML(divergence)}</b></div>
-      <div class="signalMetric"><span>Observation scope</span><b>USA + CHN</b></div>
     </div>
     <div class="subSectionTitle">Threshold signals for ${escapeHTML(profile.name)}</div>
     <div class="signalList">${signals}</div>
-    <div class="analysisNote">HHI and shares cover only the two published anchor partners. They are not whole-world concentration measures.</div>`;
+    <div class="analysisNote">Position, shift, and dual exposure cover only the two published anchor partners. They are not whole-world dependency or geopolitical-alignment scores. Dual exposure is 2 × the smaller anchor share.</div>`;
 }
 
 function renderExposureRanking(rows){
@@ -1280,10 +1856,11 @@ function renderExposureRanking(rows){
     nameCell.appendChild(button);
     tr.appendChild(nameCell);
     appendTableCell(tr, formatMetricValue(profile.total), "numeric");
+    appendTableCell(tr, `${(profile.usaShare * 100).toFixed(1)}%`, "numeric");
     appendTableCell(tr, `${(profile.chinaShare * 100).toFixed(1)}%`, "numeric");
-    appendTableCell(tr, profile.concentration.toFixed(3), "numeric");
-    appendTableCell(tr, formatMetricValue(profile.netBalance), "numeric");
-    appendTableCell(tr, profile.signals[0]?.label || "—");
+    appendTableCell(tr, profile.position);
+    appendTableCell(tr, profile.directionShift == null ? "—" : `${profile.direction} (${profile.directionShift >= 0 ? "+" : ""}${(profile.directionShift * 100).toFixed(1)}pp)`);
+    appendTableCell(tr, `${(profile.dualDependency * 100).toFixed(1)}%`, "numeric");
     fragment.appendChild(tr);
   }
   els.exposureRankingBody.replaceChildren(fragment);
@@ -1462,6 +2039,74 @@ async function renderTradeNetwork(rows){
 	renderPartnerNetwork(file, selected);
 }
 
+function mirrorPartitionFor(reporterISO3, preferredPeriod = ""){
+  const reporter = normalizeISO3(reporterISO3);
+  if (!reporter) return null;
+  const partitions = (Array.isArray(state.mirrorIndex?.partitions) ? state.mirrorIndex.partitions : [])
+    .filter(partition => normalizeISO3(partition?.reporter_iso3) === reporter && /^\d{4}$/.test(String(partition?.period || "")))
+    .sort((a, b) => String(b.period).localeCompare(String(a.period)));
+  return partitions.find(partition => String(partition.period) === String(preferredPeriod || "")) || partitions[0] || null;
+}
+
+async function loadMirrorPartition(partition){
+  const reporter = normalizeISO3(partition?.reporter_iso3);
+  const period = String(partition?.period || "");
+  if (!reporter || !/^\d{4}$/.test(period)) return null;
+  const key = `${reporter}/${period}`;
+  if (Object.prototype.hasOwnProperty.call(state.mirrorCache, key)) return state.mirrorCache[key];
+  if (!state.mirrorPromises[key]) {
+    state.mirrorPromises[key] = fetch(`./data/mirror/${reporter}/${period}.json`, { cache: "no-store" })
+      .then(response => response.ok ? response.json() : null)
+      .then(file => {
+        const valid = normalizeISO3(file?.reporter_iso3) === reporter && String(file?.period || "") === period && Array.isArray(file?.rows);
+        state.mirrorCache[key] = valid ? file : null;
+        return state.mirrorCache[key];
+      })
+      .catch(() => {
+        state.mirrorCache[key] = null;
+        return null;
+      })
+      .finally(() => { delete state.mirrorPromises[key]; });
+  }
+  return state.mirrorPromises[key];
+}
+
+function mirrorGapLabel(value){
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "—";
+  return `${numeric >= 0 ? "+" : ""}${(numeric * 100).toFixed(1)}%`;
+}
+
+async function renderMirrorDiagnostics(){
+  if (!els.mirrorDiagnostics || state.tab !== "intelligence") return;
+  const selected = state.selectedRow;
+  const partition = mirrorPartitionFor(selected?.iso3, selected?.comparison_period);
+  if (!selected) {
+    els.mirrorDiagnostics.textContent = "Select a country to compare its report with USA and China counterpart reports.";
+    return;
+  }
+  if (!partition) {
+    els.mirrorDiagnostics.innerHTML = `<div class="emptyState"><b>No mirror partition for ${escapeHTML(selected.name || selected.iso3)}</b><span>Both the country and the anchor must publish the same annual bilateral flow. Absence is shown rather than estimated.</span></div>`;
+    return;
+  }
+  const selectedISO3 = selected.iso3;
+  els.mirrorDiagnostics.textContent = `Loading ${selectedISO3} mirror-reporting diagnostics…`;
+  const file = await loadMirrorPartition(partition);
+  if (state.tab !== "intelligence" || state.selectedRow?.iso3 !== selectedISO3) return;
+  if (!file) {
+    els.mirrorDiagnostics.textContent = "Mirror-reporting diagnostics could not be loaded.";
+    return;
+  }
+  const rows = file.rows.map(row => {
+    const reporterExport = row.reporter_export_available ? formatNominalUSD(row.reporter_export_usd) : "—";
+    const anchorImport = row.anchor_import_available ? formatNominalUSD(row.anchor_import_usd) : "—";
+    const reporterImport = row.reporter_import_available ? formatNominalUSD(row.reporter_import_usd) : "—";
+    const anchorExport = row.anchor_export_available ? formatNominalUSD(row.anchor_export_usd) : "—";
+    return `<tr><th>${escapeHTML(row.anchor_iso3)}</th><td class="numeric">${escapeHTML(reporterExport)}</td><td class="numeric">${escapeHTML(anchorImport)}</td><td class="numeric">${escapeHTML(mirrorGapLabel(row.export_symmetric_gap_ratio))}</td><td class="numeric">${escapeHTML(reporterImport)}</td><td class="numeric">${escapeHTML(anchorExport)}</td><td class="numeric">${escapeHTML(mirrorGapLabel(row.import_symmetric_gap_ratio))}</td></tr>`;
+  }).join("");
+  els.mirrorDiagnostics.innerHTML = `<div class="tableScroll" tabindex="0"><table class="miniTable"><thead><tr><th>Anchor</th><th class="numeric">Country export</th><th class="numeric">Anchor import</th><th class="numeric">Symmetric gap</th><th class="numeric">Country import</th><th class="numeric">Anchor export</th><th class="numeric">Symmetric gap</th></tr></thead><tbody>${rows}</tbody></table></div><div class="analysisNote">${escapeHTML(file.period)} · nominal US$. ${escapeHTML(file.scope)}. ${escapeHTML((file.caveats || []).join(" "))}</div>`;
+}
+
 function renderIntelligence(){
   const rows = intelligenceRows();
   renderIntelligenceSummary(rows);
@@ -1470,6 +2115,7 @@ function renderIntelligence(){
 	  els.intelligenceScopeBadge.textContent = Number(state.matrixIndex?.partitions?.length || 0) > 0 ? "Multi-partner on selection" : "Two-anchor scope";
 	}
 	renderTradeNetwork(rows);
+	renderMirrorDiagnostics();
 }
 
 function renderCatalog(){
@@ -1553,9 +2199,11 @@ async function renderScenarioBaseline(){
   if (!context || state.selectedRow?.iso3 !== requestedISO3) return;
   const partnerName = context.side === "chn" ? "China" : "the United States";
   const productName = context.productCode ? `${context.productCode} ${context.product?.label || "strategic product"}` : "all products";
-  if (context.productCode && els.scenarioTariffBase) {
+  if (context.productCode && els.scenarioTariffBase && !state.preserveScenarioInputs) {
     els.scenarioTariffBase.value = context.tariffRow ? String(Number(context.tariffRow.rate_percent).toFixed(2)) : "0";
   }
+  state.preserveScenarioInputs = false;
+  syncURL();
   if (els.scenarioTariffSource) {
     if (context.tariffRow) {
       els.scenarioTariffSource.textContent = `Default: ${tariffRateLabel(context.tariffRow)} · ${context.tariffRow.classification}/${context.tariffRow.nomenclature} · ${context.tariffPartition.partition.year} · ${String(context.tariffPartition.file.provider || "").toUpperCase()} · WLD/MFN schedule.`;
@@ -1597,8 +2245,415 @@ async function runScenario(){
     <div class="analysisNote">${escapeHTML(result.warning)} ${context.baselineKind === "hs6" ? `HS6 baseline ${escapeHTML(context.tradePartition.partition.period)}.` : "Aggregate baseline fallback; product interpretation is not valid."} ${context.tariffRow ? `MFN source ${escapeHTML(context.tariffPartition.partition.year)} ${escapeHTML(context.tariffRow.classification)}.` : "Tariff entered manually."} Elasticity ${result.elasticity.toFixed(2)} · pass-through ${result.passThrough.toFixed(2)} · response capped at −95%.</div>`;
 }
 
+function chipReference(){
+  return state.semiconductorReference || { stages: [], country_roles: [], trends: [], policy_events: [], sources: [], caveats: [] };
+}
+
+function chipRequestedPeriod(){
+  const match = String(state.period || "").match(/^Y:(\d{4})$/);
+  return match ? match[1] : "latest";
+}
+
+function chipSummary(){
+  return summarizeChipStages(chipReference(), state.semiconductorFiles, state.metric, chipRequestedPeriod());
+}
+
+function populateChipControls(){
+  const reference = chipReference();
+  if (els.chipStageFilter) {
+    const fragment = document.createDocumentFragment();
+    const all = document.createElement("option");
+    all.value = "all";
+    all.textContent = "All stages";
+    fragment.appendChild(all);
+    for (const stage of reference.stages || []) {
+      const option = document.createElement("option");
+      option.value = stage.id;
+      option.textContent = stage.label;
+      fragment.appendChild(option);
+    }
+    els.chipStageFilter.replaceChildren(fragment);
+    const valid = (reference.stages || []).some(stage => stage.id === state.chipStage);
+    if (state.chipStage !== "all" && !valid) state.chipStage = "all";
+    els.chipStageFilter.value = state.chipStage;
+  }
+  if (els.chipCountryFilter) {
+    const roleMap = new Map((reference.country_roles || []).map(role => [role.iso3, role]));
+    for (const file of state.semiconductorFiles || []) {
+      const iso3 = normalizeISO3(file?.reporter_iso3);
+      if (!iso3 || roleMap.has(iso3)) continue;
+      const headline = state.latestRows.find(row => row.iso3 === iso3);
+      roleMap.set(iso3, { iso3, name: headline?.name || iso3, roles: [], note: "No curated ecosystem role is registered; only the published customs observation is shown.", evidence: "observed_only" });
+    }
+    for (const iso of state.semiconductorMonthlyIndex?.reporters || []) {
+      const iso3 = normalizeISO3(iso);
+      if (!iso3 || roleMap.has(iso3)) continue;
+      const headline = state.latestRows.find(row => row.iso3 === iso3);
+      roleMap.set(iso3, { iso3, name: headline?.name || iso3, roles: [], note: "Focused monthly observations are available; no curated ecosystem role is registered.", evidence: "observed_only" });
+    }
+    const roles = Array.from(roleMap.values()).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    const fragment = document.createDocumentFragment();
+    for (const role of roles) {
+      const option = document.createElement("option");
+      option.value = role.iso3;
+      option.textContent = `${role.name} (${role.iso3})`;
+      fragment.appendChild(option);
+    }
+    els.chipCountryFilter.replaceChildren(fragment);
+    if (!roles.some(role => role.iso3 === state.chipCountry)) state.chipCountry = roles.some(role => role.iso3 === "KOR") ? "KOR" : (roles[0]?.iso3 || "");
+    els.chipCountryFilter.value = state.chipCountry;
+  }
+  const defaults = reference.scenario_defaults || {};
+  if (els.chipDisruption && !els.chipDisruption.dataset.initialized) {
+    els.chipDisruption.value = String(Number(defaults.disruption_percent) || 20);
+    els.chipDisruption.dataset.initialized = "true";
+  }
+  if (els.chipSubstitution && !els.chipSubstitution.dataset.initialized) {
+    els.chipSubstitution.value = String(Number(defaults.substitution_percent) || 25);
+    els.chipSubstitution.dataset.initialized = "true";
+  }
+}
+
+function renderChipCoverage(summary){
+  const reference = chipReference();
+  const published = reference.publication || {};
+  const observedReporters = new Set();
+  for (const stage of summary.stages || []) for (const reporter of stage.reporters || []) observedReporters.add(reporter.iso3);
+  const dynamicPublication = state.semiconductorLoaded ? {
+    ...published,
+    observed_reporter_count: observedReporters.size,
+    observed_period_count: summary.periods.length,
+    observed_reporters: Array.from(observedReporters),
+    observed_periods: summary.periods,
+  } : published;
+  const gate = buildChipCoverageGate({ ...reference, publication: dynamicPublication }, state.strategicIndex);
+  if (els.chipCoverageBadge) {
+    els.chipCoverageBadge.textContent = gate.ready ? "Open/public data · coverage met" : gate.status === "limited" ? "Open/public data · limited coverage" : "Open/public reference only";
+    els.chipCoverageBadge.className = `scopeBadge ${gate.ready ? "" : "warningBadge"}`.trim();
+  }
+  if (els.chipCoverageSummary) {
+    const loading = state.semiconductorLoading ? " · loading partitions…" : "";
+    els.chipCoverageSummary.innerHTML = `<b>${gate.registeredCodeCount}/${gate.targets.codes} codes</b><span>${gate.reporterCount}/${gate.targets.reporters} reporters · ${gate.periodCount}/${gate.targets.periods} annual periods${escapeHTML(loading)}</span><small>${gate.ready ? "Coverage gate met; measurement gaps still apply." : "Below the publication gate—interpret as an exploratory sample."}</small>`;
+  }
+  return gate;
+}
+
+function sourceLinks(sourceIDs, sources){
+  return (sourceIDs || []).map(sourceID => sources.get(sourceID)).filter(Boolean).map(source => {
+    const url = safeHTTPSURL(source.url);
+    const label = `${source.publisher} · ${source.published_at}`;
+    return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}</a>` : escapeHTML(label);
+  }).join(" · ");
+}
+
+function renderChipTrends(reference, sources){
+  if (!els.chipTrends) return;
+  const trends = reference.trends || [];
+  if (trends.length === 0) {
+    els.chipTrends.textContent = "No dated trend register is published.";
+    return;
+  }
+  els.chipTrends.innerHTML = trends.map(trend => `<article class="chipTrendCard"><span>${escapeHTML(trend.as_of || "date unavailable")}</span><h3>${escapeHTML(trend.label)}</h3><p>${escapeHTML(trend.summary)}</p><div>${sourceLinks(trend.source_ids, sources)}</div></article>`).join("");
+}
+
+function chipObservationLabel(stage){
+  return {
+    external_context: "Context only",
+    mixed_proxy: "Mixed proxy",
+    observed_goods: "Observed goods",
+    observed_with_gap: "Observed + gap",
+    revision_sensitive: "Revision-sensitive",
+    broad_proxy: "Broad proxy",
+  }[stage?.observation_type] || "Declared scope";
+}
+
+function renderChipValueChain(summary){
+  if (!els.chipValueChain) return;
+  els.chipValueChain.innerHTML = (summary.stages || []).map((stage, index) => {
+    const active = state.chipStage === stage.id;
+    const value = stage.total > 0 ? formatNominalUSD(stage.total) : "No published observation";
+    const arrow = index < summary.stages.length - 1 ? `<span class="chipStageArrow" aria-hidden="true">→</span>` : "";
+    const reporterCount = Number(stage.reporterCount || 0);
+    const lens = stage.total > 0 ? `${stage.position} · ${stage.direction}` : "position unavailable";
+    return `<div class="chipStageWrap"><button type="button" class="chipStageCard${active ? " is-active" : ""}" data-chip-stage="${escapeHTML(stage.id)}" aria-pressed="${String(active)}"><span class="chipStageOrder">${String(Number(stage.order) || index + 1).padStart(2, "0")}</span><b>${escapeHTML(stage.short_label || stage.label)}</b><small>${escapeHTML(chipObservationLabel(stage))} · ${Number(stage.codes?.length || 0)} HS6</small><strong>${escapeHTML(value)}</strong><em>${escapeHTML(lens)} · ${reporterCount} ${reporterCount === 1 ? "reporter" : "reporters"}</em></button>${arrow}</div>`;
+  }).join("");
+}
+
+function renderChipRoleLandscape(reference){
+  if (!els.chipRoleLandscape) return;
+  const stages = reference.stages || [];
+  const roles = (reference.country_roles || []).slice().sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  const header = stages.map(stage => `<th title="${escapeHTML(stage.label)}">${escapeHTML(stage.short_label || stage.label)}</th>`).join("");
+  const body = roles.map(role => {
+    const cells = stages.map(stage => {
+      const active = (role.roles || []).includes(stage.id);
+      return `<td class="chipRoleCell${active ? " has-role" : ""}" title="${escapeHTML(role.name)} · ${escapeHTML(stage.label)}">${active ? `<span aria-label="Context role">●</span>` : `<span aria-label="No curated role">—</span>`}</td>`;
+    }).join("");
+    return `<tr class="${state.chipCountry === role.iso3 ? "is-selected" : ""}"><th><button type="button" data-chip-country="${escapeHTML(role.iso3)}">${escapeHTML(role.name)} <small>${escapeHTML(role.iso3)}</small></button></th>${cells}</tr>`;
+  }).join("");
+  els.chipRoleLandscape.innerHTML = `<div class="tableScroll chipRoleScroll" tabindex="0"><table class="chipRoleTable"><thead><tr><th>Country context</th>${header}</tr></thead><tbody>${body}</tbody></table></div><div class="analysisNote"><span class="contextDot roleLegendDot"></span> Curated ecosystem role. Blank cells do not prove an activity is absent. Use the selected country profile for separately published observations.</div>`;
+}
+
+function renderChipDistribution(summary){
+  if (!els.chipDistribution) return;
+  const selected = state.chipStage === "all" ? null : summary.stages.find(stage => stage.id === state.chipStage);
+  if (!selected) {
+    const rows = (summary.stages || []).map(stage => `<tr><td><button type="button" class="tableCountryButton" data-chip-stage="${escapeHTML(stage.id)}">${escapeHTML(stage.label)}</button></td><td class="numeric">${stage.usaValue > 0 ? escapeHTML(formatNominalUSD(stage.usaValue)) : "—"}</td><td class="numeric">${stage.chinaValue > 0 ? escapeHTML(formatNominalUSD(stage.chinaValue)) : "—"}</td><td>${escapeHTML(stage.total > 0 ? stage.position : "unavailable")}</td><td>${escapeHTML(stage.direction)}</td><td class="numeric">${stage.total > 0 ? (stage.dualDependency * 100).toFixed(1) + "%" : "—"}</td></tr>`).join("");
+    els.chipDistribution.innerHTML = `<table class="miniTable"><thead><tr><th>Stage</th><th class="numeric">USA</th><th class="numeric">China</th><th>Position</th><th>Direction</th><th class="numeric">Dual exposure</th></tr></thead><tbody>${rows}</tbody></table><div class="analysisNote">Values are reporter observations against USA and China and stage totals may overlap. Position is the two-anchor share balance, not a global supplier or political-alignment score.</div>`;
+    return;
+  }
+  if (!(selected.total > 0)) {
+    els.chipDistribution.innerHTML = `<div class="emptyState"><b>No observed HS6 value for ${escapeHTML(selected.label)}</b><span>${escapeHTML(selected.gap || "The selected stage is not directly observed in goods trade.")}</span></div>`;
+    return;
+  }
+  const max = selected.reporters[0]?.value || 1;
+  const bars = selected.reporters.slice(0, 15).map(item => `<div class="chipBarRow"><button type="button" data-chip-country="${escapeHTML(item.iso3)}">${escapeHTML(item.iso3)}</button><span><i style="--bar:${Math.max(1, item.value / max * 100).toFixed(2)}%"></i></span><b>${escapeHTML(formatNominalUSD(item.value))}</b><em>${(item.share * 100).toFixed(1)}%</em></div>`).join("");
+  const registry = new Map((state.strategicIndex?.products || []).map(product => [String(product.code || ""), product]));
+  const codes = (selected.codes || []).map(code => {
+    const product = registry.get(code);
+    return `<span class="chipCodeTag" title="${escapeHTML(product?.revision_note || "Revision scope declared in the stage registry")}"><b>HS ${escapeHTML(code)}</b>${escapeHTML(product?.label || "Mapped proxy")}</span>`;
+  }).join("");
+  const growth = selected.growth == null ? "No comparable prior period" : `${selected.growth >= 0 ? "+" : ""}${(selected.growth * 100).toFixed(1)}% vs ${selected.previousPeriod}`;
+  const reporterCount = Number(selected.reporterCount || 0);
+  const shift = selected.directionShift == null ? "—" : `${selected.directionShift >= 0 ? "+" : ""}${(selected.directionShift * 100).toFixed(1)}pp`;
+  els.chipDistribution.innerHTML = `<div class="positionHeadline"><span class="statusPill warning">${escapeHTML(selected.position)}</span><strong>${escapeHTML(selected.direction)}</strong></div><div class="signalMetrics chipSignalMetrics"><div class="signalMetric"><span>USA observed value</span><b>${escapeHTML(formatNominalUSD(selected.usaValue))}</b></div><div class="signalMetric"><span>China observed value</span><b>${escapeHTML(formatNominalUSD(selected.chinaValue))}</b></div><div class="signalMetric"><span>Exposure balance</span><b>${selected.exposureBalance >= 0 ? "+" : ""}${(selected.exposureBalance * 100).toFixed(1)}pp</b></div><div class="signalMetric"><span>Position shift</span><b>${escapeHTML(shift)}</b></div><div class="signalMetric"><span>Dual exposure</span><b>${(selected.dualDependency * 100).toFixed(1)}%</b></div><div class="signalMetric"><span>Published change</span><b>${escapeHTML(growth)}</b></div></div><div class="chipBarChart">${bars}</div><div class="chipCodeList">${codes}</div><div class="analysisNote">${escapeHTML(selected.period)} · ${reporterCount} ${reporterCount === 1 ? "reporter" : "reporters"} · selected ${metricLabel().toLowerCase()}. Positive balance/shift means toward USA; negative means toward China. ${escapeHTML(selected.gap)} Coverage changes can affect period growth.</div>`;
+}
+
+function renderChipCountry(summary){
+  if (!els.chipCountryProfile) return;
+  const profile = buildChipCountryProfile(chipReference(), summary, state.chipCountry);
+  const headline = state.latestRows.find(row => row.iso3 === profile.iso3);
+  const displayRole = profile.role || { iso3: profile.iso3, name: headline?.name || profile.iso3, roles: [], note: "No curated ecosystem role is registered; only published customs observations are shown.", evidence: "observed_only" };
+  const roleStages = (chipReference().stages || []).filter(stage => displayRole.roles.includes(stage.id));
+  const iso2 = normalizeISO2(ISO3_TO_ISO2[profile.iso3]);
+  const flag = iso2 ? `<img src="${escapeHTML(flagURL(iso2))}" alt="" loading="lazy" />` : "";
+  const roleTags = roleStages.length > 0 ? roleStages.map(stage => `<span class="sectorTag">${escapeHTML(stage.short_label || stage.label)}</span>`).join(" ") : `<span class="evidenceTag">No curated role</span>`;
+  const rows = profile.stages.filter(stage => stage.role || stage.observed).map(stage => `<tr><td>${escapeHTML(stage.label)}${stage.role ? ` <span class="evidenceTag">context role</span>` : ""}</td><td class="numeric">${stage.observed ? escapeHTML(formatNominalUSD(stage.usaValue)) : "—"}</td><td class="numeric">${stage.observed ? escapeHTML(formatNominalUSD(stage.chinaValue)) : "—"}</td><td>${escapeHTML(stage.observed ? stage.position : "not observed")}</td><td>${escapeHTML(stage.observed ? stage.direction : "—")}</td><td class="numeric">${stage.observed ? (stage.dualDependency * 100).toFixed(1) + "%" : "—"}</td></tr>`).join("");
+  els.chipCountryProfile.innerHTML = `<div class="chipCountryHeading"><span class="countryFlag">${flag}</span><div><h3>${escapeHTML(displayRole.name)} <small>(${escapeHTML(profile.iso3)})</small></h3><p>${escapeHTML(displayRole.note)}</p></div></div><div class="chipRoleTags">${roleTags}</div><div class="tableScroll" tabindex="0"><table class="miniTable"><thead><tr><th>Stage</th><th class="numeric">USA</th><th class="numeric">China</th><th>Position</th><th>Direction</th><th class="numeric">Dual</th></tr></thead><tbody>${rows || `<tr><td colspan="6">No stage-mapped observation is published.</td></tr>`}</tbody></table></div><div class="analysisNote">${displayRole.evidence === "contextual" ? `<span class="evidenceTag">External context</span> Roles are curated and unranked. ` : ""}<span class="evidenceTag">Observed</span> Values use ${escapeHTML(summary.period || "no available period")} USA/China partner data and are not production capacity.</div>`;
+}
+
+function renderChipMonthly(){
+  if (!els.chipMonthlySignals) return;
+  const file = normalizeISO3(state.semiconductorMonthlyFile?.reporter_iso3) === state.chipCountry ? state.semiconductorMonthlyFile : null;
+  const available = (state.semiconductorMonthlyIndex?.reporters || []).includes(state.chipCountry);
+  if (!available) {
+    els.chipMonthlySignals.innerHTML = `<div class="emptyState"><b>No focused monthly partition for ${escapeHTML(state.chipCountry)}</b><span>Annual stage observations remain available where published. Missing monthly coverage is not interpolated.</span></div>`;
+    return;
+  }
+  if (state.semiconductorMonthlyLoading && !file) {
+    els.chipMonthlySignals.textContent = `Loading ${state.chipCountry} monthly semiconductor observations…`;
+    return;
+  }
+  if (!file) {
+    els.chipMonthlySignals.textContent = "Monthly semiconductor observations could not be loaded.";
+    return;
+  }
+  const monthly = summarizeChipMonthly(chipReference(), file, state.metric, state.chipStage);
+  if (!monthly.latest) {
+    els.chipMonthlySignals.innerHTML = `<div class="emptyState"><b>No monthly observation for the active stage</b><span>Select All stages or another mapped stage. Values are not estimated across missing codes.</span></div>`;
+    return;
+  }
+  const shift = monthly.windowShift == null ? "—" : `${monthly.windowShift >= 0 ? "+" : ""}${(monthly.windowShift * 100).toFixed(1)}pp`;
+  const rows = monthly.rows.map(row => `<tr><th>${escapeHTML(row.period)}</th><td class="numeric">${escapeHTML(formatNominalUSD(row.usaValue))}</td><td class="numeric">${escapeHTML(formatNominalUSD(row.chinaValue))}</td><td class="numeric">${row.exposureBalance >= 0 ? "+" : ""}${(row.exposureBalance * 100).toFixed(1)}pp</td></tr>`).join("");
+  els.chipMonthlySignals.innerHTML = `<div class="positionHeadline"><span class="statusPill warning">${escapeHTML(monthly.latest.position)}</span><strong>${escapeHTML(monthly.direction)}</strong><small>${escapeHTML(state.chipCountry)} · ${escapeHTML(state.chipStage === "all" ? "all mapped chip codes" : (chipReference().stages || []).find(stage => stage.id === state.chipStage)?.label || state.chipStage)}</small></div><div class="signalMetrics"><div class="signalMetric"><span>Latest USA value</span><b>${escapeHTML(formatNominalUSD(monthly.latest.usaValue))}</b></div><div class="signalMetric"><span>Latest China value</span><b>${escapeHTML(formatNominalUSD(monthly.latest.chinaValue))}</b></div><div class="signalMetric"><span>Window position shift</span><b>${escapeHTML(shift)}</b></div><div class="signalMetric"><span>Latest dual exposure</span><b>${(monthly.latest.dualDependency * 100).toFixed(1)}%</b></div></div><div class="tableScroll monthlyTableScroll" tabindex="0"><table class="miniTable"><thead><tr><th>Month</th><th class="numeric">USA</th><th class="numeric">China</th><th class="numeric">Balance</th></tr></thead><tbody>${rows}</tbody></table></div><div class="analysisNote">Selected monthly HS6 observations only. Positive balance/shift means toward USA; negative means toward China. Monthly customs values can be volatile and revised.</div>`;
+}
+
+async function loadSelectedChipMonthly(){
+  if (state.tab !== "semiconductors") return;
+  const reporter = normalizeISO3(state.chipCountry);
+  const partition = (state.semiconductorMonthlyIndex?.partitions || []).find(item => normalizeISO3(item?.reporter_iso3) === reporter);
+  if (!reporter || !partition) {
+    state.semiconductorMonthlyFile = null;
+    renderChipMonthly();
+    return;
+  }
+  if (Object.prototype.hasOwnProperty.call(state.semiconductorMonthlyFileCache, reporter)) {
+    state.semiconductorMonthlyFile = state.semiconductorMonthlyFileCache[reporter];
+    renderChipMonthly();
+    return;
+  }
+  if (state.semiconductorMonthlyLoading) return;
+  state.semiconductorMonthlyLoading = true;
+  renderChipMonthly();
+  let file = null;
+  try {
+    const response = await fetch(`./data/semiconductors/monthly/${reporter}.json`, { cache: "no-store" });
+    const candidate = response.ok ? await response.json() : null;
+    if (normalizeISO3(candidate?.reporter_iso3) === reporter && Array.isArray(candidate?.rows)) file = candidate;
+  } catch {
+    file = null;
+  }
+  state.semiconductorMonthlyFileCache[reporter] = file;
+  state.semiconductorMonthlyLoading = false;
+  if (state.chipCountry === reporter) state.semiconductorMonthlyFile = file;
+  renderChipMonthly();
+  if (state.chipCountry !== reporter) void loadSelectedChipMonthly();
+}
+
+function renderChipTimeline(reference, sources){
+  if (!els.chipTimeline) return;
+  const events = filterPolicyEvents(reference, state.chipStage);
+  if (events.length === 0) {
+    els.chipTimeline.textContent = "No policy event is registered for the selected stage.";
+    return;
+  }
+  const usCount = events.filter(event => /united states|u\.s\./i.test(String(event.jurisdiction || ""))).length;
+  const chinaCount = events.filter(event => /china/i.test(String(event.jurisdiction || ""))).length;
+  els.chipTimeline.innerHTML = `<div class="signalMetrics"><div class="signalMetric"><span>Registered US events</span><b>${usCount}</b></div><div class="signalMetric"><span>Registered China events</span><b>${chinaCount}</b></div></div><ol class="policyTimeline">${events.map(event => {
+    const source = sources.get(event.source_id);
+    const url = safeHTTPSURL(source?.url);
+    const title = url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(event.title)}</a>` : escapeHTML(event.title);
+    return `<li><time>${escapeHTML(event.date)}</time><div><span class="sectorTag">${escapeHTML(event.jurisdiction)}</span> <span class="evidenceTag">${escapeHTML(String(event.kind || "").replaceAll("_", " "))}</span><h3>${title}</h3><p>${(event.stages || []).map(stage => escapeHTML((reference.stages || []).find(item => item.id === stage)?.short_label || stage)).join(" · ")} · ${escapeHTML(event.status)}</p></div></li>`;
+  }).join("")}</ol><div class="analysisNote">Counts describe dated events in this bounded public register, not policy severity or causal pressure. Dates are event, announcement, effective or strategy publication dates—not TradeGravity collection times.</div>`;
+}
+
+function renderChipCapacitySignals(reference, sources){
+  if (!els.chipCapacitySignals) return;
+  const signals = (reference.capacity_signals || [])
+    .filter(signal => state.chipStage === "all" || signal.stage === state.chipStage)
+    .slice()
+    .sort((a, b) => String(b.announced_at || "").localeCompare(String(a.announced_at || "")));
+  if (signals.length === 0) {
+    els.chipCapacitySignals.innerHTML = `<div class="emptyState"><b>No registered capacity signal for this stage</b><span>This does not mean that no project exists; the source register is intentionally bounded.</span></div>`;
+    return;
+  }
+  els.chipCapacitySignals.innerHTML = `<div class="capacitySignalList">${signals.map(signal => {
+    const source = sources.get(signal.source_id);
+    const url = safeHTTPSURL(source?.url);
+    const title = url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(signal.title)}</a>` : escapeHTML(signal.title);
+    const stage = (reference.stages || []).find(item => item.id === signal.stage);
+    return `<article><div><time>${escapeHTML(signal.announced_at)}</time><span class="statusPill ${signal.status === "planned" || signal.status === "supported_plan" ? "warning" : "planned"}">${escapeHTML(String(signal.status || "").replaceAll("_", " "))}</span></div><h3>${title}</h3><p>${escapeHTML(signal.claim)}</p><footer>${escapeHTML(signal.country)} · ${escapeHTML(stage?.short_label || signal.stage)} · stated operation: ${escapeHTML(signal.expected_operation)}</footer></article>`;
+  }).join("")}</div><div class="analysisNote">This is a bounded evidence register, not a complete fab database. Forecast spending, construction starts, supported plans and operating output are different measures.</div>`;
+}
+
+function renderChipSources(reference){
+  if (!els.chipSources) return;
+  const datasets = (reference.open_datasets || []).map(dataset => {
+    const url = safeHTTPSURL(dataset.url);
+    const title = url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(dataset.title)}</a>` : escapeHTML(dataset.title);
+    return `<article><span>${escapeHTML(String(dataset.access || "").replaceAll("_", " "))} · ${escapeHTML(dataset.granularity)}</span><h3>${title}</h3><p>${escapeHTML(dataset.provider)} · ${escapeHTML(dataset.role)}</p></article>`;
+  }).join("");
+  const policy = reference.data_policy || {};
+  els.chipSources.innerHTML = `<div class="positionHeadline"><span class="statusPill planned">${escapeHTML(String(policy.mode || "source policy unavailable").replaceAll("_", " "))}</span><strong>No paid dataset required</strong><small>${escapeHTML(policy.rule || "")}</small></div><div class="subSectionTitle">Open data layers</div><div class="sourceRegister">${datasets}</div><div class="subSectionTitle">Dated context sources</div><div class="sourceRegister">${(reference.sources || []).map(source => {
+    const url = safeHTTPSURL(source.url);
+    const title = url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>` : escapeHTML(source.title);
+    return `<article><span>${escapeHTML(source.published_at)} · ${escapeHTML(String(source.source_type || "").replaceAll("_", " "))}</span><h3>${title}</h3><p>${escapeHTML(source.publisher)} · ${escapeHTML(String(source.access || "public web").replaceAll("_", " "))}</p></article>`;
+  }).join("")}</div>`;
+  if (els.chipCaveats) {
+    els.chipCaveats.innerHTML = `<ul class="caveatList">${(reference.caveats || []).map(caveat => `<li>${escapeHTML(caveat)}</li>`).join("")}</ul><div class="measurementLegend"><span><i class="observedDot"></i>Observed customs data</span><span><i class="contextDot"></i>External context</span><span><i class="estimateDot"></i>Illustrative estimate</span></div>`;
+  }
+}
+
+function selectedChipStage(summary){
+  if (state.chipStage === "all") return null;
+  return (summary.stages || []).find(stage => stage.id === state.chipStage) || null;
+}
+
+function chipScenarioContext(summary){
+  const stage = selectedChipStage(summary);
+  const reporter = stage?.reporters?.find(item => item.iso3 === state.chipCountry);
+  return stage && reporter ? { stage, reporter } : null;
+}
+
+function renderChipScenarioBaseline(summary){
+  if (!els.chipScenarioBaseline) return;
+  const context = chipScenarioContext(summary);
+  if (!context) {
+    els.chipScenarioBaseline.textContent = state.chipStage === "all" ? "Choose one value-chain stage to establish a non-overlapping scenario baseline." : `No ${state.chipCountry} observation is published for the selected stage and period.`;
+    return;
+  }
+  els.chipScenarioBaseline.textContent = `${state.chipCountry} · ${context.stage.label} · ${context.stage.period} · baseline ${formatNominalUSD(context.reporter.value)} against USA/China anchors.`;
+}
+
+function runChipScenario(){
+  const summary = chipSummary();
+  const context = chipScenarioContext(summary);
+  if (!els.chipScenarioResult || !context) {
+    if (els.chipScenarioResult) els.chipScenarioResult.textContent = "A specific observed country-stage baseline is required.";
+    return;
+  }
+  const result = estimateStageShock({
+    baseline: context.reporter.value,
+    disruptionPercent: boundedInputValue(els.chipDisruption, 20, 0, 100),
+    substitutionPercent: boundedInputValue(els.chipSubstitution, 25, 0, 100),
+  });
+  els.chipScenarioResult.innerHTML = `<div class="scenarioResults"><div class="scenarioResultMetric"><span>Observed baseline</span><b>${escapeHTML(formatNominalUSD(result.baseline))}</b></div><div class="scenarioResultMetric"><span>Initially disrupted</span><b>${escapeHTML(formatNominalUSD(result.disruptedAmount))}</b></div><div class="scenarioResultMetric"><span>Substitution offset</span><b>${escapeHTML(formatNominalUSD(result.substitutedAmount))}</b></div><div class="scenarioResultMetric"><span>Residual exposure</span><b>${escapeHTML(formatNominalUSD(result.residualExposure))}</b></div></div><div class="analysisNote">${escapeHTML(result.warning)} Assumptions: ${result.disruptionPercent.toFixed(1)}% disruption · ${result.substitutionPercent.toFixed(1)}% of the disrupted amount substituted. The model does not propagate upstream or downstream effects.</div>`;
+}
+
+function renderSemiconductorAtlas(){
+  const reference = chipReference();
+  const summary = chipSummary();
+  const sources = buildChipSourceIndex(reference);
+  populateChipControls();
+  renderChipCoverage(summary);
+  renderChipTrends(reference, sources);
+  renderChipValueChain(summary);
+  renderChipRoleLandscape(reference);
+  renderChipDistribution(summary);
+  renderChipCountry(summary);
+  renderChipMonthly();
+  renderChipTimeline(reference, sources);
+  renderChipCapacitySignals(reference, sources);
+  renderChipSources(reference);
+  renderChipScenarioBaseline(summary);
+  void loadSelectedChipMonthly();
+}
+
+function chipPartitionsToLoad(){
+  const partitions = Array.isArray(state.strategicIndex?.partitions) ? state.strategicIndex.partitions : [];
+  const periods = Array.from(new Set(partitions.map(partition => String(partition?.period || "")).filter(period => /^\d{4}$/.test(period)))).sort().reverse();
+  const requested = chipRequestedPeriod();
+  const eligiblePeriods = (requested === "latest" ? periods : periods.filter(period => period <= requested)).slice(0, 5);
+  return partitions.filter(partition => eligiblePeriods.includes(String(partition?.period || "")) && /^[A-Z]{3}$/.test(String(partition?.reporter_iso3 || "")));
+}
+
+async function fetchChipPartition(partition){
+  const reporter = normalizeISO3(partition?.reporter_iso3);
+  const period = String(partition?.period || "");
+  if (!reporter || !/^\d{4}$/.test(period)) return null;
+  const key = `${reporter}/${period}`;
+  if (Object.prototype.hasOwnProperty.call(state.semiconductorFileCache, key)) return state.semiconductorFileCache[key];
+  try {
+    const response = await fetch(`./data/strategic-hs6/${reporter}/${period}.json`, { cache: "no-store" });
+    const file = response.ok ? await response.json() : null;
+    const valid = normalizeISO3(file?.reporter_iso3) === reporter && String(file?.period || "") === period && Array.isArray(file?.rows);
+    state.semiconductorFileCache[key] = valid ? file : null;
+  } catch {
+    state.semiconductorFileCache[key] = null;
+  }
+  return state.semiconductorFileCache[key];
+}
+
+async function loadSemiconductorPartitions(){
+  const partitions = chipPartitionsToLoad();
+  const loadKey = partitions.map(partition => `${partition.reporter_iso3}/${partition.period}`).sort().join("|");
+  if (state.semiconductorLoading || (state.semiconductorLoaded && state.semiconductorLoadKey === loadKey)) return;
+  state.semiconductorLoading = true;
+  state.semiconductorLoadKey = loadKey;
+  renderSemiconductorAtlas();
+  const files = [];
+  for (let index = 0; index < partitions.length; index += 8) {
+    const batch = await Promise.all(partitions.slice(index, index + 8).map(fetchChipPartition));
+    files.push(...batch.filter(Boolean));
+  }
+  state.semiconductorFiles = files;
+  state.semiconductorLoading = false;
+  state.semiconductorLoaded = true;
+  renderSemiconductorAtlas();
+}
+
+function downloadChipCSV(){
+  const summary = chipSummary();
+  const rows = [["stage_id", "stage", "period", "reporter_iso3", "metric", "usa_value", "china_value", "combined_value", "exposure_balance", "dual_exposure", "direction_shift", "direction", "sample_share", "measurement_type"]];
+  for (const stage of summary.stages || []) {
+    if (state.chipStage !== "all" && state.chipStage !== stage.id) continue;
+    for (const reporter of stage.reporters || []) rows.push([stage.id, stage.label, stage.period, reporter.iso3, state.metric, reporter.usaValue, reporter.chinaValue, reporter.value, reporter.exposureBalance, reporter.dualDependency, reporter.directionShift, reporter.direction, reporter.share, stage.observation_type]);
+  }
+  downloadBlob(new Blob([encodeCSV(rows)], { type: "text/csv;charset=utf-8" }), `tradegravity-chip-atlas-${summary.period || "no-period"}.csv`);
+}
+
 function setActiveTab(tab, options = {}){
-  const allowed = new Set(["overview", "intelligence", "products", "quality", "lab"]);
+  const allowed = new Set(["overview", "intelligence", "semiconductors", "products", "quality", "lab"]);
   state.tab = allowed.has(tab) ? tab : "overview";
   const buttons = els.dashboardTabs?.querySelectorAll("[role='tab']") || [];
   buttons.forEach(button => {
@@ -1612,6 +2667,7 @@ function setActiveTab(tab, options = {}){
     panel.hidden = panel.dataset.tabPanel !== state.tab;
   });
   if (options.syncURL !== false) syncURL();
+  renderViewContext();
   if (state.tab === "overview") {
     requestAnimationFrame(() => {
       buildTreemap(els.svgUSA, "usa", state.rows);
@@ -1620,6 +2676,10 @@ function setActiveTab(tab, options = {}){
     });
   }
   if (state.tab === "intelligence") renderIntelligence();
+  if (state.tab === "semiconductors") {
+    renderSemiconductorAtlas();
+    loadSemiconductorPartitions();
+  }
   if (state.tab === "lab") renderScenarioBaseline();
 }
 
@@ -1646,6 +2706,7 @@ function initializeTabs(){
 
 function renderAll(){
   const rows = state.rows;
+  renderViewContext();
   buildTreemap(els.svgUSA, "usa", rows);
   buildTreemap(els.svgCHN, "chn", rows);
 
@@ -1663,6 +2724,10 @@ function renderAll(){
   renderExplanation();
   renderIntelligence();
   renderCatalog();
+  if (state.tab === "semiconductors") {
+    renderSemiconductorAtlas();
+    loadSemiconductorPartitions();
+  }
   if (state.tab === "lab") renderScenarioBaseline();
 }
 
@@ -1799,6 +2864,12 @@ function renderSnapshotHTML(indicators, news){
     sections.push(`<div class="subtle">No indicator data available.</div>`);
   }
 
+  const selected = state.selectedRow;
+  const usaPeriod = selected?.usa?.period ? `${selected.usa.period_type || "?"} ${selected.usa.period}` : "unavailable";
+  const chnPeriod = selected?.chn?.period ? `${selected.chn.period_type || "?"} ${selected.chn.period}` : "unavailable";
+  const tradeClock = usaPeriod === chnPeriod ? usaPeriod : `USA ${usaPeriod} · China ${chnPeriod}`;
+  const newsWindow = Number(news?.windowDays) || NEWS_WINDOW_DAYS;
+  sections.push(`<div class="temporalNotice"><b>Different clocks</b><span>Trade observation: ${escapeHTML(tradeClock)}. Headlines: rolling ${newsWindow}-day window at the time this panel loads. They are not same-period evidence.</span></div>`);
   sections.push(`<div class="subSectionTitle">Trade &amp; supply-chain headlines <span class="experimentalBadge">Experimental</span></div>`);
   sections.push(renderNewsHTML(news));
 
@@ -1841,7 +2912,7 @@ async function main(){
     console.warn("[TradeGravity] iso3_to_iso2.json not loaded, using fallback map.", err);
   }
 
-  const [res, metaRes, seriesRes, qualityRes, productIndexRes, strategicIndexRes, tariffIndexRes, matrixIndexRes, catalogRes] = await Promise.all([
+  const [res, metaRes, seriesRes, qualityRes, productIndexRes, strategicIndexRes, tariffIndexRes, matrixIndexRes, mirrorIndexRes, catalogRes, semiconductorReferenceRes, semiconductorMonthlyIndexRes] = await Promise.all([
     fetch(DATA_URL, { cache: "no-store" }),
     fetch(META_URL, { cache: "no-store" }).catch(() => null),
     fetch(SERIES_URL, { cache: "no-store" }).catch(() => null),
@@ -1850,7 +2921,10 @@ async function main(){
     fetch(STRATEGIC_INDEX_URL, { cache: "no-store" }).catch(() => null),
     fetch(TARIFF_INDEX_URL, { cache: "no-store" }).catch(() => null),
 	  fetch(MATRIX_INDEX_URL, { cache: "no-store" }).catch(() => null),
+    fetch(MIRROR_INDEX_URL, { cache: "no-store" }).catch(() => null),
     fetch(CATALOG_URL, { cache: "no-store" }).catch(() => null),
+    fetch(SEMICONDUCTOR_REFERENCE_URL, { cache: "no-store" }).catch(() => null),
+    fetch(SEMICONDUCTOR_MONTHLY_INDEX_URL, { cache: "no-store" }).catch(() => null),
   ]);
   if (!res.ok) throw new Error(`Dataset request failed (${res.status})`);
   const data = await res.json();
@@ -1864,7 +2938,10 @@ async function main(){
   const strategicIndex = strategicIndexRes?.ok ? await strategicIndexRes.json().catch(() => null) : null;
   const tariffIndex = tariffIndexRes?.ok ? await tariffIndexRes.json().catch(() => null) : null;
 	const matrixIndex = matrixIndexRes?.ok ? await matrixIndexRes.json().catch(() => null) : null;
+  const mirrorIndex = mirrorIndexRes?.ok ? await mirrorIndexRes.json().catch(() => null) : null;
   const catalog = catalogRes?.ok ? await catalogRes.json().catch(() => null) : null;
+  const semiconductorReference = semiconductorReferenceRes?.ok ? await semiconductorReferenceRes.json().catch(() => null) : null;
+  const semiconductorMonthlyIndex = semiconductorMonthlyIndexRes?.ok ? await semiconductorMonthlyIndexRes.json().catch(() => null) : null;
 
   state.generatedAt = data.generated_at || data.generatedAt || "-";
   state.schemaVersion = String(metadata?.schema_version || data.schema_version || "");
@@ -1876,8 +2953,24 @@ async function main(){
   state.strategicIndex = strategicIndex;
   state.tariffIndex = tariffIndex;
 	state.matrixIndex = matrixIndex;
+  state.mirrorIndex = mirrorIndex;
   state.catalog = catalog;
+  state.semiconductorReference = semiconductorReference;
+  state.semiconductorMonthlyIndex = semiconductorMonthlyIndex;
   state.meta = metadata;
+  state.resourceStates = [
+    { label: "metadata", ready: Boolean(metadata) },
+    { label: "time series", ready: Boolean(series) },
+    { label: "quality report", ready: Boolean(quality) },
+    { label: "HS2 index", ready: Boolean(productIndex) },
+    { label: "strategic HS6 index", ready: Boolean(strategicIndex) },
+    { label: "tariff index", ready: Boolean(tariffIndex) },
+    { label: "bilateral matrix index", ready: Boolean(matrixIndex) },
+    { label: "mirror diagnostics index", ready: Boolean(mirrorIndex) },
+    { label: "data catalog", ready: Boolean(catalog) },
+    { label: "semiconductor atlas", ready: Boolean(semiconductorReference) },
+    { label: "monthly semiconductor index", ready: Boolean(semiconductorMonthlyIndex) },
+  ];
   const initialView = parseViewState(window.location.search);
   state.metric = initialView.metric;
   state.colorMode = initialView.color;
@@ -1891,10 +2984,15 @@ async function main(){
   state.tableQuery = initialView.query;
   state.tab = initialView.tab;
   state.strategicSector = initialView.sector;
+  state.chipStage = initialView.chipStage;
+  state.chipCountry = initialView.chipCountry;
   populateStrategicControls();
+  populateChipControls();
+  syncScenarioControls(initialView);
   initializeTabs();
   setActiveTab(state.tab, { syncURL: false });
   populateExplorerControls();
+  reconcileExplorerState();
   syncExplorerControls();
   refreshRows({ syncURL: false });
   if (initialView.country) {
@@ -1905,6 +3003,8 @@ async function main(){
     }
   }
   renderDatasetStatus(data, metadata);
+  renderDataHealth(true);
+  initializeExperienceControls();
   console.info('[TradeGravity] loaded rows=', state.latestRows.length, 'generated_at=', state.generatedAt);
 
   if (els.metric) {
@@ -1945,7 +3045,10 @@ async function main(){
   if (els.topN){
     els.topN.addEventListener("input", () => {
       const v = parseInt(els.topN.value, 10);
-      if (Number.isFinite(v)) state.topN = v;
+      if (Number.isFinite(v)) {
+        state.topN = Math.max(5, Math.min(200, v));
+        if (String(state.topN) !== els.topN.value) els.topN.value = String(state.topN);
+      }
       syncURL();
       renderAll();
     });
@@ -1979,20 +3082,34 @@ async function main(){
   if (els.copyShareURL) {
     els.copyShareURL.addEventListener("click", async () => {
       syncURL();
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        els.copyShareURL.textContent = "Copied";
-      } catch {
-        window.prompt("Copy this view URL", window.location.href);
-      }
+      const copied = await copyTextToClipboard(window.location.href);
+      els.copyShareURL.textContent = copied ? "Copied" : "URL ready in address bar";
       setTimeout(() => { els.copyShareURL.textContent = "Copy view URL"; }, 1500);
     });
   }
   if (els.scenarioPartner) {
-    els.scenarioPartner.addEventListener("change", renderScenarioBaseline);
+    els.scenarioPartner.addEventListener("change", () => {
+      syncURL();
+      renderScenarioBaseline();
+    });
   }
   if (els.scenarioProduct) {
-    els.scenarioProduct.addEventListener("change", renderScenarioBaseline);
+    els.scenarioProduct.addEventListener("change", () => {
+      syncURL();
+      renderScenarioBaseline();
+    });
+  }
+  for (const [element, property] of [
+    [els.scenarioTariffBase, "tariffBase"],
+    [els.scenarioTariffChange, "tariffChange"],
+    [els.scenarioElasticity, "elasticity"],
+    [els.scenarioPassThrough, "passThrough"],
+  ]) {
+    element?.addEventListener("input", syncURL);
+    element?.addEventListener("change", () => {
+      element.value = String(currentViewState()[property]);
+      syncURL();
+    });
   }
   if (els.scenarioForm) {
     els.scenarioForm.addEventListener("submit", event => {
@@ -2007,6 +3124,43 @@ async function main(){
       renderStrategicProducts();
     });
   }
+  if (els.chipStageFilter) {
+    els.chipStageFilter.addEventListener("change", () => {
+      state.chipStage = els.chipStageFilter.value;
+      syncURL();
+      renderSemiconductorAtlas();
+    });
+  }
+  if (els.chipCountryFilter) {
+    els.chipCountryFilter.addEventListener("change", () => {
+      state.chipCountry = els.chipCountryFilter.value;
+      syncURL();
+      renderSemiconductorAtlas();
+    });
+  }
+  const handleChipNavigation = event => {
+    const stageButton = event.target.closest("[data-chip-stage]");
+    const countryButton = event.target.closest("[data-chip-country]");
+    if (stageButton?.dataset.chipStage) {
+      state.chipStage = stageButton.dataset.chipStage;
+      syncURL();
+      renderSemiconductorAtlas();
+      return;
+    }
+    if (countryButton?.dataset.chipCountry) {
+      state.chipCountry = countryButton.dataset.chipCountry;
+      syncURL();
+      renderSemiconductorAtlas();
+    }
+  };
+  els.chipValueChain?.addEventListener("click", handleChipNavigation);
+  els.chipRoleLandscape?.addEventListener("click", handleChipNavigation);
+  els.chipDistribution?.addEventListener("click", handleChipNavigation);
+  els.chipDownloadCSV?.addEventListener("click", downloadChipCSV);
+  els.chipScenarioForm?.addEventListener("submit", event => {
+    event.preventDefault();
+    runChipScenario();
+  });
   window.addEventListener("popstate", () => {
     const view = parseViewState(window.location.search);
     state.metric = view.metric;
@@ -2021,10 +3175,14 @@ async function main(){
     state.tableQuery = view.query;
     state.tab = view.tab;
     state.strategicSector = view.sector;
+    state.chipStage = view.chipStage;
+    state.chipCountry = view.chipCountry;
     state.selectedRow = null;
     state.highlightKey = null;
     syncExplorerControls();
     populateStrategicControls();
+    populateChipControls();
+    syncScenarioControls(view);
     refreshRows({ syncURL: false });
     setActiveTab(view.tab, { syncURL: false });
     const selected = state.rows.find(row => row.iso3 === view.country);
@@ -2071,6 +3229,11 @@ function syncColorLegend(){
 
 main().catch(err => {
   console.error(err);
+  renderDataHealth(false);
+  els.retryData?.addEventListener("click", () => window.location.reload(), { once: true });
+  if (els.dataStatus) {
+    els.dataStatus.textContent = "Headline trade dataset unavailable.";
+  }
   if (els.indicators) {
     els.indicators.textContent = "Failed to load data: " + String(err);
   }

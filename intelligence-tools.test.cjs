@@ -4,6 +4,7 @@ const {
   buildAnchorNetwork,
 	buildPartnerNetwork,
   buildIntelligenceProfile,
+  exposureMetrics,
   estimateTariffScenario,
   rankExposureRows,
   selectPreferredTariffs,
@@ -22,11 +23,25 @@ test("profile derives transparent two-partner exposure signals", () => {
   const profile = buildIntelligenceProfile(rows[0]);
   assert.equal(profile.total, 400);
   assert.equal(profile.chinaShare, 0.75);
+  assert.equal(profile.exposureBalance, -0.5);
+  assert.equal(profile.dualDependency, 0.5);
+  assert.equal(profile.position, "China-leaning");
+  assert.equal(profile.direction, "toward China");
   assert.equal(profile.concentration, 0.625);
   assert.equal(profile.netBalance, -120);
-  assert.equal(profile.growthDivergence, 0.25);
+  assert.equal(profile.growthDivergence, -0.25);
   assert.match(profile.scope, /USA and China/);
   assert.equal(profile.signals.length, 2);
+});
+
+test("exposure balance makes the US-China lens and movement direction explicit", () => {
+  const metrics = exposureMetrics(60, 40, 40, 60);
+  assert.ok(Math.abs(metrics.exposureBalance - 0.2) < 1e-12);
+  assert.ok(Math.abs(metrics.previousBalance - (-0.2)) < 1e-12);
+  assert.ok(Math.abs(metrics.directionShift - 0.4) < 1e-12);
+  assert.equal(metrics.position, "US-leaning");
+  assert.equal(metrics.direction, "toward USA");
+  assert.equal(metrics.dualDependency, 0.8);
 });
 
 test("ranking and anchor network retain values without claiming routes", () => {

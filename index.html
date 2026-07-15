@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Explore reproducible trade, supply-chain exposure, product, quality, and scenario intelligence." />
+  <meta name="description" content="See where economies and semiconductor supply chains sit—and move—between the United States and China using reproducible public data." />
   <meta name="referrer" content="no-referrer" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagcdn.com; connect-src 'self' https://api.worldbank.org https://api.gdeltproject.org; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
   <title>TradeGravity – US/CN Trade Data Explorer</title>
@@ -12,6 +12,8 @@
   <script src="./data-tools.js"></script>
   <script src="./explorer-tools.js"></script>
   <script src="./intelligence-tools.js"></script>
+  <script src="./semiconductor-tools.js"></script>
+  <script src="./experience-tools.js"></script>
   <script src="./news-tools.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 </head>
@@ -20,7 +22,7 @@
   <header class="topbar">
     <div class="brand">
       <div class="title">TradeGravity</div>
-      <div class="subtitle">From reproducible trade observations to supply-chain exposure signals. Every analytical view keeps its source scope, assumptions, and availability visible.</div>
+      <div class="subtitle">A public-data lens on how economies and strategic supply chains sit—and move—between the United States and China. Sources, scope, assumptions, and gaps stay visible.</div>
       <div class="datasetMeta">
         <span id="dataStatus">Loading dataset metadata…</span>
         <a id="sourceLink" href="https://wits.worldbank.org/" target="_blank" rel="noopener noreferrer">Data source</a>
@@ -102,15 +104,40 @@
     </div>
   </header>
 
+  <section id="dataHealthBanner" class="dataHealthBanner is-loading" role="status" aria-live="polite" aria-label="Published data status">
+    <div class="dataHealthCopy">
+      <span id="dataHealthBadge" class="dataHealthBadge">Checking data</span>
+      <span id="dataHealthText">Validating publication coverage and refresh status…</span>
+    </div>
+    <button id="retryData" class="textButton" type="button" hidden>Retry data load</button>
+  </section>
+
   <nav class="tabBar" aria-label="Dashboard sections">
     <div id="dashboardTabs" class="tabList" role="tablist" aria-label="TradeGravity dashboard">
       <button id="tabButton-overview" class="tabButton is-active" type="button" role="tab" aria-selected="true" aria-controls="tab-overview" data-tab="overview">Overview</button>
-      <button id="tabButton-intelligence" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-intelligence" data-tab="intelligence" tabindex="-1">Intelligence</button>
+      <button id="tabButton-intelligence" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-intelligence" data-tab="intelligence" tabindex="-1">US–China Lens</button>
+      <button id="tabButton-semiconductors" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-semiconductors" data-tab="semiconductors" tabindex="-1">Chip Lens</button>
       <button id="tabButton-products" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-products" data-tab="products" tabindex="-1">Products</button>
       <button id="tabButton-quality" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-quality" data-tab="quality" tabindex="-1">Data &amp; Quality</button>
       <button id="tabButton-lab" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-lab" data-tab="lab" tabindex="-1">Scenario Lab</button>
     </div>
   </nav>
+
+  <section class="viewUtility" aria-label="Active view context and export tools">
+    <div class="viewContext" aria-live="polite">
+      <div><span class="contextLabel">Metric</span><b id="metricContext">Total trade</b><span id="metricContextDefinition">Exports plus imports reported by each country for the selected partner.</span></div>
+      <div><span class="contextLabel">Observation</span><b id="periodContext">Loading periods…</b><span>Observation period is not the pipeline refresh time.</span></div>
+      <div><span class="contextLabel">Filters</span><b id="filterContext">All reporters</b><span id="filterContextDetail">Same-period comparison · no country selected.</span></div>
+      <div><span class="contextLabel">Limit</span><b id="scopeContext">Two-anchor scope</b><span id="scopeContextLimit">USA/China observations are not complete world trade.</span></div>
+    </div>
+    <div class="viewActions">
+      <button id="openOnboarding" class="btn" type="button">30-sec guide</button>
+      <button id="openMethodology" class="btn" type="button">Definitions &amp; limits</button>
+      <button id="exportPNG" class="btn" type="button">PNG snapshot</button>
+      <button id="exportCSV" class="btn" type="button">CSV data</button>
+      <button id="exportReport" class="btn" type="button">Summary report</button>
+    </div>
+  </section>
 
   <div id="mainContent" tabindex="-1">
   <section id="tab-overview" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-overview" data-tab-panel="overview">
@@ -179,15 +206,15 @@
   <section id="tab-intelligence" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-intelligence" data-tab-panel="intelligence" hidden>
     <div class="sectionIntro">
       <div>
-        <span class="eyebrow">Decision support · descriptive</span>
-        <h1>Trade exposure intelligence</h1>
-        <p>Signals are derived only from the selected USA/China observations. They indicate exposure worth investigating, not shipment routes, causality, fraud, or investment advice.</p>
+        <span class="eyebrow">Explicit perspective · neutral observations</span>
+        <h1>Position between the United States and China</h1>
+        <p>Read a country in four steps: current two-anchor position, direction of movement, contributing trade, and evidence limits. The lens is explicit; the underlying reported values are not altered.</p>
       </div>
 	  <span id="intelligenceScopeBadge" class="scopeBadge">Two-anchor scope</span>
     </div>
     <div class="intelligenceGrid">
       <article class="analysisCard intelligenceProfile" aria-labelledby="intelligenceTitle">
-        <div class="analysisHeader"><div><h2 id="intelligenceTitle">Selected-country signals</h2><p>Concentration, balance, and partner growth divergence with explicit thresholds.</p></div></div>
+        <div class="analysisHeader"><div><h2 id="intelligenceTitle">1. Current position and direction</h2><p>US/China shares, exposure balance, dual exposure, and movement from the comparable prior period.</p></div></div>
         <div id="intelligenceSummary" class="analysisBody subtle" aria-live="polite">Select a country in Overview or the ranking below.</div>
       </article>
       <article class="analysisCard networkCard" aria-labelledby="networkTitle">
@@ -198,13 +225,104 @@
         </div>
       </article>
       <article class="analysisCard rankingCard" aria-labelledby="rankingTitle">
-        <div class="analysisHeader"><div><h2 id="rankingTitle">Exposure ranking</h2><p>Compare scale, China share, concentration, balance, and current growth signals.</p></div></div>
+        <div class="analysisHeader"><div><h2 id="rankingTitle">Country position map</h2><p>Compare scale, current lean, movement, and dual exposure within the explicit two-anchor scope.</p></div></div>
         <div class="tableScroll compactTableScroll" tabindex="0">
           <table class="tradeTable compactTable">
-            <thead><tr><th>Reporter</th><th class="numeric">Observed value</th><th class="numeric">China share</th><th class="numeric">2-partner HHI</th><th class="numeric">Net balance</th><th>Signal</th></tr></thead>
+            <thead><tr><th>Reporter</th><th class="numeric">Observed value</th><th class="numeric">USA share</th><th class="numeric">China share</th><th>Position</th><th>Movement</th><th class="numeric">Dual exposure</th></tr></thead>
             <tbody id="exposureRankingBody"></tbody>
           </table>
         </div>
+      </article>
+      <article class="analysisCard rankingCard" aria-labelledby="mirrorTitle">
+        <div class="analysisHeader"><div><h2 id="mirrorTitle">4. Mirror-reporting check</h2><p>Compare the selected country’s report with the USA/China counterpart report. Differences are diagnostics, not adjusted truth or evidence of evasion.</p></div><a href="./data/mirror/index.json" target="_blank" rel="noopener noreferrer">Mirror index</a></div>
+        <div id="mirrorDiagnostics" class="analysisBody subtle" aria-live="polite">Select a country with a published counterpart report.</div>
+      </article>
+    </div>
+  </section>
+
+  <section id="tab-semiconductors" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-semiconductors" data-tab-panel="semiconductors" hidden>
+    <div class="sectionIntro chipIntro">
+      <div>
+        <span class="eyebrow">US–China specialist lens · open/public data only</span>
+        <h1>US–China Chip Supply Chain Lens</h1>
+        <p>See how each semiconductor stage and connector economy is positioned between US and Chinese demand, how that position is moving, and which official policies or projects form the context. Customs observations, context, and estimates remain separate.</p>
+      </div>
+      <span id="chipCoverageBadge" class="scopeBadge warningBadge">Checking coverage…</span>
+    </div>
+
+    <section class="chipControlBar" aria-label="Semiconductor atlas controls">
+      <label class="field"><span class="label">Value-chain stage</span><select id="chipStageFilter"><option value="all">All stages</option></select></label>
+      <label class="field"><span class="label">Country context</span><select id="chipCountryFilter"><option value="KOR">Korea, Rep.</option></select></label>
+      <div id="chipCoverageSummary" class="chipCoverageSummary" role="status" aria-live="polite">Loading the stage registry and publication gate…</div>
+      <button id="chipDownloadCSV" class="btn" type="button">Export stage CSV</button>
+    </section>
+
+    <section class="chipTrendStrip" aria-labelledby="chipTrendTitle">
+      <div class="chipSectionHeading"><div><span class="eyebrow">Current structural shifts</span><h2 id="chipTrendTitle">What is changing</h2></div><span class="evidenceTag">External context · dated sources</span></div>
+      <div id="chipTrends" class="chipTrendGrid subtle" aria-live="polite">Loading current semiconductor trends…</div>
+    </section>
+
+    <section class="chipAtlasSection" aria-labelledby="chipChainTitle">
+      <div class="chipSectionHeading">
+        <div><span class="eyebrow">Stage model</span><h2 id="chipChainTitle">End-to-end value chain</h2></div>
+        <span class="analysisNote">Stage totals can overlap where one HS6 proxy serves multiple stages; do not add them together.</span>
+      </div>
+      <div id="chipValueChain" class="chipValueChain subtle" aria-live="polite">Loading value-chain stages…</div>
+    </section>
+
+    <section class="chipAtlasSection" aria-labelledby="chipLandscapeTitle">
+      <div class="chipSectionHeading">
+        <div><span class="eyebrow">Strategic connector context</span><h2 id="chipLandscapeTitle">Country–stage role matrix</h2></div>
+        <span class="analysisNote">Curated roles are qualitative context, not market shares. Select a country to compare its separately observed trade.</span>
+      </div>
+      <div id="chipRoleLandscape" class="chipRoleLandscape subtle" aria-live="polite">Loading country-stage roles…</div>
+    </section>
+
+    <div class="chipAnalysisGrid">
+      <article class="analysisCard" aria-labelledby="chipDistributionTitle">
+        <div class="analysisHeader"><div><h2 id="chipDistributionTitle">Stage position between USA and China</h2><p>Stage-mapped HS6 observations split by the two anchors—not global supplier share or production capacity.</p></div></div>
+        <div id="chipDistribution" class="analysisBody subtle" aria-live="polite">Select a stage to inspect its observed distribution.</div>
+      </article>
+      <article class="analysisCard" aria-labelledby="chipCountryTitle">
+        <div class="analysisHeader"><div><h2 id="chipCountryTitle">Country position by stage</h2><p>Current lean and dual exposure come from customs observations; curated ecosystem roles remain separate context.</p></div></div>
+        <div id="chipCountryProfile" class="analysisBody subtle" aria-live="polite">Loading country roles…</div>
+      </article>
+    </div>
+
+    <section class="chipAtlasSection" aria-labelledby="chipMonthlyTitle">
+      <div class="chipSectionHeading"><div><span class="eyebrow">Recent turning point · focused monthly data</span><h2 id="chipMonthlyTitle">12-month USA–China direction</h2></div><span class="evidenceTag">UN Comtrade · selected HS6</span></div>
+      <div id="chipMonthlySignals" class="analysisBody subtle" aria-live="polite">Choose a country with monthly connector coverage.</div>
+    </section>
+
+    <div class="chipAnalysisGrid chipLowerGrid">
+      <article class="analysisCard" aria-labelledby="chipTimelineTitle">
+        <div class="analysisHeader"><div><h2 id="chipTimelineTitle">Policy and investment timeline</h2><p>Official events are filtered by the active stage and ordered by effective or announcement date.</p></div></div>
+        <div id="chipTimeline" class="analysisBody subtle" aria-live="polite">Loading policy events…</div>
+      </article>
+      <article class="analysisCard" aria-labelledby="chipCapacityTitle">
+        <div class="analysisHeader"><div><h2 id="chipCapacityTitle">Capacity and project signals</h2><p>Official projects and industry forecasts retain their stated status; announcements are never counted as operating capacity.</p></div></div>
+        <div id="chipCapacitySignals" class="analysisBody subtle" aria-live="polite">Loading capacity signals…</div>
+      </article>
+      <article class="analysisCard chipScenarioWide" aria-labelledby="chipScenarioTitle">
+        <div class="analysisHeader"><div><h2 id="chipScenarioTitle">Stage exposure sensitivity</h2><p>Apply a transparent disruption and substitution assumption to the selected observed stage value.</p></div><span class="statusPill warning">Illustrative</span></div>
+        <form id="chipScenarioForm" class="chipScenarioForm">
+          <div id="chipScenarioBaseline" class="scenarioSourceNote">Choose a country and specific stage with published observations.</div>
+          <label><span>Disruption assumption (%)</span><input id="chipDisruption" type="number" min="0" max="100" step="1" value="20" /></label>
+          <label><span>Substitutable share (%)</span><input id="chipSubstitution" type="number" min="0" max="100" step="1" value="25" /></label>
+          <button class="btn primaryBtn" type="submit">Run sensitivity</button>
+        </form>
+        <div id="chipScenarioResult" class="analysisBody subtle" aria-live="polite">No sensitivity has been run.</div>
+      </article>
+    </div>
+
+    <div class="chipAnalysisGrid chipEvidenceGrid">
+      <article class="analysisCard" aria-labelledby="chipSourcesTitle">
+        <div class="analysisHeader"><div><h2 id="chipSourcesTitle">Free/public evidence register</h2><p>Every contextual trend and policy event resolves to a dated, publicly accessible source; no paid dataset is required.</p></div><a href="./data/semiconductors/reference.json" target="_blank" rel="noopener noreferrer">Reference JSON</a></div>
+        <div id="chipSources" class="analysisBody subtle" aria-live="polite">Loading evidence register…</div>
+      </article>
+      <article class="analysisCard" aria-labelledby="chipCaveatsTitle">
+        <div class="analysisHeader"><div><h2 id="chipCaveatsTitle">Measurement boundaries</h2><p>What this atlas can and cannot support.</p></div></div>
+        <div id="chipCaveats" class="analysisBody subtle" aria-live="polite">Loading measurement notes…</div>
       </article>
     </div>
   </section>
@@ -323,6 +441,45 @@
     </div>
   </section>
   </div>
+
+  <dialog id="onboardingDialog" class="appDialog onboardingDialog" aria-labelledby="onboardingTitle">
+    <div class="dialogHeader">
+      <div><span class="eyebrow">30-second orientation</span><h2 id="onboardingTitle">Turn a country into a reproducible trade view</h2></div>
+      <button class="iconButton" type="button" data-close-dialog="onboardingDialog" aria-label="Close onboarding">×</button>
+    </div>
+    <div class="onboardingSteps">
+      <article><span>01</span><h3>Choose a reporter</h3><p>Select a country tile. USA and China are partner anchors, not inferred shipment routes.</p></article>
+      <article><span>02</span><h3>Check the clocks</h3><p>Read each observation period and comparison quality. Pipeline refresh and recent headlines use different dates.</p></article>
+      <article><span>03</span><h3>Inspect and reproduce</h3><p>Use Intelligence, Products, and Data &amp; Quality, then export or copy the exact view URL.</p></article>
+    </div>
+    <div class="dialogCallout"><b>Interpretation rule:</b> TradeGravity surfaces descriptive exposure signals. It does not prove causality, physical rerouting, fraud, or investment outcomes.</div>
+    <div class="dialogActions">
+      <button id="dismissOnboarding" class="btn" type="button">Explore on my own</button>
+      <button id="startSampleView" class="btn primaryBtn" type="button">Start with Viet Nam</button>
+    </div>
+  </dialog>
+
+  <dialog id="methodologyDialog" class="appDialog methodologyDialog" aria-labelledby="methodologyTitle">
+    <div class="dialogHeader">
+      <div><span class="eyebrow">Definitions at a glance</span><h2 id="methodologyTitle">What this view means—and does not mean</h2></div>
+      <button class="iconButton" type="button" data-close-dialog="methodologyDialog" aria-label="Close definitions and limits">×</button>
+    </div>
+    <div class="definitionGrid">
+      <article><h3>Total trade</h3><p>Reporter exports plus reporter imports with the selected partner.</p></article>
+      <article><h3>Exports / imports</h3><p>Flows are recorded from each reporter country's perspective, with USA or China as partner.</p></article>
+      <article><h3>USA / China share</h3><p>Each anchor divided by USA plus China in this two-anchor view. Neither is a whole-world market share.</p></article>
+      <article><h3>Exposure balance</h3><p>USA share minus China share. Positive means US-leaning; negative means China-leaning within the two anchors.</p></article>
+      <article><h3>Position shift</h3><p>Current balance minus the previous comparable balance. Its sign shows movement toward USA or China, not causality.</p></article>
+      <article><h3>Dual exposure</h3><p>Twice the smaller anchor share. It describes how material both anchors are, not whole-world dependency.</p></article>
+      <article><h3>Two-partner HHI</h3><p>Concentration across the two published anchors only. It is not whole-world supplier concentration.</p></article>
+      <article><h3>Latest by reporter</h3><p>Uses each reporter's latest published observations. Select an exact period for cross-country comparisons.</p></article>
+      <article><h3>Growth</h3><p>Change from the published previous period shown for that observation; missing baselines remain unavailable.</p></article>
+      <article><h3>Normalized values</h3><p>Per-capita and GDP-share views combine trade with the published World Bank country context and its own year.</p></article>
+      <article><h3>Headlines</h3><p>Recent GDELT headlines are optional context. Their rolling window is not aligned to historical trade periods.</p></article>
+    </div>
+    <div id="methodologyCurrentView" class="dialogCallout">Loading the active view definition…</div>
+    <div class="dialogActions"><button class="btn primaryBtn" type="button" data-close-dialog="methodologyDialog">Got it</button></div>
+  </dialog>
 
   <div id="tooltip" class="tooltip" role="status" aria-live="polite" style="display:none;"></div>
   <script src="./app.js"></script>

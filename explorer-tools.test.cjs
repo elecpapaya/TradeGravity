@@ -18,18 +18,37 @@ const series = [{ iso3: "KOR", points: [
 ]}];
 
 test("view state round-trips supported filters and rejects unsafe values", () => {
-  const parsed = parseViewState("?metric=export&period=Y%3A2023&mode=all&group=asean&top=40&country=kor&tab=intelligence&sector=semiconductors");
+  const parsed = parseViewState("?metric=export&period=Y%3A2023&mode=all&group=asean&top=40&country=kor&tab=lab&sector=semiconductors&scenario_partner=chn&scenario_product=854231&tariff_base=7.5&tariff_change=25&elasticity=-2&pass_through=.75");
   assert.equal(parsed.metric, "export");
   assert.equal(parsed.period, "Y:2023");
   assert.equal(parsed.group, "ASEAN");
   assert.equal(parsed.country, "KOR");
-  assert.equal(parsed.tab, "intelligence");
+  assert.equal(parsed.tab, "lab");
   assert.equal(parsed.sector, "semiconductors");
+  assert.equal(parsed.scenarioPartner, "chn");
+  assert.equal(parsed.scenarioProduct, "854231");
+  assert.equal(parsed.tariffBase, 7.5);
+  assert.equal(parsed.tariffChange, 25);
+  assert.equal(parsed.elasticity, -2);
+  assert.equal(parsed.passThrough, 0.75);
   assert.match(serializeViewState(parsed), /period=Y%3A2023/);
+  assert.match(serializeViewState(parsed), /scenario_product=854231/);
   assert.equal(parseViewState("?metric=bogus&period=javascript:alert(1)").metric, "trade");
   assert.equal(parseViewState("?metric=bogus&period=javascript:alert(1)").period, "latest");
   assert.equal(parseViewState("?tab=javascript:alert(1)").tab, "overview");
   assert.equal(parseViewState("?sector=../../secret").sector, "all");
+  const chipView = parseViewState("?tab=semiconductors&chip_stage=memory_hbm&chip_country=kor");
+  assert.equal(chipView.tab, "semiconductors");
+  assert.equal(chipView.chipStage, "memory_hbm");
+  assert.equal(chipView.chipCountry, "KOR");
+  assert.match(serializeViewState(chipView), /chip_stage=memory_hbm/);
+  const bounded = parseViewState("?scenario_partner=evil&scenario_product=../../x&tariff_base=999&tariff_change=-999&elasticity=2&pass_through=9");
+  assert.equal(bounded.scenarioPartner, "usa");
+  assert.equal(bounded.scenarioProduct, "");
+  assert.equal(bounded.tariffBase, 300);
+  assert.equal(bounded.tariffChange, -100);
+  assert.equal(bounded.elasticity, -0.05);
+  assert.equal(bounded.passThrough, 1);
 });
 
 test("period derivation calculates comparable rows and previous-period growth", () => {
