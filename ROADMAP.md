@@ -32,30 +32,30 @@ TradeGravity is maintained as a small, inspectable public-data pipeline. The roa
 - Collect and publish WITS/TRAINS strategic-HS6 tariffs with AVE/reported identity and fallback behavior.
 - Publish reported UN Comtrade multi-partner matrices and selected-country partner networks without route claims.
 - Connect published MFN tariffs and HS6 import baselines to the transparent scenario sensitivity lab.
+- Publish the reviewed [`v0.1.0` release](https://github.com/elecpapaya/TradeGravity/releases/tag/v0.1.0) using the documented checklist.
 
 ## Near term: adoption evidence and release operations
 
-- Expand integration coverage for collection and end-to-end publishing failures.
-- Publish the first tagged release using the documented checklist.
-- Run the documented task with at least three students, researchers, or developers and publish consented findings as GitHub issues.
-- Track task completion, interpretation errors, and time-to-answer in `docs/USER_TESTING.md`.
+- [Add browser end-to-end coverage for the documented ASEAN task](https://github.com/elecpapaya/TradeGravity/issues/8), including narrow and desktop viewports.
+- Run the documented task with at least three students, researchers, or developers and publish consented findings through [the public study tracker](https://github.com/elecpapaya/TradeGravity/issues/3).
+- Track task completion, interpretation errors, and time-to-answer in [`docs/USER_TESTING.md`](docs/USER_TESTING.md); never substitute synthetic sessions for real participants.
 - Publish and maintain the reproducible ASEAN example notebook.
 
 ## Next: usability and analytical depth
 
 - Add constant-price or deflator-aware normalization; current values are nominal.
-- Add product-share changes across multiple years when provider quotas permit reliable collection.
-- Improve chart keyboard navigation, screen-reader summaries, and small-screen layouts.
-- Add automated magnitude and schema anomaly checks.
-- Add bilateral mirror-statistics diagnostics and explicit CIF/FOB, lag, and indirect-trade reconciliation assumptions.
+- [Add product-share changes across multiple years](https://github.com/elecpapaya/TradeGravity/issues/12) when provider quotas permit reliable collection.
+- [Improve chart keyboard navigation and screen-reader summaries](https://github.com/elecpapaya/TradeGravity/issues/9); continue testing small-screen layouts.
+- [Add automated magnitude and cross-file schema anomaly checks](https://github.com/elecpapaya/TradeGravity/issues/10).
+- [Add bilateral mirror-statistics diagnostics](https://github.com/elecpapaya/TradeGravity/issues/11) with explicit CIF/FOB, lag, and indirect-trade reconciliation assumptions.
 - Prototype ESI/ECI/ICI/SPDI/RPI only after formulas, benchmark datasets, uncertainty, and validation cases are documented.
 - Add tariff-change decomposition and Marimekko/waterfall views when the required multi-year product coverage is reliable.
-- Add versioned scenario manifests and reproducible result artifacts before introducing SMART-like substitution or welfare outputs.
+- [Add versioned scenario manifests and reproducible result artifacts](https://github.com/elecpapaya/TradeGravity/issues/13) before introducing SMART-like substitution or welfare outputs.
 
 ## Later: provider resilience and interpretation
 
 - Add configurable provider fallback without mixing provenance silently.
-- Track data lag and coverage changes across scheduled runs, not only within the latest artifact.
+- [Track data lag and coverage changes across scheduled runs](https://github.com/elecpapaya/TradeGravity/issues/7), not only within the latest artifact.
 - Expand grounded explanations after external evaluation confirms they reduce rather than increase interpretation errors.
 
 Priorities may change when upstream APIs change or users report higher-impact needs. Roadmap discussion should happen in a GitHub issue so decisions remain public and reviewable.

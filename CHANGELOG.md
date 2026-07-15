@@ -4,6 +4,22 @@ All notable changes to TradeGravity will be documented in this file. The project
 
 ## Unreleased
 
+## [0.1.1] - 2026-07-16
+
+### Added
+
+- A real-dashboard README screenshot and a preconfigured 30-second ASEAN/Viet Nam trial path.
+- A reusable, privacy-preserving external user-study recruitment kit.
+- Public `v0.2.0` roadmap issues with scoped acceptance criteria.
+- Deterministic browser tests for trade-focused news relevance, recency, deduplication, and safe links.
+
+### Changed
+
+- The optional GDELT panel now requests trade and supply-chain topics within a 14-day window, rejects irrelevant or stale titles, removes duplicate headlines, and displays its experimental scope and limitations.
+- Main-branch Pages deployment reuses the last published dataset instead of calling upstream providers on every code push.
+- Dashboard controls, tabs, treemaps, labels, and focus styling adapt more reliably to desktop and narrow layouts.
+- Updated `modernc.org/sqlite` from 1.29.10 to 1.53.0.
+
 ## [0.1.0] - 2026-07-15
 
 ### Added

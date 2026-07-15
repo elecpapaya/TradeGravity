@@ -4,7 +4,7 @@ Tagged releases provide stable citation and change-history points. Create releas
 
 ## 1. Prepare
 
-1. Choose a Semantic Versioning tag. The first public release is expected to be `v0.1.0`.
+1. Choose the next Semantic Versioning tag. Never reuse or move a published tag.
 2. Move relevant entries in `CHANGELOG.md` from **Unreleased** into a dated version section.
 3. Add the matching `version` and `date-released` values to `CITATION.cff`.
 4. Confirm that documentation, schema compatibility notes, and generated-data interpretation are current.
@@ -24,7 +24,8 @@ node --check site/security.js
 node --check site/data-tools.js
 node --check site/explorer-tools.js
 node --check site/intelligence-tools.js
-node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/structure.test.cjs
+node --check site/news-tools.js
+node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
 python -m pip install --disable-pip-version-check cffconvert==2.0.0
 cffconvert --validate
 go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
@@ -54,12 +55,12 @@ After the release-preparation pull request is merged:
 ```bash
 git switch main
 git pull --ff-only
-git tag -a v0.1.0 -m "TradeGravity v0.1.0"
-git push origin v0.1.0
-gh release create v0.1.0 --verify-tag --generate-notes --title "TradeGravity v0.1.0"
+git tag -a v0.1.1 -m "TradeGravity v0.1.1"
+git push origin v0.1.1
+gh release create v0.1.1 --verify-tag --generate-notes --title "TradeGravity v0.1.1"
 ```
 
-Replace `v0.1.0` with the prepared version. Do not move an existing public tag; publish a new patch version for corrections.
+Replace `v0.1.1` with the prepared version. Do not move an existing public tag; publish a new patch version for corrections.
 
 ## 4. Post-release checks
 

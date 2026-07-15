@@ -392,6 +392,17 @@ select option{background:#fff;color:#111}
   text-transform:uppercase;
   letter-spacing:.08em;
 }
+.experimentalBadge{
+  display:inline-block;
+  margin-left:5px;
+  padding:1px 5px;
+  border:1px solid rgba(231,211,124,.35);
+  border-radius:999px;
+  color:var(--accent);
+  font-size:9px;
+  letter-spacing:.04em;
+  vertical-align:1px;
+}
 .newsItem{
   margin-top:6px;
   font-size:12px;
@@ -404,6 +415,7 @@ select option{background:#fff;color:#111}
 .newsItem a:hover{
   text-decoration:underline;
 }
+.newsNote{margin-top:7px;font-size:11px;line-height:1.4}
 
 .tooltip{
   position:fixed;

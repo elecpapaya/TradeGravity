@@ -16,6 +16,14 @@ TradeGravity is an open-source pipeline and tabbed static intelligence dashboard
 - **Project roadmap:** [ROADMAP.md](ROADMAP.md)
 - **How to cite:** [CITATION.cff](CITATION.cff)
 
+## Try it in 30 seconds
+
+[![TradeGravity Intelligence view showing Viet Nam's reported partner network and transparent USA/China exposure signals](docs/assets/tradegravity-dashboard.png)](https://elecpapaya.github.io/TradeGravity/?period=Y%3A2023&group=ASEAN&country=VNM&tab=intelligence)
+
+1. Open the [ready-made ASEAN · Viet Nam · 2023 view](https://elecpapaya.github.io/TradeGravity/?period=Y%3A2023&group=ASEAN&country=VNM&tab=intelligence). The URL restores the period, group, country, and tab.
+2. Read **Selected-country signals**, then inspect the partner network. Its links are reported bilateral trade totals—not ports, firms, shipment paths, or proof of rerouting.
+3. Open **Products** for the HS2 mix and **Data & Quality** for provider, period, coverage, and warnings. Use **Copy view URL** or an export to retain the evidence behind an observation.
+
 ## Why this project exists
 
 Public trade data is valuable but often difficult to compare quickly across many countries. Source APIs use different response shapes, countries can have different latest reporting periods, and a raw table makes the relative scale of US- and China-linked trade hard to see.
@@ -26,7 +34,7 @@ TradeGravity provides a reproducible path from public source data to a lightweig
 
 TradeGravity is an early-stage project under active maintenance. A scheduled GitHub Actions workflow currently refreshes and deploys the public dataset every day. The default allowlist publishes 51 reporter countries; coverage can be changed through configuration.
 
-**Help test v0.1.0:** we are recruiting three students, researchers, or developers for a 15-minute, task-based evaluation. No setup or trade-data expertise is required. Start with [the public study tracker](https://github.com/elecpapaya/TradeGravity/issues/3), then submit only nonidentifying feedback through the linked form. Participation is voluntary, and public feedback is recorded only with consent.
+**Help test v0.1.1:** we are recruiting three students, researchers, or developers for a 15-minute, task-based evaluation. No setup or trade-data expertise is required. Start with [the public study tracker](https://github.com/elecpapaya/TradeGravity/issues/3) or reuse the [recruitment invitation](docs/USER_RECRUITMENT.md), then submit only nonidentifying feedback through the linked form. Participation is voluntary, and public feedback is recorded only with consent.
 
 The viewer is intended for exploration and education, not financial, legal, or policy advice. Its default comparison mode includes only reporters whose USA and China values use the same observation period. Users can opt into all available values, where mixed or stale periods remain visibly flagged.
 
@@ -53,7 +61,7 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 - A machine-readable `catalog.json` that separates ready, partial, and planned resources. Strategic HS6, tariffs, and bilateral matrices are published; reconciliation, value-added, and versioned scenario outputs remain planned.
 - Build-time evidence-grounded explanations with citation validation and deterministic fallback.
 - Year-over-year growth coloring when prior-period data is available.
-- Optional World Bank indicator and GDELT headline panels.
+- Optional World Bank indicators and an experimental GDELT trade/supply-chain headline panel with a 14-day window, title relevance checks, deduplication, source-country scope, and visible caveats.
 - Reporter allowlist for controlled coverage.
 - Daily collection and GitHub Pages deployment through GitHub Actions.
 
@@ -83,7 +91,7 @@ World Bank context ----------/                  |                    |
 | [WITS/TRAINS](https://wits.worldbank.org/WITS/WITS/Support%20Materials/Training/GTAP_UNCTAD_Tariff_Data.asp) | Product-level tariff schedules |
 | [UN Comtrade](https://comtradeplus.un.org/) | HS2/strategic HS6 trade and reported multi-partner totals |
 | [World Bank Open Data](https://data.worldbank.org/) | Optional country indicators in the viewer |
-| [GDELT](https://www.gdeltproject.org/) | Optional country-related headline panel |
+| [GDELT](https://www.gdeltproject.org/) | Optional, experimental trade/supply-chain headline context; keyword-filtered by publisher source country and never used in trade metrics |
 
 Exports and imports are reported from each reporter country's perspective, with `USA` or `CHN` on the partner side. Trade is calculated as exports plus imports. The publisher retains the period and period type used for each partner block so users can see data freshness.
 
@@ -155,7 +163,7 @@ To run the automated checks:
 ```bash
 go test ./...
 go vet ./...
-node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/structure.test.cjs
+node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
 ```
 
 ## Collector configuration

@@ -30,6 +30,10 @@ const intelligenceTools = globalThis.TradeGravityIntelligenceTools;
 if (!intelligenceTools) {
   throw new Error("TradeGravity intelligence helpers failed to load.");
 }
+const newsTools = globalThis.TradeGravityNewsTools;
+if (!newsTools) {
+  throw new Error("TradeGravity news helpers failed to load.");
+}
 const { encodeCSV, escapeHTML, normalizeISO2, normalizeISO3, safeHTTPSURL } = security;
 const { buildCSVMatrix: createCSVMatrix } = dataTools;
 const {
@@ -49,6 +53,12 @@ const {
   rankExposureRows,
   selectPreferredTariffs,
 } = intelligenceTools;
+const {
+  DEFAULT_MAX_ITEMS: NEWS_MAX,
+  DEFAULT_WINDOW_DAYS: NEWS_WINDOW_DAYS,
+  buildGdeltURL,
+  curateNewsArticles,
+} = newsTools;
 
 const els = {
   svgUSA: document.getElementById("svg-usa"),
@@ -162,7 +172,6 @@ const INDICATORS = [
 ];
 const indicatorCache = {};
 const indicatorPromises = {};
-const NEWS_MAX = 5;
 const newsCache = {};
 const newsPromises = {};
 
@@ -1750,19 +1759,25 @@ async function loadNews(iso2, key){
   if (newsPromises[key]) return newsPromises[key];
 
   const promise = (async () => {
-    const query = encodeURIComponent(`sourcecountry:${iso2.toUpperCase()}`);
-    const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=ArtList&maxrecords=${NEWS_MAX}&format=json`;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const articles = Array.isArray(data?.articles) ? data.articles : [];
-    const items = articles.map(article => ({
-      title: article.title || "Untitled",
-      url: article.url,
-      domain: article.domain || "",
-      seen: formatGdeltDate(article.seendate || "")
-    }));
-    const summary = { iso2, items };
+    const url = buildGdeltURL(iso2, { windowDays: NEWS_WINDOW_DAYS, maxRecords: 50 });
+    if (!url) return null;
+    let summary;
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) {
+        summary = { iso2: iso2.toUpperCase(), items: [], windowDays: NEWS_WINDOW_DAYS, status: "unavailable" };
+      } else {
+        const data = await res.json();
+        const articles = Array.isArray(data?.articles) ? data.articles : [];
+        const items = curateNewsArticles(articles, {
+          windowDays: NEWS_WINDOW_DAYS,
+          maxItems: NEWS_MAX,
+        });
+        summary = { iso2: iso2.toUpperCase(), items, windowDays: NEWS_WINDOW_DAYS, status: items.length ? "ok" : "empty" };
+      }
+    } catch {
+      summary = { iso2: iso2.toUpperCase(), items: [], windowDays: NEWS_WINDOW_DAYS, status: "unavailable" };
+    }
     newsCache[key] = summary;
     return summary;
   })();
@@ -1784,15 +1799,18 @@ function renderSnapshotHTML(indicators, news){
     sections.push(`<div class="subtle">No indicator data available.</div>`);
   }
 
-  sections.push(`<div class="subSectionTitle">Latest news</div>`);
+  sections.push(`<div class="subSectionTitle">Trade &amp; supply-chain headlines <span class="experimentalBadge">Experimental</span></div>`);
   sections.push(renderNewsHTML(news));
 
   return sections.join("");
 }
 
 function renderNewsHTML(news){
+  if (news?.status === "unavailable") {
+    return `<div class="subtle newsNote">Trade-focused headline context is temporarily unavailable from GDELT. This optional panel does not affect TradeGravity metrics.</div>`;
+  }
   if (!news || !Array.isArray(news.items) || news.items.length === 0) {
-    return `<div class="subtle">No recent news found. (Source: GDELT, by source country)</div>`;
+    return `<div class="subtle newsNote">No recent trade-focused headlines met the ${NEWS_WINDOW_DAYS}-day relevance filter. This optional panel does not affect TradeGravity metrics.</div>`;
   }
   const rows = news.items.map(item => {
     const title = escapeHTML(item.title || "Untitled");
@@ -1804,15 +1822,10 @@ function renderNewsHTML(news){
       : `<span>${title}</span>`;
     return `<div class="newsItem">${headline}${domain}${seen}</div>`;
   });
-  rows.push(`<div class="subtle" style="margin-top:6px;font-size:11px;">Source: GDELT (by source country)</div>`);
+  const scope = escapeHTML(news.iso2 || "selected");
+  const windowDays = Number(news.windowDays) || NEWS_WINDOW_DAYS;
+  rows.push(`<div class="subtle newsNote">GDELT DOC 2.0 · publisher source country: ${scope} · ${windowDays}-day window · keyword-filtered and deduplicated. Headlines may still be misclassified; verify the publisher article. This optional context does not affect trade metrics.</div>`);
   return rows.join("");
-}
-
-function formatGdeltDate(value){
-  if (!value) return "";
-  const match = String(value).match(/^(\d{4})(\d{2})(\d{2})/);
-  if (!match) return "";
-  return `${match[1]}-${match[2]}-${match[3]}`;
 }
 
 async function main(){
