@@ -2,6 +2,8 @@
 
 TradeGravity needs evidence that intended users can complete a real analytical task and interpret periods and provenance correctly. Maintainers must not invent participants, quotes, completion times, or findings.
 
+Recruitment copy and the maintainer checklist are in [USER_RECRUITMENT.md](USER_RECRUITMENT.md). The public coordination record is [issue #3](https://github.com/elecpapaya/TradeGravity/issues/3).
+
 ## Target participants
 
 Recruit at least three people outside the implementation team, ideally one student, one researcher or analyst, and one developer or data-tool user. Participation is voluntary. Do not collect names, employers, recordings, or sensitive information unless the participant explicitly consents to publication.
@@ -25,6 +27,7 @@ Record only consented, non-identifying results:
 - usability problems stated in their own words, quoted only with permission;
 - severity: blocks task, causes wrong interpretation, slows task, or cosmetic;
 - the tested release/commit, browser, and viewport class.
+- whether the trade-focused headline panel, if opened, was understood as experimental context rather than an input to the published trade metrics.
 
 ## Public record
 

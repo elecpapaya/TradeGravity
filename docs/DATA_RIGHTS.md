@@ -17,6 +17,8 @@ Generated JSON, charts, explanations, and CSV exports may contain transformed or
 | World Bank Open Data | Region, income, population, and GDP context published in `context.json` and joined into `latest.json`; optional live snapshot fields | [World Bank dataset terms summary](https://data.worldbank.org/summary-terms-of-use). Dataset-specific metadata can add or change conditions, especially for third-party indicators. |
 | GDELT | Recent headline metadata fetched in the browser; not included in `latest.json` | [GDELT terms of use](https://www.gdeltproject.org/about.html). GDELT asks users and redistributors to cite and link to the GDELT Project. Linked news articles remain on their publishers' sites. |
 
+The experimental headline panel requests recent trade and supply-chain terms, filters and deduplicates titles in the browser, and limits article links to HTTPS. Its `sourcecountry` scope describes the country assigned to the publishing outlet; it is not proof that the selected country is the subject of an article. API failure, rate limiting, and zero relevant results are displayed separately. Headline metadata is optional context and is never an input to TradeGravity's published trade values or analytical signals.
+
 Terms can change. These links are references, not a replacement for reading the controlling terms for an intended use.
 
 ## Recommended attribution record
