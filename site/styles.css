@@ -61,10 +61,10 @@ body{
 .datasetMeta a:hover,.datasetMeta a:focus-visible{color:var(--text);border-bottom-color:var(--text)}
 
 .controls{
-  display:flex;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:10px;
   align-items:flex-end;
-  flex-wrap:wrap;
 }
 .field{display:flex;flex-direction:column;gap:6px}
 .label{font-size:12px;color:var(--muted)}
@@ -77,6 +77,7 @@ input,select{
   color:var(--text);
   outline:none;
   min-width:120px;
+  font:inherit;
 }
 select{min-width:170px}
 select{background: rgba(255,255,255,.12); color:#fff}
@@ -108,22 +109,17 @@ select option{background:#fff;color:#111}
   border-color: rgba(255,255,255,.18);
 }
 .segBtn:hover{color:var(--text)}
-.segBtn:focus-visible,.tile:focus-visible,.btn:focus-visible,.tableCountryButton:focus-visible,.tableScroll:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+.segBtn:focus-visible,.btn:focus-visible,.tableCountryButton:focus-visible,.tableScroll:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
 
-.controls .field{
+.controls .field{min-width:0}
+.controls .field > input,
+.controls .field > select,
+.controls .field > .segmented{
+  width:100%;
   min-width:0;
 }
-.controls .field:has(.segmented){
-  flex:1 1 220px;
-}
-.controls .field:has(input){
-  flex:1 1 160px;
-}
-.controls .field:has(select){
-  flex:0 1 140px;
-}
-.controls .field:has(#topN){
-  flex:0 1 110px;
+.controls .field > select{
+  padding-right:30px;
 }
 .growthLegend{
   display:flex;
@@ -135,6 +131,8 @@ select option{background:#fff;color:#111}
   border:1px solid var(--border);
   background: rgba(255,255,255,.04);
 }
+.controls > .growthLegend,
+.controls > .btn{width:100%;min-width:0}
 .growthLegend.is-hidden{display:none}
 .legendBar{
   width:120px;
@@ -334,7 +332,7 @@ select option{background:#fff;color:#111}
   overflow:hidden;
 }
 .topbar .brand{flex:1 1 380px;min-width:280px}
-.topbar .controls{flex:2 1 760px}
+.topbar .controls{flex:2 1 760px;min-width:0}
 .tableHeader{
   display:flex;
   justify-content:space-between;
@@ -428,9 +426,17 @@ select option{background:#fff;color:#111}
 .tile.is-hi rect{stroke: rgba(231,211,124,.95); stroke-width: 2; opacity: .95}
 .tile.is-hi .tileLabel{fill: rgba(231,211,124,.98)}
 .tile.is-hi .tileValue{fill: rgba(231,211,124,.78)}
+.tile:focus{outline:none}
+.tile:focus-visible > rect{stroke:rgba(231,211,124,.98);stroke-width:3}
+
+@media (max-width: 1600px){
+  .topbar{flex-direction:column;padding:14px}
+  .topbar .brand,.topbar .controls{flex:none;width:100%}
+}
 
 @media (max-width: 900px){
-  .topbar{flex-direction:column;padding:14px}
+  .controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .controls .field:has(.segmented){grid-column:span 2}
   .layout{grid-template-columns:1fr;height:auto;overflow:visible}
   .canvas{height:720px}
   .side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -448,6 +454,11 @@ select option{background:#fff;color:#111}
   .tableActions{width:100%}
   .tableSearchLabel{width:100%}
   #tableSearch{flex:1 1 180px;min-width:0}
+}
+
+@media (max-width: 480px){
+  .controls{grid-template-columns:1fr}
+  .controls .field:has(.segmented){grid-column:auto}
 }
 
 /* Flag image tint/outline */

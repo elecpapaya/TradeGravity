@@ -405,6 +405,13 @@ function formatMetricValue(value){
   return exactNumberFormatter.format(Number(value));
 }
 
+function formatCompactMetricValue(value){
+  if (value == null || !Number.isFinite(Number(value))) return "—";
+  if (state.normalization === "gdp_share") return `${(Number(value) * 100).toFixed(2)}%`;
+  if (state.normalization === "per_capita") return `$${fmt(Number(value))}`;
+  return fmt(Number(value));
+}
+
 function appendTableCell(tableRow, value, className = "", title = ""){
   const cell = document.createElement("td");
   cell.textContent = String(value ?? "");
@@ -607,9 +614,10 @@ function applyHighlight(key){
 
 function buildTreemap(svgEl, side, rows){
   const svg = d3.select(svgEl);
-  svg.selectAll("*").remove();
-
   const { width, height } = svgEl.getBoundingClientRect();
+  if (width <= 0 || height <= 0) return;
+
+  svg.selectAll("*").remove();
   svg.attr("viewBox", `0 0 ${width} ${height}`);
 
   const rawChildren = rows.map(r => ({
@@ -706,7 +714,9 @@ function buildTreemap(svgEl, side, rows){
     .attr("class", "flagImg")
     .attr("href", d => {
       const iso2 = d.data.iso2;
-      return iso2 ? flagURL(iso2) : null;
+      const width = d.x1 - d.x0;
+      const height = d.y1 - d.y0;
+      return iso2 && width >= 32 && height >= 22 ? flagURL(iso2) : null;
     })
     .attr("x", 6)
     .attr("y", 6)
@@ -719,29 +729,38 @@ function buildTreemap(svgEl, side, rows){
     .attr("class","tileLabel")
     .attr("x", 6)
     .attr("y", 18)
-    .text(d => labelSet.has(d.data.iso3) ? d.data.iso3 : "")
+    .text(d => {
+      const width = d.x1 - d.x0;
+      const height = d.y1 - d.y0;
+      const minimumWidth = d.data.iso2 ? 56 : 30;
+      return labelSet.has(d.data.iso3) && width >= minimumWidth && height >= 24 ? d.data.iso3 : "";
+    })
     .attr("fill", "rgba(255,255,255,.78)")
     .attr("font-size", 12)
     .attr("font-family", "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace")
     .style("pointer-events","none")
     .attr("dx", d => {
       const w = (d.x1 - d.x0), h = (d.y1 - d.y0);
-      return (d.data.iso2 && w >= 32 && h >= 22) ? 24 : 0;
-    });
+      return (d.data.iso2 && w >= 56 && h >= 24) ? 24 : 0;
+    })
+    .attr("clip-path", d => `url(#${d.__clipId})`);
 
   nodes.append("text")
     .attr("class","tileValue")
     .attr("x", 6)
     .attr("y", 34)
-    .text(d => labelSet.has(d.data.iso3) ? formatMetricValue(d.data.value) : "")
+    .text(d => {
+      if (!labelSet.has(d.data.iso3)) return "";
+      const width = d.x1 - d.x0;
+      const height = d.y1 - d.y0;
+      const value = formatCompactMetricValue(d.data.value);
+      return height >= 42 && width >= value.length * 7 + 12 ? value : "";
+    })
     .attr("fill", "rgba(255,255,255,.55)")
     .attr("font-size", 11)
     .attr("font-family", "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace")
     .style("pointer-events","none")
-    .attr("dx", d => {
-      const w = (d.x1 - d.x0), h = (d.y1 - d.y0);
-      return (d.data.iso2 && w >= 32 && h >= 22) ? 24 : 0;
-    });
+    .attr("clip-path", d => `url(#${d.__clipId})`);
 
   nodes
     .on("mousemove", (ev, d) => {
@@ -1584,6 +1603,13 @@ function setActiveTab(tab, options = {}){
     panel.hidden = panel.dataset.tabPanel !== state.tab;
   });
   if (options.syncURL !== false) syncURL();
+  if (state.tab === "overview") {
+    requestAnimationFrame(() => {
+      buildTreemap(els.svgUSA, "usa", state.rows);
+      buildTreemap(els.svgCHN, "chn", state.rows);
+      applyHighlight(state.highlightKey);
+    });
+  }
   if (state.tab === "intelligence") renderIntelligence();
   if (state.tab === "lab") renderScenarioBaseline();
 }
