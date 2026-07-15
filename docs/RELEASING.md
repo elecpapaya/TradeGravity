@@ -26,6 +26,7 @@ node --test site/security.test.cjs site/data-tools.test.cjs site/structure.test.
 python -m pip install --disable-pip-version-check cffconvert==2.0.0
 cffconvert --validate
 go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+go run ./cmd/validator -dir examples/sample-data -min-reporters 3
 ```
 
 Confirm that all required pull-request checks pass. Then run the collector, publisher, and validator against the intended provider or verify the latest successful scheduled run:

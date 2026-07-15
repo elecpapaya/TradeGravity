@@ -29,6 +29,7 @@ node --check site/security.js
 node --check site/data-tools.js
 node --test site/security.test.cjs site/data-tools.test.cjs site/structure.test.cjs
 go run ./cmd/validator -dir cmd/validator/testdata/valid -min-reporters 1
+go run ./cmd/validator -dir examples/sample-data -min-reporters 3
 ```
 
 When changing `CITATION.cff`, install `cffconvert==2.0.0` and run `cffconvert --validate`; CI performs the same schema check.

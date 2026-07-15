@@ -86,6 +86,8 @@ Each partner block carries its own `period_type` and `period` because upstream r
 
 Values are nominal US dollars as supplied and normalized by the selected provider. TradeGravity does not combine providers silently.
 
+The schema describes structure and meaning, not a blanket license for upstream observations. See [DATA_RIGHTS.md](DATA_RIGHTS.md) for provider terms and attribution references.
+
 ## Compatibility
 
 Additive fields may be introduced within a schema version. Removing fields, changing meanings, or changing required types requires a schema-version change and release note. Consumers should ignore unknown fields but should not assume that every reporter has both partner blocks.

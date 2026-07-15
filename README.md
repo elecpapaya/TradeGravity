@@ -10,6 +10,8 @@ TradeGravity is an open-source pipeline and static web viewer for comparing how 
 - **Live demo:** https://elecpapaya.github.io/TradeGravity/
 - **System design:** [DESIGN.md](DESIGN.md)
 - **Published data schema:** [docs/DATA_SCHEMA.md](docs/DATA_SCHEMA.md)
+- **Reuse examples:** [docs/USAGE.md](docs/USAGE.md)
+- **Data rights and attribution:** [docs/DATA_RIGHTS.md](docs/DATA_RIGHTS.md)
 - **Project roadmap:** [ROADMAP.md](ROADMAP.md)
 - **How to cite:** [CITATION.cff](CITATION.cff)
 
@@ -81,6 +83,8 @@ The public deployment exposes stable machine-readable endpoints:
 
 When citing a result, record the repository URL, commit or release when applicable, provider, `generated_at` timestamp, and the observation period shown for each value. GitHub can generate citation formats from [CITATION.cff](CITATION.cff).
 
+Apache-2.0 covers the project code and original documentation, not rights in upstream observations or linked news. Review [docs/DATA_RIGHTS.md](docs/DATA_RIGHTS.md) and the selected provider's current terms before redistributing generated data.
+
 ## Requirements
 
 - Go 1.25.12+ (includes standard-library security fixes required by CI)
@@ -97,6 +101,22 @@ python -m http.server 8080
 ```
 
 Open `http://localhost:8080`.
+
+### Offline sample preview
+
+The production collector requires network access and can take several minutes. For UI or contribution work, copy the validated synthetic sample into the ignored output directory:
+
+```powershell
+New-Item -ItemType Directory -Force site/data
+Copy-Item examples/sample-data/*.json site/data/
+```
+
+```bash
+mkdir -p site/data
+cp examples/sample-data/*.json site/data/
+```
+
+Then serve `site/` as shown above. The three sample reporters and values are synthetic and are not evidence about real trade.
 
 To run the automated checks:
 

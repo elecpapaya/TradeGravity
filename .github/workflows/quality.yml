@@ -42,6 +42,9 @@ jobs:
       - name: Run vet
         run: go vet ./...
 
+      - name: Validate offline sample dataset
+        run: go run ./cmd/validator -dir examples/sample-data -min-reporters 3
+
       - name: Check browser JavaScript
         run: node --check site/app.js && node --check site/security.js && node --check site/data-tools.js
 
