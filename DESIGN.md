@@ -20,10 +20,26 @@ World Bank country data ──┘       │                       │           
 - `cmd/collector` normalizes WITS totals/history and Comtrade HS2 chapters. Reporter-level concurrency is bounded and provider rate limits remain global.
 - `internal/store/sqlite` uses schema-aware idempotent keys and migrates version 1 total-only databases.
 - `cmd/context` publishes country labels, region, income, project groups, population, and GDP.
-- `cmd/publisher` emits schema 2 totals, time series, product files, quality signals, and context-enriched latest rows.
+- `cmd/publisher` emits schema 2 totals, time series, product files, quality signals, context-enriched latest rows, and a resource catalog for chunk discovery.
 - `cmd/explainer` generates build-time explanations whose statements cite evidence IDs. OpenAI use is optional; deterministic fallback covers every reporter.
 - `cmd/validator` rejects internally inconsistent or incompletely grounded artifact sets before deployment.
-- `site/` is a static client. It never receives provider or OpenAI credentials.
+- `site/` is a static tabbed client. It never receives provider or OpenAI credentials.
+
+## Dashboard sections
+
+The client separates workflows without duplicating data state:
+
+- **Overview** preserves the two-anchor treemap, country snapshot, trend, and evidence-grounded explanation.
+- **Intelligence** derives scoped concentration, balance, growth-divergence signals, a two-anchor network, and an accessible ranking from the active filters.
+- **Products** loads reporter-partitioned HS2 files and exposes the planned HS6/tariff boundary.
+- **Data & Quality** combines the resource catalog, quality report, accessible table, and exports.
+- **Scenario Lab** provides an explicitly illustrative constant-elasticity tariff sensitivity calculation. It is not presented as SMART, a causal forecast, or a GDP/welfare model.
+
+The selected reporter and all filters are shared across tabs. The enumerated `tab` query parameter makes a workflow directly shareable and is restored by browser history.
+
+## Growth path for high-volume data
+
+`catalog.json` decouples resource discovery from individual artifact schemas. Every resource identifies grain, readiness, and partitioning. Current product data already uses an index plus reporter chunks; strategic HS6, tariff, bilateral-matrix, reconciliation, value-added, and scenario resources have planned contracts but no fabricated observations or URLs. New high-volume publishers should emit small manifests and bounded chunks rather than append millions of rows to `latest.json`.
 
 ## Observation model
 
@@ -73,7 +89,7 @@ Any failure produces deterministic rules output. The viewer shows generator meta
 
 ## Static explorer state
 
-The query string preserves metric, color, Top N, period, comparison mode, region, income, project group, normalization, reporter search, and selected country. URL parsing accepts only enumerated values and bounded strings. Popstate restores the view.
+The query string preserves tab, metric, color, Top N, period, comparison mode, region, income, project group, normalization, reporter search, and selected country. URL parsing accepts only enumerated values and bounded strings. Popstate restores the view.
 
 Filtering affects treemaps, the accessible table, and downloads. CSV is a raw flattened convenience export; filtered JSON records the view state. Machine consumers should prefer the canonical schema 2 artifacts documented in `docs/DATA_SCHEMA.md`.
 
@@ -90,4 +106,6 @@ The first release uses schema 2.0. Breaking field or meaning changes require a s
 - Current values are not inflation-adjusted.
 - Product collection currently publishes one selected year per scheduled run.
 - Explanations summarize observed evidence and do not infer causes.
+- Intelligence concentration covers only the published USA/China partner universe and is not a whole-world concentration measure.
+- The scenario lab uses user-supplied elasticity, tariff, and pass-through assumptions; production trade-diversion analysis still requires tariff schedules, substitution parameters, model versioning, and backtests.
 - External usability findings must be gathered from real, consented participants; the protocol is in `docs/USER_TESTING.md`.

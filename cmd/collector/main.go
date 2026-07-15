@@ -31,6 +31,12 @@ func main() {
 		run(os.Args[2:])
 	case "products":
 		runProducts(os.Args[2:])
+	case "strategic":
+		runStrategic(os.Args[2:])
+	case "tariffs":
+		runTariffs(os.Args[2:])
+	case "matrix":
+		runMatrix(os.Args[2:])
 	default:
 		usage()
 		os.Exit(2)
@@ -52,7 +58,7 @@ func runProducts(args []string) {
 	verbose := fs.Bool("verbose", false, "print collection progress")
 	fs.Parse(args)
 
-	if err := runProductCollector(*provider, *primaryProvider, *year, *level, *partners, *flows, *limit, *allowlist, *dbPath, *concurrency, *verbose); err != nil {
+	if err := runProductCollector(*provider, *primaryProvider, *year, *level, nil, *partners, *flows, *limit, *allowlist, *dbPath, *concurrency, *verbose); err != nil {
 		fmt.Fprintln(os.Stderr, "product collector failed:", err)
 		os.Exit(1)
 	}
@@ -92,6 +98,9 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "  -verbose     print each observation")
 	fmt.Fprintln(os.Stderr, "")
 	fmt.Fprintln(os.Stderr, "product breakdown: collector products [options]")
+	fmt.Fprintln(os.Stderr, "strategic HS6: collector strategic [options]")
+	fmt.Fprintln(os.Stderr, "strategic HS6 tariffs: collector tariffs [options]")
+	fmt.Fprintln(os.Stderr, "multi-partner matrix: collector matrix [options]")
 }
 
 func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, historyYears, concurrency int, verbose bool) (runErr error) {
@@ -260,14 +269,29 @@ func runCollector(providerID, partnersCSV, flowsCSV string, limit int, allowlist
 	return nil
 }
 
-func runProductCollector(providerID, primaryProvider, year string, level int, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, concurrency int, verbose bool) (runErr error) {
+func runProductCollector(providerID, primaryProvider, year string, level int, selectedCodes []string, partnersCSV, flowsCSV string, limit int, allowlistPath, dbPath string, concurrency int, verbose bool) (runErr error) {
 	provider, err := buildProvider(providerID)
 	if err != nil {
 		return err
 	}
-	productProvider, ok := provider.(providers.ProductProvider)
-	if !ok {
-		return fmt.Errorf("provider %s does not support product breakdowns", providerID)
+	var fetchProducts func(context.Context, string, string, model.Flow, string, int) ([]model.Observation, error)
+	mode := fmt.Sprintf("products-hs%d", level)
+	if len(selectedCodes) > 0 {
+		selectedProvider, ok := provider.(providers.SelectedProductProvider)
+		if !ok {
+			return fmt.Errorf("provider %s does not support selected product codes", providerID)
+		}
+		codes := append([]string(nil), selectedCodes...)
+		fetchProducts = func(ctx context.Context, reporter, partner string, flow model.Flow, year string, level int) ([]model.Observation, error) {
+			return selectedProvider.FetchProductCodes(ctx, reporter, partner, flow, year, level, codes)
+		}
+		mode = fmt.Sprintf("products-strategic-hs%d", level)
+	} else {
+		productProvider, ok := provider.(providers.ProductProvider)
+		if !ok {
+			return fmt.Errorf("provider %s does not support product breakdowns", providerID)
+		}
+		fetchProducts = productProvider.FetchProducts
 	}
 	ctx := context.Background()
 	st, err := openStore(dbPath)
@@ -276,9 +300,9 @@ func runProductCollector(providerID, primaryProvider, year string, level int, pa
 	}
 	defer st.Close()
 	runRecord := model.IngestRun{
-		RunID:     newRunID(providerID, "products-hs2"),
+		RunID:     newRunID(providerID, mode),
 		Provider:  providerID,
-		Mode:      "products-hs2",
+		Mode:      mode,
 		StartedAt: time.Now().UTC(),
 	}
 	defer func() {
@@ -349,7 +373,7 @@ func runProductCollector(providerID, primaryProvider, year string, level int, pa
 							results <- productResult{reporter: reporter.ISO3, partner: partner, flow: flow}
 							continue
 						}
-						observations, fetchErr := productProvider.FetchProducts(ctx, reporter.ISO3, partner, flow, selectedYear, level)
+						observations, fetchErr := fetchProducts(ctx, reporter.ISO3, partner, flow, selectedYear, level)
 						results <- productResult{reporter: reporter.ISO3, partner: partner, flow: flow, observations: observations, err: fetchErr, requested: true}
 					}
 				}

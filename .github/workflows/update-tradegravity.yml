@@ -45,6 +45,27 @@ jobs:
           COMTRADE_TIMEOUT_SECONDS: "60"
         run: go run ./cmd/collector products -provider comtrade -primary-provider wits -year auto -product-level 2 -concurrency 2 -db tradegravity.db
 
+      - name: Collect curated strategic HS6 products
+        env:
+          COMTRADE_RATE_LIMIT_PER_SEC: "1"
+          COMTRADE_MAX_RETRIES: "6"
+          COMTRADE_TIMEOUT_SECONDS: "60"
+        run: go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto -registry configs/strategic_hs6.csv -concurrency 2 -db tradegravity.db
+
+      - name: Collect multi-partner bilateral matrix
+        env:
+          COMTRADE_RATE_LIMIT_PER_SEC: "1"
+          COMTRADE_MAX_RETRIES: "6"
+          COMTRADE_TIMEOUT_SECONDS: "60"
+        run: go run ./cmd/collector matrix -provider comtrade -primary-provider wits -year auto -concurrency 2 -db tradegravity.db
+
+      - name: Collect curated strategic HS6 tariffs
+        env:
+          TRAINS_TIMEOUT_SECONDS: "60"
+          TRAINS_RETRIES: "2"
+          TRAINS_BACKOFF_MILLISECONDS: "1000"
+        run: go run ./cmd/collector tariffs -provider trains -year auto -registry configs/strategic_hs6.csv -partners WLD -data-type aveestimated -concurrency 3 -db tradegravity.db
+
       - name: Run publisher
         run: go run ./cmd/publisher build -db tradegravity.db -out site/data -context site/data/context.json -series-years 10 -product-provider comtrade -product-level 2
 

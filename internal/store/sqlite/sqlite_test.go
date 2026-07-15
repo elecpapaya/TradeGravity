@@ -93,3 +93,84 @@ func TestDominantAnnualPeriodUsesLatestPeriodPerSeries(t *testing.T) {
 		t.Fatalf("DominantAnnualPeriod() = %q, want latest-series mode 2023", period)
 	}
 }
+
+func TestUpsertTariffObservationsKeepsRateTypesSeparate(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "tradegravity.db")
+	store, err := New(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = store.Close() })
+	base := model.TariffObservation{
+		Provider: "example", Classification: "H6", ProductCode: "854231", ProductLevel: 6,
+		ImporterISO3: "USA", ExporterISO3: "CHN", Regime: "general", Year: "2023", RatePercent: 10,
+	}
+	base.RateType = model.TariffMFNApplied
+	preferential := base
+	preferential.RateType = model.TariffPreferential
+	preferential.Regime = "agreement-x"
+	preferential.RatePercent = 5
+	if err := store.UpsertTariffObservations(context.Background(), []model.TariffObservation{base, preferential}); err != nil {
+		t.Fatal(err)
+	}
+	base.RatePercent = 12
+	if err := store.UpsertTariffObservations(context.Background(), []model.TariffObservation{base}); err != nil {
+		t.Fatal(err)
+	}
+	estimated := base
+	estimated.DataType = model.TariffAVEEstimated
+	estimated.RatePercent = 13
+	estimated.Nomenclature = "H5"
+	estimated.TotalLines = 2
+	if err := store.UpsertTariffObservations(context.Background(), []model.TariffObservation{estimated}); err != nil {
+		t.Fatal(err)
+	}
+	var count int
+	var total float64
+	if err := store.db.QueryRow(`SELECT COUNT(*), SUM(rate_percent) FROM tariff_observations`).Scan(&count, &total); err != nil {
+		t.Fatal(err)
+	}
+	if count != 3 || total != 30 {
+		t.Fatalf("tariff rows/count = %d/%v, want 3/30", count, total)
+	}
+	invalid := base
+	invalid.ProductCode = "8542"
+	if err := store.UpsertTariffObservations(context.Background(), []model.TariffObservation{invalid}); err == nil {
+		t.Fatal("UpsertTariffObservations() accepted a non-HS6 product")
+	}
+}
+
+func TestMigrateTariffObservationsAddsDataTypeWithoutDroppingRows(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "legacy.db")
+	legacy, err := New(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := legacy.db.Exec(`DROP TABLE tariff_observations;
+		CREATE TABLE tariff_observations (
+			provider TEXT NOT NULL, classification TEXT NOT NULL, product_code TEXT NOT NULL,
+			product_level INTEGER NOT NULL, importer_iso3 TEXT NOT NULL, exporter_iso3 TEXT NOT NULL,
+			rate_type TEXT NOT NULL, regime TEXT NOT NULL, year TEXT NOT NULL, rate_percent REAL NOT NULL,
+			ingested_at TEXT NOT NULL, source_updated_at TEXT,
+			PRIMARY KEY (provider, classification, product_code, importer_iso3, exporter_iso3, rate_type, regime, year)
+		);
+		INSERT INTO tariff_observations VALUES ('legacy','H5','854231',6,'USA','WLD','mfn_applied','mfn','2021',2.5,'2026-01-01T00:00:00Z',NULL);`); err != nil {
+		t.Fatal(err)
+	}
+	if err := legacy.Close(); err != nil {
+		t.Fatal(err)
+	}
+	migrated, err := New(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = migrated.Close() })
+	var count int
+	var dataType string
+	if err := migrated.db.QueryRow(`SELECT COUNT(*), MAX(data_type) FROM tariff_observations`).Scan(&count, &dataType); err != nil {
+		t.Fatal(err)
+	}
+	if count != 1 || dataType != "reported" {
+		t.Fatalf("migrated count/data_type = %d/%q", count, dataType)
+	}
+}

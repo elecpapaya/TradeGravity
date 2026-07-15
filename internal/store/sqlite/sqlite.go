@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -124,6 +126,135 @@ func (s *Store) UpsertObservations(ctx context.Context, observations []model.Obs
 	return nil
 }
 
+func (s *Store) UpsertTariffObservations(ctx context.Context, observations []model.TariffObservation) error {
+	if len(observations) == 0 {
+		return nil
+	}
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	stmt, err := tx.PrepareContext(ctx, `
+		INSERT INTO tariff_observations (
+			provider, classification, product_code, product_level,
+			importer_iso3, exporter_iso3, exporter_code, data_type,
+			rate_type, regime, year, rate_percent,
+			sum_rate_percent, min_rate_percent, max_rate_percent,
+			total_lines, preferential_lines, mfn_lines, non_ad_valorem_lines,
+			nomenclature, excluded_from, ingested_at, source_updated_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		ON CONFLICT(provider, classification, product_code, importer_iso3, exporter_iso3, data_type, rate_type, regime, year)
+		DO UPDATE SET
+			exporter_code = excluded.exporter_code,
+			rate_percent = excluded.rate_percent,
+			sum_rate_percent = excluded.sum_rate_percent,
+			min_rate_percent = excluded.min_rate_percent,
+			max_rate_percent = excluded.max_rate_percent,
+			total_lines = excluded.total_lines,
+			preferential_lines = excluded.preferential_lines,
+			mfn_lines = excluded.mfn_lines,
+			non_ad_valorem_lines = excluded.non_ad_valorem_lines,
+			nomenclature = excluded.nomenclature,
+			excluded_from = excluded.excluded_from,
+			ingested_at = excluded.ingested_at,
+			source_updated_at = excluded.source_updated_at
+	`)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+	now := time.Now().UTC()
+	for _, observation := range observations {
+		observation.Provider = strings.ToLower(strings.TrimSpace(observation.Provider))
+		observation.Classification = strings.ToUpper(strings.TrimSpace(observation.Classification))
+		observation.ProductCode = strings.TrimSpace(observation.ProductCode)
+		observation.ImporterISO3 = strings.ToUpper(strings.TrimSpace(observation.ImporterISO3))
+		observation.ExporterISO3 = strings.ToUpper(strings.TrimSpace(observation.ExporterISO3))
+		observation.ExporterCode = strings.ToUpper(strings.TrimSpace(observation.ExporterCode))
+		if observation.DataType == "" {
+			observation.DataType = model.TariffReported
+		}
+		observation.Regime = strings.ToLower(strings.TrimSpace(observation.Regime))
+		observation.Year = strings.TrimSpace(observation.Year)
+		observation.Nomenclature = strings.ToUpper(strings.TrimSpace(observation.Nomenclature))
+		observation.ExcludedFrom = strings.ToUpper(strings.TrimSpace(observation.ExcludedFrom))
+		if err = validateTariffObservation(observation); err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+		if observation.IngestedAt.IsZero() {
+			observation.IngestedAt = now
+		}
+		var sourceUpdatedAt any
+		if !observation.SourceUpdatedAt.IsZero() {
+			sourceUpdatedAt = observation.SourceUpdatedAt.UTC()
+		}
+		_, err = stmt.ExecContext(ctx,
+			observation.Provider, observation.Classification, observation.ProductCode, observation.ProductLevel,
+			observation.ImporterISO3, observation.ExporterISO3, observation.ExporterCode, string(observation.DataType),
+			string(observation.RateType), observation.Regime, observation.Year, observation.RatePercent,
+			observation.SumRatePercent, observation.MinRatePercent, observation.MaxRatePercent,
+			observation.TotalLines, observation.PreferentialLines, observation.MFNLines, observation.NonAdValoremLines,
+			observation.Nomenclature, observation.ExcludedFrom, observation.IngestedAt.UTC(), sourceUpdatedAt,
+		)
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+func validateTariffObservation(observation model.TariffObservation) error {
+	if observation.Provider == "" || observation.Classification == "" {
+		return errors.New("tariff provider and classification are required")
+	}
+	if observation.ProductLevel != 6 || len(observation.ProductCode) != 6 || !digitsOnly(observation.ProductCode) {
+		return fmt.Errorf("tariff product code %q must be HS6", observation.ProductCode)
+	}
+	if len(observation.ImporterISO3) != 3 || len(observation.ExporterISO3) != 3 {
+		return errors.New("tariff importer and exporter must be ISO3-compatible codes")
+	}
+	if observation.RateType != model.TariffMFNApplied && observation.RateType != model.TariffEffectivelyApplied && observation.RateType != model.TariffPreferential {
+		return fmt.Errorf("unsupported tariff rate type %q", observation.RateType)
+	}
+	if observation.DataType != model.TariffReported && observation.DataType != model.TariffAVEEstimated {
+		return fmt.Errorf("unsupported tariff data type %q", observation.DataType)
+	}
+	if observation.Regime == "" || len(observation.Year) != 4 || !digitsOnly(observation.Year) {
+		return errors.New("tariff regime and four-digit year are required")
+	}
+	if math.IsNaN(observation.RatePercent) || math.IsInf(observation.RatePercent, 0) || observation.RatePercent < 0 {
+		return fmt.Errorf("tariff rate must be finite and non-negative, got %v", observation.RatePercent)
+	}
+	for label, value := range map[string]*float64{
+		"sum": observation.SumRatePercent, "minimum": observation.MinRatePercent, "maximum": observation.MaxRatePercent,
+	} {
+		if value != nil && (math.IsNaN(*value) || math.IsInf(*value, 0) || *value < 0) {
+			return fmt.Errorf("tariff %s rate must be finite and non-negative, got %v", label, *value)
+		}
+	}
+	if observation.TotalLines < 0 || observation.PreferentialLines < 0 || observation.MFNLines < 0 || observation.NonAdValoremLines < 0 {
+		return errors.New("tariff line counts must be non-negative")
+	}
+	return nil
+}
+
+func digitsOnly(value string) bool {
+	for _, char := range value {
+		if char < '0' || char > '9' {
+			return false
+		}
+	}
+	return value != ""
+}
+
 func (s *Store) RecordIngestRun(ctx context.Context, run model.IngestRun) error {
 	if s == nil || s.db == nil {
 		return nil
@@ -236,6 +367,17 @@ func (s *Store) migrate() error {
 			}
 		}
 	}
+	tariffColumns, err := s.tableColumns("tariff_observations")
+	if err != nil {
+		return err
+	}
+	if len(tariffColumns) > 0 {
+		if _, ok := tariffColumns["data_type"]; !ok {
+			if err := s.migrateTariffsV2(); err != nil {
+				return err
+			}
+		}
+	}
 
 	statements := []string{
 		`CREATE TABLE IF NOT EXISTS trade_observations (
@@ -255,6 +397,34 @@ func (s *Store) migrate() error {
 		);`,
 		`CREATE INDEX IF NOT EXISTS idx_trade_observations_totals
 		 ON trade_observations(provider, product_level, reporter_iso3, partner_iso3, period_type, period);`,
+		`CREATE TABLE IF NOT EXISTS tariff_observations (
+			provider TEXT NOT NULL,
+			classification TEXT NOT NULL,
+			product_code TEXT NOT NULL,
+			product_level INTEGER NOT NULL,
+			importer_iso3 TEXT NOT NULL,
+			exporter_iso3 TEXT NOT NULL,
+			exporter_code TEXT NOT NULL DEFAULT '',
+			data_type TEXT NOT NULL,
+			rate_type TEXT NOT NULL,
+			regime TEXT NOT NULL,
+			year TEXT NOT NULL,
+			rate_percent REAL NOT NULL,
+			sum_rate_percent REAL,
+			min_rate_percent REAL,
+			max_rate_percent REAL,
+			total_lines INTEGER NOT NULL DEFAULT 0,
+			preferential_lines INTEGER NOT NULL DEFAULT 0,
+			mfn_lines INTEGER NOT NULL DEFAULT 0,
+			non_ad_valorem_lines INTEGER NOT NULL DEFAULT 0,
+			nomenclature TEXT NOT NULL DEFAULT '',
+			excluded_from TEXT NOT NULL DEFAULT '',
+			ingested_at TEXT NOT NULL,
+			source_updated_at TEXT,
+			PRIMARY KEY (provider, classification, product_code, importer_iso3, exporter_iso3, data_type, rate_type, regime, year)
+		);`,
+		`CREATE INDEX IF NOT EXISTS idx_tariff_observations_lookup
+		 ON tariff_observations(importer_iso3, exporter_iso3, year, product_code, data_type, rate_type);`,
 		`CREATE TABLE IF NOT EXISTS ingest_runs (
 			run_id TEXT PRIMARY KEY,
 			provider TEXT NOT NULL,
@@ -334,6 +504,62 @@ func (s *Store) migrateObservationsV1() (err error) {
 			period_type, period, value_usd, ingested_at, source_updated_at
 		  FROM trade_observations_v1;`,
 		`DROP TABLE trade_observations_v1;`,
+	}
+	for _, statement := range statements {
+		if _, err = tx.Exec(statement); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+func (s *Store) migrateTariffsV2() (err error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	statements := []string{
+		`ALTER TABLE tariff_observations RENAME TO tariff_observations_v1;`,
+		`CREATE TABLE tariff_observations (
+			provider TEXT NOT NULL,
+			classification TEXT NOT NULL,
+			product_code TEXT NOT NULL,
+			product_level INTEGER NOT NULL,
+			importer_iso3 TEXT NOT NULL,
+			exporter_iso3 TEXT NOT NULL,
+			exporter_code TEXT NOT NULL DEFAULT '',
+			data_type TEXT NOT NULL,
+			rate_type TEXT NOT NULL,
+			regime TEXT NOT NULL,
+			year TEXT NOT NULL,
+			rate_percent REAL NOT NULL,
+			sum_rate_percent REAL,
+			min_rate_percent REAL,
+			max_rate_percent REAL,
+			total_lines INTEGER NOT NULL DEFAULT 0,
+			preferential_lines INTEGER NOT NULL DEFAULT 0,
+			mfn_lines INTEGER NOT NULL DEFAULT 0,
+			non_ad_valorem_lines INTEGER NOT NULL DEFAULT 0,
+			nomenclature TEXT NOT NULL DEFAULT '',
+			excluded_from TEXT NOT NULL DEFAULT '',
+			ingested_at TEXT NOT NULL,
+			source_updated_at TEXT,
+			PRIMARY KEY (provider, classification, product_code, importer_iso3, exporter_iso3, data_type, rate_type, regime, year)
+		);`,
+		`INSERT INTO tariff_observations (
+			provider, classification, product_code, product_level, importer_iso3,
+			exporter_iso3, exporter_code, data_type, rate_type, regime, year,
+			rate_percent, ingested_at, source_updated_at
+		) SELECT provider, classification, product_code, product_level, importer_iso3,
+			exporter_iso3, '', 'reported', rate_type, regime, year,
+			rate_percent, ingested_at, source_updated_at
+		  FROM tariff_observations_v1;`,
+		`DROP TABLE tariff_observations_v1;`,
 	}
 	for _, statement := range statements {
 		if _, err = tx.Exec(statement); err != nil {

@@ -1,6 +1,6 @@
 # Published data schema 2.0
 
-TradeGravity publishes one versioned artifact set under `site/data/`. `meta.json`, `latest.json`, `series.json`, `quality.json`, the product index/files, and the explanation index/files share the same `schema_version` and publisher `generated_at`. `context.json` has its own refresh time because it is built before the trade publisher.
+TradeGravity publishes one versioned artifact set under `site/data/`. Headline, product, strategic HS6, tariff, bilateral-matrix, quality, and explanation artifacts share the trade `schema_version` and publisher `generated_at`. `catalog.json` has an independent additive catalog schema and the same publisher timestamp. `context.json` has its own refresh time because it is built before the trade publisher.
 
 ## Time and comparison semantics
 
@@ -18,9 +18,24 @@ TradeGravity publishes one versioned artifact set under `site/data/`. `meta.json
 | `context.json` | Region, income, groups, population, GDP | World Bank + project groups |
 | `products/index.json` | Product-file discovery and classification | UN Comtrade |
 | `products/{ISO3}.json` | HS2 chapters by reporter and period | UN Comtrade |
+| `strategic-hs6/index.json` | Curated code registry and partition discovery | UN Comtrade + project registry |
+| `strategic-hs6/{ISO3}/{YEAR}.json` | USA/China strategic HS6 flows | UN Comtrade |
+| `tariffs/index.json` | Importer/year tariff partition discovery | WITS/TRAINS |
+| `tariffs/{ISO3}/{YEAR}.json` | Revision-aware strategic HS6 tariff rows | WITS/TRAINS |
+| `bilateral-matrix/index.json` | Multi-partner `TOTAL` partition discovery | UN Comtrade |
+| `bilateral-matrix/{ISO3}/{YEAR}.json` | Reported partner exports/imports and availability | UN Comtrade |
 | `quality.json` | Missing/stale data, collection runs, provider comparisons | Pipeline calculations |
+| `catalog.json` | Resource discovery, grain, partitioning, and readiness | Publisher |
 | `explanations/index.json` | Explanation coverage and generator counts | Explainer |
 | `explanations/{ISO3}.json` | Claims with exact evidence IDs | Published JSON evidence |
+
+## `catalog.json`
+
+The catalog is the stable discovery layer for a dashboard that may grow beyond a few single-file datasets. Each resource declares an `id`, display title, `status`, analytical `grain`, `partitioning`, and an `href` only when an artifact is published. Current statuses are `ready`, `partial`, and `planned`.
+
+`strategic_hs6`, `tariff_schedules`, and `bilateral_matrix` are published resources. Mirror/reconciled estimates, value-added networks, and versioned scenario results remain planned contracts and do not claim that those observations exist. Published resources use relative same-origin paths; the validator rejects duplicate IDs, invalid statuses, unsafe paths, and metadata that conflicts with `meta.json`.
+
+The current product resource demonstrates the intended scaling pattern: a small discovery index plus one reporter file. Higher-volume resources should use period, reporter, importer, industry, or sector chunks named in the catalog rather than expanding `latest.json`.
 
 ## `meta.json`
 
@@ -43,7 +58,11 @@ Important fields include:
   "product_classification": "H6",
   "product_level": 2,
   "product_reporter_count": 49,
-  "context_status": "success"
+  "context_status": "success",
+  "strategic_partition_count": 49,
+  "tariff_importer_count": 5,
+  "matrix_reporter_count": 49,
+  "matrix_partner_row_count": 10586
 }
 ```
 
@@ -105,6 +124,30 @@ The product index identifies provider, classification, level, periods, and avail
 
 Product data is never substituted for the WITS headline series. `quality.json` may compare the summed HS2 value with a WITS total only when reporter, partner, flow, period type, and period are identical.
 
+## Strategic HS6 and tariffs
+
+`strategic-hs6/index.json` publishes the curated code descriptors, sectors, available reporters/periods, and reporter/year partition links. Each row retains the source classification because a six-digit code must not be assumed equivalent across every HS revision.
+
+`tariffs/index.json` discovers importer/year partitions and enumerates data types and rate types. A tariff row includes source classification and nomenclature, exporter/regime, `reported` or `ave_estimated`, rate identity, average/minimum/maximum rates when supplied, line counts, exclusions, and the source update timestamp. The UI prefers World MFN AVE rows only as an explicit display rule; it does not merge them with preferential rates.
+
+## Multi-partner bilateral matrix
+
+The matrix index has `product_code: "TOTAL"`, `product_level: 0`, sorted reporter/partner/period dimensions, partition counts, partner-row counts, and source-observation counts. Each reporter/year file contains one row per alphabetic ISO3 partner:
+
+```json
+{
+  "partner_iso3": "USA",
+  "export_available": true,
+  "import_available": true,
+  "export_usd": 100,
+  "import_usd": 80,
+  "trade_usd": 180,
+  "balance_usd": 20
+}
+```
+
+`trade_usd = export_usd + import_usd` and `balance_usd = export_usd - import_usd`. Availability flags distinguish a missing flow from a reported zero. World (`partnerCode=0`), regional groups, non-alphabetic special codes, and the reporter itself are excluded. These rows are reported bilateral totals, not shipment legs, firm relationships, value-added origin, or proof of rerouting.
+
 ## Quality and collection runs
 
 `quality.json` contains summary counts, reporter issue codes, recent collection runs, and same-period provider comparisons. Run status is `success`, `partial`, or `failed`; successful observations remain published even when other requests fail. Provider deltas are ratios `(secondary - primary) / primary`, not corrections.
@@ -125,7 +168,7 @@ Run the same validation used before deployment:
 go run ./cmd/validator -dir site/data -min-reporters 40
 ```
 
-The validator checks cross-file provenance and counts, reporter and period uniqueness, finite non-negative numbers, calculated totals/shares, product keys, context coverage, collection-run metadata, and every explanation citation.
+The validator checks cross-file provenance and counts, reporter and period uniqueness, finite numbers, calculated totals/shares/balances, flow-availability identities, strategic registry membership, tariff rate identities, catalog contracts, context coverage, collection-run metadata, and every explanation citation.
 
 ## CSV and filtered JSON
 

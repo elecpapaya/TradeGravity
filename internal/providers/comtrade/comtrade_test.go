@@ -1,7 +1,12 @@
 package comtrade
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 
 	"tradegravity/internal/model"
 )
@@ -33,6 +38,53 @@ func TestParseObservationsNormalizesProviderRows(t *testing.T) {
 	}
 }
 
+func TestFetchPartnerMatrixOmitsPartnerCodeAndFiltersWorldAggregate(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		switch request.URL.Path {
+		case "/files/reporters":
+			_, _ = writer.Write([]byte(`{"results":[{"id":"410","iso3":"KOR","text":"Korea","isReporter":true,"isGroup":false}]}`))
+		case "/files/partners":
+			_, _ = writer.Write([]byte(`{"results":[{"id":"842","iso3":"USA","text":"United States","isPartner":true,"isGroup":false},{"id":"156","iso3":"CHN","text":"China","isPartner":true,"isGroup":false},{"id":"899","iso3":"S19","text":"Special category","isPartner":true,"isGroup":false}]}`))
+		case "/preview":
+			if request.URL.Query().Has("partnerCode") {
+				t.Fatalf("matrix request must omit partnerCode, got %s", request.URL.RawQuery)
+			}
+			if request.URL.Query().Get("cmdCode") != "TOTAL" || request.URL.Query().Get("breakdownMode") != "classic" {
+				t.Fatalf("unexpected matrix query %s", request.URL.RawQuery)
+			}
+			_, _ = writer.Write([]byte(`{"data":[
+				{"period":"2023","primaryValue":100,"reporterCode":410,"reporterISO":null,"partnerCode":842,"partnerISO":null,"cmdCode":"TOTAL","classificationSearchCode":"H6"},
+				{"period":"2023","primaryValue":80,"reporterCode":410,"reporterISO":null,"partnerCode":156,"partnerISO":null,"cmdCode":"TOTAL","classificationSearchCode":"H6"},
+				{"period":"2023","primaryValue":999,"reporterCode":410,"reporterISO":null,"partnerCode":0,"partnerISO":null,"cmdCode":"TOTAL","classificationSearchCode":"H6"},
+				{"period":"2023","primaryValue":20,"reporterCode":410,"reporterISO":null,"partnerCode":899,"partnerISO":null,"cmdCode":"TOTAL","classificationSearchCode":"H6"}
+			]}`))
+		default:
+			http.NotFound(writer, request)
+		}
+	}))
+	defer server.Close()
+	provider, err := NewWithConfig(Config{
+		BaseURL: server.URL, DataPath: "data", PreviewDataPath: "preview",
+		ReportersURL: server.URL + "/files/reporters", PartnersURL: server.URL + "/files/partners",
+		MaxRecords: 500, Timeout: time.Second, RateLimitPerSec: 100, RateLimitBurst: 10,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows, err := provider.FetchPartnerMatrix(context.Background(), "KOR", model.FlowExport, "2023")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 2 || rows[0].PartnerISO3 != "USA" || rows[1].PartnerISO3 != "CHN" {
+		t.Fatalf("matrix rows = %#v", rows)
+	}
+	for _, row := range rows {
+		if row.ProductCode != "TOTAL" || row.ProductLevel != 0 || strings.TrimSpace(row.Provider) != "comtrade" {
+			t.Fatalf("invalid matrix row = %#v", row)
+		}
+	}
+}
+
 func TestQuotaAndRetryParsing(t *testing.T) {
 	body := []byte(`{"message":"Daily quota exceeded; try again in 42 seconds"}`)
 	if !isQuotaExceeded(body) {
@@ -40,5 +92,18 @@ func TestQuotaAndRetryParsing(t *testing.T) {
 	}
 	if got := parseRetrySeconds("Daily quota exceeded; try again in 42 seconds"); got != 42 {
 		t.Fatalf("parseRetrySeconds() = %d, want 42", got)
+	}
+}
+
+func TestNormalizeProductCodesValidatesAndDeduplicatesHS6(t *testing.T) {
+	got, err := normalizeProductCodes([]string{"854231", " 850760 ", "854231"}, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 || got[0] != "854231" || got[1] != "850760" {
+		t.Fatalf("normalizeProductCodes() = %v", got)
+	}
+	if _, err := normalizeProductCodes([]string{"8542"}, 6); err == nil {
+		t.Fatal("normalizeProductCodes() accepted an HS4 code for HS6 collection")
 	}
 }

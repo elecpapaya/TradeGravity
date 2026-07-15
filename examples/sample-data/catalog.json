@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-15T14:10:35Z",
+  "resources": [
+    {
+      "id": "headline_totals",
+      "title": "Headline bilateral totals",
+      "status": "ready",
+      "provider": "wits",
+      "grain": "reporter × USA/CHN partner × flow × latest period",
+      "partitioning": "single publication",
+      "href": "./latest.json"
+    },
+    {
+      "id": "time_series",
+      "title": "Headline time series",
+      "status": "ready",
+      "provider": "wits",
+      "grain": "reporter × USA/CHN partner × flow × period",
+      "partitioning": "single publication",
+      "href": "./series.json"
+    },
+    {
+      "id": "country_context",
+      "title": "Country economic context",
+      "status": "ready",
+      "provider": "world_bank",
+      "grain": "reporter × indicator × year",
+      "partitioning": "single publication",
+      "href": "./context.json"
+    },
+    {
+      "id": "product_chapters",
+      "title": "Product chapter observations",
+      "status": "ready",
+      "provider": "comtrade",
+      "classification": "H6",
+      "product_level": 2,
+      "grain": "reporter × partner × flow × HS2 × period",
+      "partitioning": "index + one file per reporter",
+      "href": "./products/index.json"
+    },
+    {
+      "id": "quality",
+      "title": "Quality and provenance signals",
+      "status": "ready",
+      "provider": "tradegravity",
+      "grain": "publication + reporter/provider issue",
+      "partitioning": "single publication",
+      "href": "./quality.json"
+    },
+    {
+      "id": "strategic_hs6",
+      "title": "Curated strategic HS6 products",
+      "status": "partial",
+      "provider": "comtrade",
+      "classification": "source HS revision",
+      "product_level": 6,
+      "grain": "reporter × partner × flow × HS6 × period × source classification",
+      "partitioning": "index + reporter/year chunks",
+      "href": "./strategic-hs6/index.json"
+    },
+    {
+      "id": "tariff_schedules",
+      "title": "Tariff schedules",
+      "status": "ready",
+      "provider": "trains",
+      "classification": "source HS revision",
+      "product_level": 6,
+      "grain": "importer × exporter/regime × HS6 × year × data type",
+      "partitioning": "index + importer/year chunks",
+      "href": "./tariffs/index.json"
+    },
+    {
+      "id": "bilateral_matrix",
+      "title": "Multi-partner bilateral matrix",
+      "status": "ready",
+      "provider": "comtrade",
+      "grain": "reporter × partner × flow × TOTAL × annual period",
+      "partitioning": "index + reporter/year chunks",
+      "href": "./bilateral-matrix/index.json"
+    },
+    {
+      "id": "mirror_reconciliation",
+      "title": "Mirror and reconciled estimates",
+      "status": "planned",
+      "grain": "reporter pair × flow × product × period × estimate type",
+      "partitioning": "period/reporter chunks"
+    },
+    {
+      "id": "value_added_network",
+      "title": "Value-added supply-chain exposure",
+      "status": "planned",
+      "grain": "origin × destination × industry × year",
+      "partitioning": "year/industry chunks"
+    },
+    {
+      "id": "scenario_runs",
+      "title": "Versioned scenario outputs",
+      "status": "planned",
+      "grain": "scenario × market × product × partner",
+      "partitioning": "one manifest and result set per run"
+    }
+  ]
+}

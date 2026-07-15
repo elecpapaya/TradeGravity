@@ -9,8 +9,10 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"tradegravity/internal/model"
+	"tradegravity/internal/strategic"
 )
 
 type contextMetric struct {
@@ -86,6 +88,198 @@ type productFile struct {
 	Rows           []productEntry `json:"rows"`
 }
 
+type strategicIndexFile struct {
+	SchemaVersion    string                       `json:"schema_version"`
+	GeneratedAt      string                       `json:"generated_at"`
+	Provider         string                       `json:"provider"`
+	Level            int                          `json:"level"`
+	Partners         []string                     `json:"partners"`
+	Sectors          []string                     `json:"sectors"`
+	Products         []strategicProductDescriptor `json:"products"`
+	Reporters        []string                     `json:"reporters"`
+	Periods          []string                     `json:"periods"`
+	Partitions       []strategicPartition         `json:"partitions"`
+	ObservationCount int                          `json:"observation_count"`
+}
+
+type strategicProductDescriptor struct {
+	Code         string `json:"code"`
+	Sector       string `json:"sector"`
+	Label        string `json:"label"`
+	RevisionNote string `json:"revision_note"`
+	Notes        string `json:"notes,omitempty"`
+}
+
+type strategicPartition struct {
+	ReporterISO3 string `json:"reporter_iso3"`
+	Period       string `json:"period"`
+	Href         string `json:"href"`
+	RowCount     int    `json:"row_count"`
+}
+
+type strategicFile struct {
+	SchemaVersion string                  `json:"schema_version"`
+	GeneratedAt   string                  `json:"generated_at"`
+	Provider      string                  `json:"provider"`
+	Level         int                     `json:"level"`
+	Partners      []string                `json:"partners"`
+	ReporterISO3  string                  `json:"reporter_iso3"`
+	Period        string                  `json:"period"`
+	Rows          []strategicProductEntry `json:"rows"`
+}
+
+type strategicProductEntry struct {
+	Classification string      `json:"classification"`
+	Code           string      `json:"code"`
+	Sector         string      `json:"sector"`
+	Label          string      `json:"label"`
+	RevisionNote   string      `json:"revision_note"`
+	USA            seriesBlock `json:"usa"`
+	CHN            seriesBlock `json:"chn"`
+	Total          float64     `json:"total"`
+	ShareCN        float64     `json:"share_cn"`
+}
+
+type tariffIndexFile struct {
+	SchemaVersion    string                       `json:"schema_version"`
+	GeneratedAt      string                       `json:"generated_at"`
+	Provider         string                       `json:"provider"`
+	Level            int                          `json:"level"`
+	Importers        []string                     `json:"importers"`
+	Exporters        []string                     `json:"exporters"`
+	Years            []string                     `json:"years"`
+	DataTypes        []string                     `json:"data_types"`
+	RateTypes        []string                     `json:"rate_types"`
+	Products         []strategicProductDescriptor `json:"products"`
+	Partitions       []tariffPartition            `json:"partitions"`
+	ObservationCount int                          `json:"observation_count"`
+}
+
+type tariffPartition struct {
+	ImporterISO3 string `json:"importer_iso3"`
+	Year         string `json:"year"`
+	Href         string `json:"href"`
+	RowCount     int    `json:"row_count"`
+}
+
+type tariffFile struct {
+	SchemaVersion string               `json:"schema_version"`
+	GeneratedAt   string               `json:"generated_at"`
+	Provider      string               `json:"provider"`
+	Level         int                  `json:"level"`
+	ImporterISO3  string               `json:"importer_iso3"`
+	Year          string               `json:"year"`
+	Rows          []tariffPublishedRow `json:"rows"`
+}
+
+type tariffPublishedRow struct {
+	Classification    string   `json:"classification"`
+	Nomenclature      string   `json:"nomenclature"`
+	Code              string   `json:"code"`
+	Sector            string   `json:"sector"`
+	Label             string   `json:"label"`
+	ExporterISO3      string   `json:"exporter_iso3"`
+	ExporterCode      string   `json:"exporter_code,omitempty"`
+	DataType          string   `json:"data_type"`
+	RateType          string   `json:"rate_type"`
+	Regime            string   `json:"regime"`
+	RatePercent       float64  `json:"rate_percent"`
+	SumRatePercent    *float64 `json:"sum_rate_percent,omitempty"`
+	MinRatePercent    *float64 `json:"min_rate_percent,omitempty"`
+	MaxRatePercent    *float64 `json:"max_rate_percent,omitempty"`
+	TotalLines        int      `json:"total_lines"`
+	PreferentialLines int      `json:"preferential_lines"`
+	MFNLines          int      `json:"mfn_lines"`
+	NonAdValoremLines int      `json:"non_ad_valorem_lines"`
+	ExcludedFrom      string   `json:"excluded_from,omitempty"`
+	SourceUpdatedAt   string   `json:"source_updated_at,omitempty"`
+}
+
+type tariffObservationRow struct {
+	Provider          string
+	Classification    string
+	ProductCode       string
+	ProductLevel      int
+	ImporterISO3      string
+	ExporterISO3      string
+	ExporterCode      string
+	DataType          string
+	RateType          string
+	Regime            string
+	Year              string
+	RatePercent       float64
+	SumRatePercent    *float64
+	MinRatePercent    *float64
+	MaxRatePercent    *float64
+	TotalLines        int
+	PreferentialLines int
+	MFNLines          int
+	NonAdValoremLines int
+	Nomenclature      string
+	ExcludedFrom      string
+	SourceUpdatedAt   string
+}
+
+type matrixIndexFile struct {
+	SchemaVersion    string            `json:"schema_version"`
+	GeneratedAt      string            `json:"generated_at"`
+	Provider         string            `json:"provider"`
+	ProductCode      string            `json:"product_code"`
+	ProductLevel     int               `json:"product_level"`
+	Reporters        []string          `json:"reporters"`
+	Partners         []string          `json:"partners"`
+	Periods          []string          `json:"periods"`
+	Partitions       []matrixPartition `json:"partitions"`
+	PartnerRowCount  int               `json:"partner_row_count"`
+	ObservationCount int               `json:"observation_count"`
+}
+
+type matrixPartition struct {
+	ReporterISO3 string `json:"reporter_iso3"`
+	Period       string `json:"period"`
+	Href         string `json:"href"`
+	RowCount     int    `json:"row_count"`
+}
+
+type matrixFile struct {
+	SchemaVersion string          `json:"schema_version"`
+	GeneratedAt   string          `json:"generated_at"`
+	Provider      string          `json:"provider"`
+	ProductCode   string          `json:"product_code"`
+	ProductLevel  int             `json:"product_level"`
+	ReporterISO3  string          `json:"reporter_iso3"`
+	Period        string          `json:"period"`
+	Rows          []matrixPartner `json:"rows"`
+}
+
+type matrixPartner struct {
+	PartnerISO3     string  `json:"partner_iso3"`
+	ExportAvailable bool    `json:"export_available"`
+	ImportAvailable bool    `json:"import_available"`
+	ExportUSD       float64 `json:"export_usd"`
+	ImportUSD       float64 `json:"import_usd"`
+	TradeUSD        float64 `json:"trade_usd"`
+	BalanceUSD      float64 `json:"balance_usd"`
+}
+
+type dataCatalogFile struct {
+	SchemaVersion string            `json:"schema_version"`
+	GeneratedAt   string            `json:"generated_at"`
+	Resources     []catalogResource `json:"resources"`
+}
+
+type catalogResource struct {
+	ID             string `json:"id"`
+	Title          string `json:"title"`
+	Status         string `json:"status"`
+	Provider       string `json:"provider,omitempty"`
+	Classification string `json:"classification,omitempty"`
+	ProductLevel   int    `json:"product_level,omitempty"`
+	Grain          string `json:"grain"`
+	Partitioning   string `json:"partitioning"`
+	Href           string `json:"href,omitempty"`
+}
+
 type productEntry struct {
 	PeriodType model.PeriodType `json:"period_type"`
 	Period     string           `json:"period"`
@@ -150,6 +344,54 @@ type providerComparison struct {
 	PrimaryTradeUSD   float64 `json:"primary_trade_usd"`
 	SecondaryTradeUSD float64 `json:"secondary_trade_usd"`
 	DeltaRatio        float64 `json:"delta_ratio"`
+}
+
+func buildDataCatalog(generatedAt, provider, contextStatus string, series seriesFile, products productIndexFile, strategicIndex strategicIndexFile, tariffIndex tariffIndexFile, matrixIndex matrixIndexFile) dataCatalogFile {
+	primaryProvider := strings.ToLower(strings.TrimSpace(provider))
+	productStatus := "partial"
+	if len(products.Reporters) > 0 {
+		productStatus = "ready"
+	}
+	countryContextStatus := "partial"
+	if strings.EqualFold(contextStatus, "success") {
+		countryContextStatus = "ready"
+	}
+	strategicStatus := "partial"
+	if len(strategicIndex.Partitions) > 0 {
+		strategicStatus = "ready"
+	}
+	tariffStatus := "partial"
+	if len(tariffIndex.Partitions) > 0 {
+		tariffStatus = "ready"
+	}
+	matrixStatus := "partial"
+	if len(matrixIndex.Partitions) > 0 {
+		matrixStatus = "ready"
+	}
+	return dataCatalogFile{
+		SchemaVersion: "1.0",
+		GeneratedAt:   generatedAt,
+		Resources: []catalogResource{
+			{ID: "headline_totals", Title: "Headline bilateral totals", Status: "ready", Provider: primaryProvider, Grain: "reporter × USA/CHN partner × flow × latest period", Partitioning: "single publication", Href: "./latest.json"},
+			{ID: "time_series", Title: "Headline time series", Status: statusForCount(len(series.Rows)), Provider: primaryProvider, Grain: "reporter × USA/CHN partner × flow × period", Partitioning: "single publication", Href: "./series.json"},
+			{ID: "country_context", Title: "Country economic context", Status: countryContextStatus, Provider: "world_bank", Grain: "reporter × indicator × year", Partitioning: "single publication", Href: "./context.json"},
+			{ID: "product_chapters", Title: "Product chapter observations", Status: productStatus, Provider: strings.ToLower(products.Provider), Classification: products.Classification, ProductLevel: products.Level, Grain: "reporter × partner × flow × HS2 × period", Partitioning: "index + one file per reporter", Href: "./products/index.json"},
+			{ID: "quality", Title: "Quality and provenance signals", Status: "ready", Provider: "tradegravity", Grain: "publication + reporter/provider issue", Partitioning: "single publication", Href: "./quality.json"},
+			{ID: "strategic_hs6", Title: "Curated strategic HS6 products", Status: strategicStatus, Provider: strategicIndex.Provider, Classification: "source HS revision", ProductLevel: 6, Grain: "reporter × partner × flow × HS6 × period × source classification", Partitioning: "index + reporter/year chunks", Href: "./strategic-hs6/index.json"},
+			{ID: "tariff_schedules", Title: "Tariff schedules", Status: tariffStatus, Provider: tariffIndex.Provider, Classification: "source HS revision", ProductLevel: 6, Grain: "importer × exporter/regime × HS6 × year × data type", Partitioning: "index + importer/year chunks", Href: "./tariffs/index.json"},
+			{ID: "bilateral_matrix", Title: "Multi-partner bilateral matrix", Status: matrixStatus, Provider: matrixIndex.Provider, ProductLevel: 0, Grain: "reporter × partner × flow × TOTAL × annual period", Partitioning: "index + reporter/year chunks", Href: "./bilateral-matrix/index.json"},
+			{ID: "mirror_reconciliation", Title: "Mirror and reconciled estimates", Status: "planned", Grain: "reporter pair × flow × product × period × estimate type", Partitioning: "period/reporter chunks"},
+			{ID: "value_added_network", Title: "Value-added supply-chain exposure", Status: "planned", Grain: "origin × destination × industry × year", Partitioning: "year/industry chunks"},
+			{ID: "scenario_runs", Title: "Versioned scenario outputs", Status: "planned", Grain: "scenario × market × product × partner", Partitioning: "one manifest and result set per run"},
+		},
+	}
+}
+
+func statusForCount(count int) string {
+	if count > 0 {
+		return "ready"
+	}
+	return "partial"
 }
 
 func loadContext(path string) (contextDataset, error) {
@@ -441,6 +683,511 @@ func buildProductFiles(generatedAt, provider string, level int, partners []strin
 	return index, files
 }
 
+func buildStrategicFiles(generatedAt, provider string, partners []string, observations []observationRow, products []strategic.Product) (strategicIndexFile, map[string]strategicFile) {
+	type entryKey struct {
+		classification string
+		code           string
+	}
+	type partitionKey struct {
+		reporter string
+		period   string
+	}
+
+	descriptors := make(map[string]strategicProductDescriptor, len(products))
+	index := strategicIndexFile{
+		SchemaVersion: schemaVersion,
+		GeneratedAt:   generatedAt,
+		Provider:      strings.ToLower(strings.TrimSpace(provider)),
+		Level:         6,
+		Partners:      append([]string(nil), partners...),
+		Sectors:       strategic.Sectors(products),
+		Products:      make([]strategicProductDescriptor, 0, len(products)),
+		Reporters:     []string{},
+		Periods:       []string{},
+		Partitions:    []strategicPartition{},
+	}
+	for _, product := range products {
+		descriptor := strategicProductDescriptor{
+			Code:         product.Code,
+			Sector:       product.Sector,
+			Label:        product.Label,
+			RevisionNote: product.RevisionNote,
+			Notes:        product.Notes,
+		}
+		descriptors[product.Code] = descriptor
+		index.Products = append(index.Products, descriptor)
+	}
+
+	grouped := make(map[partitionKey]map[entryKey]*strategicProductEntry)
+	for _, row := range observations {
+		descriptor, ok := descriptors[row.ProductCode]
+		if !ok || row.ProductLevel != 6 || row.PeriodType != model.PeriodYear {
+			continue
+		}
+		reporter := strings.ToUpper(strings.TrimSpace(row.ReporterISO))
+		if reporter == "" || row.Period == "" {
+			continue
+		}
+		partner := strings.ToUpper(strings.TrimSpace(row.PartnerISO))
+		if partner != "USA" && partner != "CHN" {
+			continue
+		}
+		classification := strings.ToUpper(strings.TrimSpace(row.Classification))
+		if classification == "" {
+			classification = "HS"
+		}
+		pkey := partitionKey{reporter: reporter, period: row.Period}
+		if grouped[pkey] == nil {
+			grouped[pkey] = make(map[entryKey]*strategicProductEntry)
+		}
+		ekey := entryKey{classification: classification, code: row.ProductCode}
+		entry := grouped[pkey][ekey]
+		if entry == nil {
+			entry = &strategicProductEntry{
+				Classification: classification,
+				Code:           descriptor.Code,
+				Sector:         descriptor.Sector,
+				Label:          descriptor.Label,
+				RevisionNote:   descriptor.RevisionNote,
+			}
+			grouped[pkey][ekey] = entry
+		}
+		block := &entry.USA
+		if partner == "CHN" {
+			block = &entry.CHN
+		}
+		block.Available = true
+		if row.Flow == model.FlowExport {
+			block.Export += row.ValueUSD
+		} else if row.Flow == model.FlowImport {
+			block.Import += row.ValueUSD
+		}
+		index.ObservationCount++
+	}
+
+	files := make(map[string]strategicFile, len(grouped))
+	reporterSet := make(map[string]struct{})
+	periodSet := make(map[string]struct{})
+	keys := make([]partitionKey, 0, len(grouped))
+	for key := range grouped {
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		if keys[i].reporter != keys[j].reporter {
+			return keys[i].reporter < keys[j].reporter
+		}
+		return keys[i].period > keys[j].period
+	})
+	for _, key := range keys {
+		file := strategicFile{
+			SchemaVersion: schemaVersion,
+			GeneratedAt:   generatedAt,
+			Provider:      index.Provider,
+			Level:         6,
+			Partners:      append([]string(nil), partners...),
+			ReporterISO3:  key.reporter,
+			Period:        key.period,
+			Rows:          []strategicProductEntry{},
+		}
+		for _, entry := range grouped[key] {
+			entry.USA.Trade = entry.USA.Export + entry.USA.Import
+			entry.CHN.Trade = entry.CHN.Export + entry.CHN.Import
+			entry.Total = entry.USA.Trade + entry.CHN.Trade
+			if entry.Total > 0 {
+				entry.ShareCN = entry.CHN.Trade / entry.Total
+			}
+			file.Rows = append(file.Rows, *entry)
+		}
+		sort.Slice(file.Rows, func(i, j int) bool {
+			if file.Rows[i].Sector != file.Rows[j].Sector {
+				return file.Rows[i].Sector < file.Rows[j].Sector
+			}
+			if file.Rows[i].Total != file.Rows[j].Total {
+				return file.Rows[i].Total > file.Rows[j].Total
+			}
+			if file.Rows[i].Code != file.Rows[j].Code {
+				return file.Rows[i].Code < file.Rows[j].Code
+			}
+			return file.Rows[i].Classification < file.Rows[j].Classification
+		})
+		relativePath := key.reporter + "/" + key.period + ".json"
+		files[relativePath] = file
+		index.Partitions = append(index.Partitions, strategicPartition{
+			ReporterISO3: key.reporter,
+			Period:       key.period,
+			Href:         "./" + relativePath,
+			RowCount:     len(file.Rows),
+		})
+		reporterSet[key.reporter] = struct{}{}
+		periodSet[key.period] = struct{}{}
+	}
+	for reporter := range reporterSet {
+		index.Reporters = append(index.Reporters, reporter)
+	}
+	for period := range periodSet {
+		index.Periods = append(index.Periods, period)
+	}
+	sort.Strings(index.Reporters)
+	sort.Sort(sort.Reverse(sort.StringSlice(index.Periods)))
+	return index, files
+}
+
+func loadTariffObservations(dbPath, provider string) ([]tariffObservationRow, error) {
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	columns, err := sqliteTableColumns(db, "tariff_observations")
+	if err != nil {
+		return nil, err
+	}
+	if len(columns) == 0 {
+		return []tariffObservationRow{}, nil
+	}
+	column := func(name, fallback string) string {
+		if _, ok := columns[name]; ok {
+			return name
+		}
+		return fallback + " AS " + name
+	}
+	query := `SELECT provider, classification, product_code, product_level,
+		importer_iso3, exporter_iso3, ` + column("exporter_code", "''") + `,
+		` + column("data_type", "'reported'") + `, rate_type, regime, year, rate_percent,
+		` + column("sum_rate_percent", "NULL") + `, ` + column("min_rate_percent", "NULL") + `,
+		` + column("max_rate_percent", "NULL") + `, ` + column("total_lines", "0") + `,
+		` + column("preferential_lines", "0") + `, ` + column("mfn_lines", "0") + `,
+		` + column("non_ad_valorem_lines", "0") + `, ` + column("nomenclature", "''") + `,
+		` + column("excluded_from", "''") + `, ` + column("source_updated_at", "NULL") + `
+		FROM tariff_observations WHERE product_level = 6`
+	args := []any{}
+	if strings.TrimSpace(provider) != "" {
+		query += " AND provider = ?"
+		args = append(args, strings.ToLower(strings.TrimSpace(provider)))
+	}
+	rows, err := db.QueryContext(context.Background(), query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := make([]tariffObservationRow, 0)
+	for rows.Next() {
+		var row tariffObservationRow
+		var sumRate, minRate, maxRate sql.NullFloat64
+		var sourceUpdated sql.NullString
+		if err := rows.Scan(
+			&row.Provider, &row.Classification, &row.ProductCode, &row.ProductLevel,
+			&row.ImporterISO3, &row.ExporterISO3, &row.ExporterCode, &row.DataType,
+			&row.RateType, &row.Regime, &row.Year, &row.RatePercent,
+			&sumRate, &minRate, &maxRate, &row.TotalLines, &row.PreferentialLines,
+			&row.MFNLines, &row.NonAdValoremLines, &row.Nomenclature, &row.ExcludedFrom,
+			&sourceUpdated,
+		); err != nil {
+			return nil, err
+		}
+		row.SumRatePercent = nullableFloat(sumRate)
+		row.MinRatePercent = nullableFloat(minRate)
+		row.MaxRatePercent = nullableFloat(maxRate)
+		if sourceUpdated.Valid {
+			row.SourceUpdatedAt = sourceUpdated.String
+		}
+		result = append(result, row)
+	}
+	return result, rows.Err()
+}
+
+func sqliteTableColumns(db *sql.DB, table string) (map[string]struct{}, error) {
+	rows, err := db.Query(`PRAGMA table_info(` + table + `)`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	columns := make(map[string]struct{})
+	for rows.Next() {
+		var cid, notNull, primaryKey int
+		var name, dataType string
+		var defaultValue any
+		if err := rows.Scan(&cid, &name, &dataType, &notNull, &defaultValue, &primaryKey); err != nil {
+			return nil, err
+		}
+		columns[strings.ToLower(name)] = struct{}{}
+	}
+	return columns, rows.Err()
+}
+
+func nullableFloat(value sql.NullFloat64) *float64 {
+	if !value.Valid {
+		return nil
+	}
+	result := value.Float64
+	return &result
+}
+
+func buildTariffFiles(generatedAt, provider string, observations []tariffObservationRow, products []strategic.Product) (tariffIndexFile, map[string]tariffFile) {
+	type partitionKey struct {
+		importer string
+		year     string
+	}
+	descriptors := make(map[string]strategicProductDescriptor, len(products))
+	index := tariffIndexFile{
+		SchemaVersion: schemaVersion, GeneratedAt: generatedAt, Provider: strings.ToLower(strings.TrimSpace(provider)), Level: 6,
+		Importers: []string{}, Exporters: []string{}, Years: []string{}, DataTypes: []string{}, RateTypes: []string{},
+		Products: []strategicProductDescriptor{}, Partitions: []tariffPartition{},
+	}
+	for _, product := range products {
+		descriptor := strategicProductDescriptor{Code: product.Code, Sector: product.Sector, Label: product.Label, RevisionNote: product.RevisionNote, Notes: product.Notes}
+		descriptors[product.Code] = descriptor
+		index.Products = append(index.Products, descriptor)
+	}
+	grouped := make(map[partitionKey][]tariffPublishedRow)
+	importers := make(map[string]struct{})
+	exporters := make(map[string]struct{})
+	years := make(map[string]struct{})
+	dataTypes := make(map[string]struct{})
+	rateTypes := make(map[string]struct{})
+	for _, observation := range observations {
+		descriptor, ok := descriptors[strings.TrimSpace(observation.ProductCode)]
+		if !ok || observation.ProductLevel != 6 {
+			continue
+		}
+		importer := strings.ToUpper(strings.TrimSpace(observation.ImporterISO3))
+		exporter := strings.ToUpper(strings.TrimSpace(observation.ExporterISO3))
+		year := strings.TrimSpace(observation.Year)
+		if len(importer) != 3 || len(exporter) != 3 || len(year) != 4 {
+			continue
+		}
+		row := tariffPublishedRow{
+			Classification: strings.ToUpper(strings.TrimSpace(observation.Classification)),
+			Nomenclature:   strings.ToUpper(strings.TrimSpace(observation.Nomenclature)),
+			Code:           descriptor.Code, Sector: descriptor.Sector, Label: descriptor.Label,
+			ExporterISO3: exporter, ExporterCode: strings.ToUpper(strings.TrimSpace(observation.ExporterCode)),
+			DataType: strings.ToLower(strings.TrimSpace(observation.DataType)), RateType: strings.ToLower(strings.TrimSpace(observation.RateType)),
+			Regime: strings.ToLower(strings.TrimSpace(observation.Regime)), RatePercent: observation.RatePercent,
+			SumRatePercent: observation.SumRatePercent, MinRatePercent: observation.MinRatePercent, MaxRatePercent: observation.MaxRatePercent,
+			TotalLines: observation.TotalLines, PreferentialLines: observation.PreferentialLines, MFNLines: observation.MFNLines,
+			NonAdValoremLines: observation.NonAdValoremLines, ExcludedFrom: strings.ToUpper(strings.TrimSpace(observation.ExcludedFrom)),
+			SourceUpdatedAt: normalizePublishedTime(observation.SourceUpdatedAt),
+		}
+		key := partitionKey{importer: importer, year: year}
+		grouped[key] = append(grouped[key], row)
+		importers[importer] = struct{}{}
+		exporters[exporter] = struct{}{}
+		years[year] = struct{}{}
+		dataTypes[row.DataType] = struct{}{}
+		rateTypes[row.RateType] = struct{}{}
+		index.ObservationCount++
+	}
+	keys := make([]partitionKey, 0, len(grouped))
+	for key := range grouped {
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		if keys[i].importer != keys[j].importer {
+			return keys[i].importer < keys[j].importer
+		}
+		return keys[i].year > keys[j].year
+	})
+	files := make(map[string]tariffFile, len(keys))
+	for _, key := range keys {
+		partitionRows := grouped[key]
+		sort.Slice(partitionRows, func(i, j int) bool {
+			if partitionRows[i].Sector != partitionRows[j].Sector {
+				return partitionRows[i].Sector < partitionRows[j].Sector
+			}
+			if partitionRows[i].Code != partitionRows[j].Code {
+				return partitionRows[i].Code < partitionRows[j].Code
+			}
+			if partitionRows[i].ExporterISO3 != partitionRows[j].ExporterISO3 {
+				return partitionRows[i].ExporterISO3 < partitionRows[j].ExporterISO3
+			}
+			if partitionRows[i].DataType != partitionRows[j].DataType {
+				return partitionRows[i].DataType < partitionRows[j].DataType
+			}
+			return partitionRows[i].RateType < partitionRows[j].RateType
+		})
+		relativePath := key.importer + "/" + key.year + ".json"
+		files[relativePath] = tariffFile{
+			SchemaVersion: schemaVersion, GeneratedAt: generatedAt, Provider: index.Provider, Level: 6,
+			ImporterISO3: key.importer, Year: key.year, Rows: partitionRows,
+		}
+		index.Partitions = append(index.Partitions, tariffPartition{ImporterISO3: key.importer, Year: key.year, Href: "./" + relativePath, RowCount: len(partitionRows)})
+	}
+	for value := range importers {
+		index.Importers = append(index.Importers, value)
+	}
+	for value := range exporters {
+		index.Exporters = append(index.Exporters, value)
+	}
+	for value := range years {
+		index.Years = append(index.Years, value)
+	}
+	for value := range dataTypes {
+		index.DataTypes = append(index.DataTypes, value)
+	}
+	for value := range rateTypes {
+		index.RateTypes = append(index.RateTypes, value)
+	}
+	sort.Strings(index.Importers)
+	sort.Strings(index.Exporters)
+	sort.Sort(sort.Reverse(sort.StringSlice(index.Years)))
+	sort.Strings(index.DataTypes)
+	sort.Strings(index.RateTypes)
+	return index, files
+}
+
+func normalizePublishedTime(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	for _, layout := range []string{time.RFC3339Nano, "2006-01-02 15:04:05 -0700 MST", "2006-01-02 15:04:05.999999999 -0700 MST"} {
+		if parsed, err := time.Parse(layout, value); err == nil {
+			return parsed.UTC().Format(time.RFC3339)
+		}
+	}
+	return value
+}
+
+func loadMatrixObservations(dbPath, provider string) ([]observationRow, error) {
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	query := `SELECT provider, reporter_iso3, partner_iso3, flow, period_type, period,
+		MAX(value_usd), MAX(classification), 'TOTAL', 0
+		FROM trade_observations
+		WHERE product_level = 0 AND product_code = 'TOTAL' AND period_type = 'Y'
+			AND flow IN ('export','import') AND partner_iso3 <> 'WLD' AND partner_iso3 <> reporter_iso3`
+	args := []any{}
+	if strings.TrimSpace(provider) != "" {
+		query += " AND provider = ?"
+		args = append(args, strings.ToLower(strings.TrimSpace(provider)))
+	}
+	query += ` GROUP BY provider, reporter_iso3, partner_iso3, flow, period_type, period`
+	rows, err := db.QueryContext(context.Background(), query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := make([]observationRow, 0)
+	for rows.Next() {
+		var row observationRow
+		if err := rows.Scan(&row.Provider, &row.ReporterISO, &row.PartnerISO, &row.Flow, &row.PeriodType, &row.Period, &row.ValueUSD, &row.Classification, &row.ProductCode, &row.ProductLevel); err != nil {
+			return nil, err
+		}
+		result = append(result, row)
+	}
+	return result, rows.Err()
+}
+
+func buildMatrixFiles(generatedAt, provider string, observations []observationRow) (matrixIndexFile, map[string]matrixFile) {
+	type partitionKey struct {
+		reporter string
+		period   string
+	}
+	index := matrixIndexFile{
+		SchemaVersion: schemaVersion, GeneratedAt: generatedAt, Provider: strings.ToLower(strings.TrimSpace(provider)),
+		ProductCode: "TOTAL", ProductLevel: 0, Reporters: []string{}, Partners: []string{}, Periods: []string{}, Partitions: []matrixPartition{},
+	}
+	grouped := make(map[partitionKey]map[string]*matrixPartner)
+	partnerSet := make(map[string]struct{})
+	for _, observation := range observations {
+		if observation.ProductLevel != 0 || strings.ToUpper(strings.TrimSpace(observation.ProductCode)) != "TOTAL" || observation.PeriodType != model.PeriodYear {
+			continue
+		}
+		reporter := strings.ToUpper(strings.TrimSpace(observation.ReporterISO))
+		partner := strings.ToUpper(strings.TrimSpace(observation.PartnerISO))
+		period := strings.TrimSpace(observation.Period)
+		if !isPublishedISO3(reporter) || !isPublishedISO3(partner) || partner == "WLD" || partner == reporter || len(period) != 4 || observation.ValueUSD < 0 {
+			continue
+		}
+		key := partitionKey{reporter: reporter, period: period}
+		if grouped[key] == nil {
+			grouped[key] = make(map[string]*matrixPartner)
+		}
+		entry := grouped[key][partner]
+		if entry == nil {
+			entry = &matrixPartner{PartnerISO3: partner}
+			grouped[key][partner] = entry
+		}
+		switch observation.Flow {
+		case model.FlowExport:
+			entry.ExportAvailable = true
+			entry.ExportUSD = observation.ValueUSD
+		case model.FlowImport:
+			entry.ImportAvailable = true
+			entry.ImportUSD = observation.ValueUSD
+		default:
+			continue
+		}
+		partnerSet[partner] = struct{}{}
+		index.ObservationCount++
+	}
+
+	keys := make([]partitionKey, 0, len(grouped))
+	for key := range grouped {
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		if keys[i].reporter != keys[j].reporter {
+			return keys[i].reporter < keys[j].reporter
+		}
+		return keys[i].period > keys[j].period
+	})
+	files := make(map[string]matrixFile, len(keys))
+	reporterSet := make(map[string]struct{})
+	periodSet := make(map[string]struct{})
+	for _, key := range keys {
+		file := matrixFile{
+			SchemaVersion: schemaVersion, GeneratedAt: generatedAt, Provider: index.Provider, ProductCode: "TOTAL", ProductLevel: 0,
+			ReporterISO3: key.reporter, Period: key.period, Rows: []matrixPartner{},
+		}
+		for _, entry := range grouped[key] {
+			entry.TradeUSD = entry.ExportUSD + entry.ImportUSD
+			entry.BalanceUSD = entry.ExportUSD - entry.ImportUSD
+			file.Rows = append(file.Rows, *entry)
+		}
+		sort.Slice(file.Rows, func(i, j int) bool {
+			if file.Rows[i].TradeUSD != file.Rows[j].TradeUSD {
+				return file.Rows[i].TradeUSD > file.Rows[j].TradeUSD
+			}
+			return file.Rows[i].PartnerISO3 < file.Rows[j].PartnerISO3
+		})
+		relativePath := key.reporter + "/" + key.period + ".json"
+		files[relativePath] = file
+		index.Partitions = append(index.Partitions, matrixPartition{ReporterISO3: key.reporter, Period: key.period, Href: "./" + relativePath, RowCount: len(file.Rows)})
+		index.PartnerRowCount += len(file.Rows)
+		reporterSet[key.reporter] = struct{}{}
+		periodSet[key.period] = struct{}{}
+	}
+	for value := range reporterSet {
+		index.Reporters = append(index.Reporters, value)
+	}
+	for value := range partnerSet {
+		index.Partners = append(index.Partners, value)
+	}
+	for value := range periodSet {
+		index.Periods = append(index.Periods, value)
+	}
+	sort.Strings(index.Reporters)
+	sort.Strings(index.Partners)
+	sort.Sort(sort.Reverse(sort.StringSlice(index.Periods)))
+	return index, files
+}
+
+func isPublishedISO3(value string) bool {
+	if len(value) != 3 {
+		return false
+	}
+	for _, character := range value {
+		if character < 'A' || character > 'Z' {
+			return false
+		}
+	}
+	return true
+}
+
 func loadIngestRuns(dbPath string, limit int) ([]ingestRunRecord, error) {
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
@@ -632,4 +1379,37 @@ func augmentMeta(meta *metaFile, latest []latestEntry, series seriesFile, produc
 	meta.ProductReporterCount = len(products.Reporters)
 	meta.ProductObservationCount = productObservationCount
 	meta.ContextStatus = contextStatus
+}
+
+func augmentStrategicMeta(meta *metaFile, index strategicIndexFile) {
+	if meta == nil {
+		return
+	}
+	meta.StrategicProvider = index.Provider
+	meta.StrategicLevel = index.Level
+	meta.StrategicProductCount = len(index.Products)
+	meta.StrategicReporterCount = len(index.Reporters)
+	meta.StrategicPartitionCount = len(index.Partitions)
+	meta.StrategicObservationCount = index.ObservationCount
+}
+
+func augmentTariffMeta(meta *metaFile, index tariffIndexFile) {
+	if meta == nil {
+		return
+	}
+	meta.TariffProvider = index.Provider
+	meta.TariffImporterCount = len(index.Importers)
+	meta.TariffPartitionCount = len(index.Partitions)
+	meta.TariffObservationCount = index.ObservationCount
+}
+
+func augmentMatrixMeta(meta *metaFile, index matrixIndexFile) {
+	if meta == nil {
+		return
+	}
+	meta.MatrixProvider = index.Provider
+	meta.MatrixReporterCount = len(index.Reporters)
+	meta.MatrixPartitionCount = len(index.Partitions)
+	meta.MatrixPartnerRowCount = index.PartnerRowCount
+	meta.MatrixObservationCount = index.ObservationCount
 }

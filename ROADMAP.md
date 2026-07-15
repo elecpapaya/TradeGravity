@@ -27,6 +27,11 @@ TradeGravity is maintained as a small, inspectable public-data pipeline. The roa
 - Publish a quality dashboard with collection runs and same-period provider comparisons.
 - Generate evidence-grounded explanations at build time with citation and numeric-claim validation.
 - Add filtered JSON export and a deterministic sample-data generator.
+- Split the viewer into synchronized Overview, Intelligence, Products, Data & Quality, and Scenario Lab tabs.
+- Publish curated strategic HS6 trade partitions with source-revision metadata.
+- Collect and publish WITS/TRAINS strategic-HS6 tariffs with AVE/reported identity and fallback behavior.
+- Publish reported UN Comtrade multi-partner matrices and selected-country partner networks without route claims.
+- Connect published MFN tariffs and HS6 import baselines to the transparent scenario sensitivity lab.
 
 ## Near term: adoption evidence and release operations
 
@@ -42,6 +47,10 @@ TradeGravity is maintained as a small, inspectable public-data pipeline. The roa
 - Add product-share changes across multiple years when provider quotas permit reliable collection.
 - Improve chart keyboard navigation, screen-reader summaries, and small-screen layouts.
 - Add automated magnitude and schema anomaly checks.
+- Add bilateral mirror-statistics diagnostics and explicit CIF/FOB, lag, and indirect-trade reconciliation assumptions.
+- Prototype ESI/ECI/ICI/SPDI/RPI only after formulas, benchmark datasets, uncertainty, and validation cases are documented.
+- Add tariff-change decomposition and Marimekko/waterfall views when the required multi-year product coverage is reliable.
+- Add versioned scenario manifests and reproducible result artifacts before introducing SMART-like substitution or welfare outputs.
 
 ## Later: provider resilience and interpretation
 

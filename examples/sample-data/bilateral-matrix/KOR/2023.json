@@ -1,0 +1,56 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T14:10:35Z",
+  "provider": "comtrade",
+  "product_code": "TOTAL",
+  "product_level": 0,
+  "reporter_iso3": "KOR",
+  "period": "2023",
+  "rows": [
+    {
+      "partner_iso3": "CHN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 140240519999.99997,
+      "import_usd": 105795479999.99998,
+      "trade_usd": 246035999999.99994,
+      "balance_usd": 34445039999.999985
+    },
+    {
+      "partner_iso3": "USA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 105791999999.99998,
+      "import_usd": 79808000000,
+      "trade_usd": 185600000000,
+      "balance_usd": 25983999999.999985
+    },
+    {
+      "partner_iso3": "VNM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 37093319999.99999,
+      "import_usd": 27982679999.999996,
+      "trade_usd": 65075999999.999985,
+      "balance_usd": 9110639999.999996
+    },
+    {
+      "partner_iso3": "MEX",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 28603511999.999996,
+      "import_usd": 21578088000,
+      "trade_usd": 50181600000,
+      "balance_usd": 7025423999.999996
+    },
+    {
+      "partner_iso3": "AUS",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 24755327999.999996,
+      "import_usd": 18675072000,
+      "trade_usd": 43430400000,
+      "balance_usd": 6080255999.999996
+    }
+  ]
+}

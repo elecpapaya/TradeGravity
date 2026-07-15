@@ -61,7 +61,14 @@ func main() {
 	ctx := context.Background()
 	observations := totalObservations()
 	observations = append(observations, productObservations()...)
+	matrix := matrixObservations()
+	observations = append(observations, matrix...)
 	if err := store.UpsertObservations(ctx, observations); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	tariffs := tariffObservations()
+	if err := store.UpsertTariffObservations(ctx, tariffs); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -75,9 +82,25 @@ func main() {
 		os.Exit(1)
 	}
 	if err := store.RecordIngestRun(ctx, model.IngestRun{
+		RunID: "sample-trains-tariffs", Provider: "trains", Mode: "tariffs-strategic-hs6", StartedAt: fixed.Add(4 * time.Minute),
+		FinishedAt: fixed.Add(5 * time.Minute), Status: "success", ReporterCount: 3,
+		RequestCount: 3, SuccessCount: 3, StoredCount: len(tariffs), Errors: []string{},
+	}); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if err := store.RecordIngestRun(ctx, model.IngestRun{
 		RunID: "sample-comtrade-products", Provider: "comtrade", Mode: "products-hs2", StartedAt: fixed.Add(2 * time.Minute),
 		FinishedAt: fixed.Add(3 * time.Minute), Status: "success", ReporterCount: 3,
 		RequestCount: 12, SuccessCount: 12, StoredCount: 36, Errors: []string{},
+	}); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if err := store.RecordIngestRun(ctx, model.IngestRun{
+		RunID: "sample-comtrade-matrix", Provider: "comtrade", Mode: "bilateral-matrix", StartedAt: fixed.Add(6 * time.Minute),
+		FinishedAt: fixed.Add(7 * time.Minute), Status: "success", ReporterCount: 3,
+		RequestCount: 6, SuccessCount: 6, StoredCount: len(matrix), Errors: []string{},
 	}); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -87,6 +110,29 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Printf("sample fixture created (db=%s observations=%d context=%s)\n", *dbPath, len(observations), *contextPath)
+}
+
+func tariffObservations() []model.TariffObservation {
+	products := []struct {
+		code string
+		base float64
+	}{{"260300", 1.5}, {"850760", 3.2}, {"854231", 2.4}}
+	fixed := time.Date(2025, 8, 11, 0, 0, 0, 0, time.UTC)
+	var observations []model.TariffObservation
+	for importerIndex, importer := range []string{"DEU", "JPN", "KOR"} {
+		for _, product := range products {
+			rate := product.base + float64(importerIndex)*0.4
+			minRate, maxRate, sumRate := rate, rate+1, rate*2+1
+			observations = append(observations, model.TariffObservation{
+				Provider: "trains", Classification: "HS2017", ProductCode: product.code, ProductLevel: 6,
+				ImporterISO3: importer, ExporterISO3: "WLD", ExporterCode: "000", DataType: model.TariffAVEEstimated,
+				RateType: model.TariffMFNApplied, Regime: "mfn", Year: "2023", RatePercent: rate,
+				SumRatePercent: &sumRate, MinRatePercent: &minRate, MaxRatePercent: &maxRate,
+				TotalLines: 2, MFNLines: 2, Nomenclature: "H5", SourceUpdatedAt: fixed,
+			})
+		}
+	}
+	return observations
 }
 
 func totalObservations() []model.Observation {
@@ -140,6 +186,30 @@ func productObservations() []model.Observation {
 						ValueUSD: chapter.value * (1 + float64(reporterIndex)*0.1) * (1 + float64(partnerIndex)*0.15) * flow.share,
 					})
 				}
+			}
+		}
+	}
+	return observations
+}
+
+func matrixObservations() []model.Observation {
+	partners := []struct {
+		iso3  string
+		value float64
+	}{{"USA", 160e9}, {"CHN", 210e9}, {"VNM", 55e9}, {"MEX", 42e9}, {"AUS", 36e9}}
+	var observations []model.Observation
+	for reporterIndex, reporter := range []string{"DEU", "JPN", "KOR"} {
+		for partnerIndex, partner := range partners {
+			for _, flow := range []struct {
+				name  model.Flow
+				share float64
+			}{{model.FlowExport, 0.57}, {model.FlowImport, 0.43}} {
+				observations = append(observations, model.Observation{
+					Provider: "comtrade", Classification: "H6", ProductCode: "TOTAL", ProductLevel: 0,
+					ReporterISO3: reporter, PartnerISO3: partner.iso3, Flow: flow.name,
+					PeriodType: model.PeriodYear, Period: "2023",
+					ValueUSD: partner.value * (1 + float64(reporterIndex)*0.08) * (1 + float64(partnerIndex)*0.01) * flow.share,
+				})
 			}
 		}
 	}

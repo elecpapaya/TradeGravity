@@ -16,10 +16,18 @@ In the viewer, choose `Y:2023`, `Same-period only`, group `ASEAN`, and the desir
 - **Teaching:** demonstrate API normalization, reproducible pipelines, data lag, bilateral reporting asymmetry, validation, and accessible visualization.
 - **Data tooling:** consume a small static JSON dataset without operating a database or web application server.
 - **Monitoring:** detect changes in provider availability, reporting periods, or high-level totals that merit investigation in the upstream source.
+- **Partner screening:** select a reporter and inspect its largest reported bilateral partners before performing route-, firm-, or product-specific research.
+- **Tariff sensitivity:** use a published strategic-HS6 MFN rate and import baseline for a transparent elasticity sensitivity check, not a forecast.
 
 ## Important non-goals
 
 TradeGravity is not a real-time feed, an exhaustive mirror of either provider, or a basis for financial, legal, or policy decisions. Imports and exports are from the reporter's perspective, and mirror statistics can differ for valuation, timing, classification, and reporting reasons.
+
+The multi-partner network is not a physical supply-chain route. The scenario lab is not a WITS SMART, welfare, GDP, substitution, or causal model. ECI/ESI/ICI/SPDI/RPI, mirror reconciliation, tariff-evasion estimates, and value-added routing are not currently published.
+
+## Discovering scalable resources
+
+Read `catalog.json` first, then follow the relevant index. For example, load `bilateral-matrix/index.json`, find the reporter/year partition, and fetch that bounded file. Do the same with `strategic-hs6/index.json` and `tariffs/index.json`; do not guess a partition that the index does not list.
 
 Per-capita and GDP-share modes use the latest published World Bank denominator shown with each country. They are cross-sectional aids, not constant-price or year-specific normalized time series. HS2 values use UN Comtrade and are not silently combined with WITS headline totals.
 

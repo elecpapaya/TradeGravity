@@ -23,7 +23,8 @@ node --check site/app.js
 node --check site/security.js
 node --check site/data-tools.js
 node --check site/explorer-tools.js
-node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/structure.test.cjs
+node --check site/intelligence-tools.js
+node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/structure.test.cjs
 python -m pip install --disable-pip-version-check cffconvert==2.0.0
 cffconvert --validate
 go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
@@ -36,12 +37,15 @@ Confirm that all required pull-request checks pass. Then run the collector, publ
 go run ./cmd/context
 go run ./cmd/collector run -history-years 9
 go run ./cmd/collector products -provider comtrade -primary-provider wits -year auto
+go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto
+go run ./cmd/collector matrix -provider comtrade -primary-provider wits -year auto
+go run ./cmd/collector tariffs -provider trains -year auto -data-type aveestimated
 go run ./cmd/publisher build -db tradegravity.db -out site/data -series-years 10
 go run ./cmd/explainer -dir site/data
 go run ./cmd/validator -dir site/data -min-reporters 40
 ```
 
-Preview the site locally and confirm same-period/all modes, exact-period selection, regional/group filters, normalizations, share URL restoration, both exports, trends, HS2 products, quality signals, explanations, accessible table, and small-screen layout.
+Preview the site locally and confirm same-period/all modes, exact-period selection, regional/group filters, normalizations, share URL restoration, both exports, trends, HS2/strategic HS6 products, tariff source labels, multi-partner fallback behavior, scenario assumptions, quality signals, explanations, accessible table, and small-screen layout.
 
 ## 3. Tag and publish
 

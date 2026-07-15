@@ -1,0 +1,172 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T14:10:35Z",
+  "provider": "trains",
+  "level": 6,
+  "importers": [
+    "DEU",
+    "JPN",
+    "KOR"
+  ],
+  "exporters": [
+    "WLD"
+  ],
+  "years": [
+    "2023"
+  ],
+  "data_types": [
+    "ave_estimated"
+  ],
+  "rate_types": [
+    "mfn_applied"
+  ],
+  "products": [
+    {
+      "code": "260300",
+      "sector": "critical_minerals",
+      "label": "Copper ores and concentrates",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Upstream copper supply exposure"
+    },
+    {
+      "code": "282520",
+      "sector": "critical_minerals",
+      "label": "Lithium oxide and hydroxide",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Processed lithium compounds"
+    },
+    {
+      "code": "283691",
+      "sector": "critical_minerals",
+      "label": "Lithium carbonates",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Processed lithium compounds"
+    },
+    {
+      "code": "284690",
+      "sector": "critical_minerals",
+      "label": "Other rare-earth compounds",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Rare-earth compounds outside cerium compounds"
+    },
+    {
+      "code": "847150",
+      "sector": "data_infrastructure",
+      "label": "Processing units",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Broad processing-unit trade rather than AI chips alone"
+    },
+    {
+      "code": "851762",
+      "sector": "data_infrastructure",
+      "label": "Network transmission equipment",
+      "revision_note": "HS 2007 and later",
+      "notes": "Routing switching and data-transmission equipment"
+    },
+    {
+      "code": "850760",
+      "sector": "ev_batteries",
+      "label": "Lithium-ion accumulators",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Finished lithium-ion cells and batteries"
+    },
+    {
+      "code": "850790",
+      "sector": "ev_batteries",
+      "label": "Electric accumulator parts",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Broader accumulator parts exposure"
+    },
+    {
+      "code": "870380",
+      "sector": "ev_batteries",
+      "label": "Battery-electric passenger vehicles",
+      "revision_note": "HS 2017 and later",
+      "notes": "Passenger vehicles with only an electric motor for propulsion"
+    },
+    {
+      "code": "848620",
+      "sector": "semiconductors",
+      "label": "Semiconductor manufacturing machinery",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Wafer and semiconductor-device manufacturing equipment"
+    },
+    {
+      "code": "854231",
+      "sector": "semiconductors",
+      "label": "Processors and controllers",
+      "revision_note": "HS 2007 and later",
+      "notes": "Electronic integrated circuits"
+    },
+    {
+      "code": "854232",
+      "sector": "semiconductors",
+      "label": "Memories",
+      "revision_note": "HS 2007 and later",
+      "notes": "Electronic integrated circuits"
+    },
+    {
+      "code": "854233",
+      "sector": "semiconductors",
+      "label": "Amplifiers",
+      "revision_note": "HS 2007 and later",
+      "notes": "Electronic integrated circuits"
+    },
+    {
+      "code": "854239",
+      "sector": "semiconductors",
+      "label": "Other integrated circuits",
+      "revision_note": "HS 2007 and later",
+      "notes": "Electronic integrated circuits not covered by the selected functional codes"
+    },
+    {
+      "code": "854290",
+      "sector": "semiconductors",
+      "label": "Integrated-circuit parts",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Parts of electronic integrated circuits"
+    },
+    {
+      "code": "854140",
+      "sector": "solar",
+      "label": "Photosensitive semiconductor devices legacy group",
+      "revision_note": "Through HS 2017",
+      "notes": "Includes photovoltaic cells before the HS 2022 split"
+    },
+    {
+      "code": "854142",
+      "sector": "solar",
+      "label": "Photovoltaic cells not assembled in modules",
+      "revision_note": "HS 2022 and later",
+      "notes": "Use only where the source classification supports HS 2022"
+    },
+    {
+      "code": "854143",
+      "sector": "solar",
+      "label": "Photovoltaic cells assembled in modules or panels",
+      "revision_note": "HS 2022 and later",
+      "notes": "Use only where the source classification supports HS 2022"
+    }
+  ],
+  "partitions": [
+    {
+      "importer_iso3": "DEU",
+      "year": "2023",
+      "href": "./DEU/2023.json",
+      "row_count": 3
+    },
+    {
+      "importer_iso3": "JPN",
+      "year": "2023",
+      "href": "./JPN/2023.json",
+      "row_count": 3
+    },
+    {
+      "importer_iso3": "KOR",
+      "year": "2023",
+      "href": "./KOR/2023.json",
+      "row_count": 3
+    }
+  ],
+  "observation_count": 9
+}

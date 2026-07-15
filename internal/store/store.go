@@ -9,6 +9,7 @@ import (
 
 type Store interface {
 	UpsertObservations(ctx context.Context, observations []model.Observation) error
+	UpsertTariffObservations(ctx context.Context, observations []model.TariffObservation) error
 	RecordIngestRun(ctx context.Context, run model.IngestRun) error
 	DominantAnnualPeriod(ctx context.Context, provider string) (string, error)
 	ListReporters(ctx context.Context, onlyActive bool) ([]model.Reporter, error)
@@ -19,6 +20,12 @@ type Store interface {
 type NopStore struct{}
 
 func (s *NopStore) UpsertObservations(ctx context.Context, observations []model.Observation) error {
+	_ = ctx
+	_ = observations
+	return nil
+}
+
+func (s *NopStore) UpsertTariffObservations(ctx context.Context, observations []model.TariffObservation) error {
 	_ = ctx
 	_ = observations
 	return nil

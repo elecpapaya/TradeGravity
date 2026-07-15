@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -10,7 +11,10 @@ import (
 	"time"
 )
 
-var hs2Pattern = regexp.MustCompile(`^\d{2}$`)
+var (
+	hs2Pattern = regexp.MustCompile(`^\d{2}$`)
+	hs6Pattern = regexp.MustCompile(`^\d{6}$`)
+)
 
 type validationSeries struct {
 	SchemaVersion string                     `json:"schema_version"`
@@ -64,6 +68,24 @@ type validationProductFile struct {
 	Rows           []validationProductEntry `json:"rows"`
 }
 
+type validationCatalog struct {
+	SchemaVersion string                      `json:"schema_version"`
+	GeneratedAt   string                      `json:"generated_at"`
+	Resources     []validationCatalogResource `json:"resources"`
+}
+
+type validationCatalogResource struct {
+	ID             string `json:"id"`
+	Title          string `json:"title"`
+	Status         string `json:"status"`
+	Provider       string `json:"provider,omitempty"`
+	Classification string `json:"classification,omitempty"`
+	ProductLevel   int    `json:"product_level,omitempty"`
+	Grain          string `json:"grain"`
+	Partitioning   string `json:"partitioning"`
+	Href           string `json:"href,omitempty"`
+}
+
 type validationProductEntry struct {
 	PeriodType string                `json:"period_type"`
 	Period     string                `json:"period"`
@@ -73,6 +95,155 @@ type validationProductEntry struct {
 	CHN        validationSeriesBlock `json:"chn"`
 	Total      float64               `json:"total"`
 	ShareCN    float64               `json:"share_cn"`
+}
+
+type validationStrategicIndex struct {
+	SchemaVersion    string                                 `json:"schema_version"`
+	GeneratedAt      string                                 `json:"generated_at"`
+	Provider         string                                 `json:"provider"`
+	Level            int                                    `json:"level"`
+	Partners         []string                               `json:"partners"`
+	Sectors          []string                               `json:"sectors"`
+	Products         []validationStrategicProductDescriptor `json:"products"`
+	Reporters        []string                               `json:"reporters"`
+	Periods          []string                               `json:"periods"`
+	Partitions       []validationStrategicPartition         `json:"partitions"`
+	ObservationCount int                                    `json:"observation_count"`
+}
+
+type validationStrategicProductDescriptor struct {
+	Code         string `json:"code"`
+	Sector       string `json:"sector"`
+	Label        string `json:"label"`
+	RevisionNote string `json:"revision_note"`
+	Notes        string `json:"notes,omitempty"`
+}
+
+type validationStrategicPartition struct {
+	ReporterISO3 string `json:"reporter_iso3"`
+	Period       string `json:"period"`
+	Href         string `json:"href"`
+	RowCount     int    `json:"row_count"`
+}
+
+type validationStrategicFile struct {
+	SchemaVersion string                            `json:"schema_version"`
+	GeneratedAt   string                            `json:"generated_at"`
+	Provider      string                            `json:"provider"`
+	Level         int                               `json:"level"`
+	Partners      []string                          `json:"partners"`
+	ReporterISO3  string                            `json:"reporter_iso3"`
+	Period        string                            `json:"period"`
+	Rows          []validationStrategicProductEntry `json:"rows"`
+}
+
+type validationStrategicProductEntry struct {
+	Classification string                `json:"classification"`
+	Code           string                `json:"code"`
+	Sector         string                `json:"sector"`
+	Label          string                `json:"label"`
+	RevisionNote   string                `json:"revision_note"`
+	USA            validationSeriesBlock `json:"usa"`
+	CHN            validationSeriesBlock `json:"chn"`
+	Total          float64               `json:"total"`
+	ShareCN        float64               `json:"share_cn"`
+}
+
+type validationTariffIndex struct {
+	SchemaVersion    string                                 `json:"schema_version"`
+	GeneratedAt      string                                 `json:"generated_at"`
+	Provider         string                                 `json:"provider"`
+	Level            int                                    `json:"level"`
+	Importers        []string                               `json:"importers"`
+	Exporters        []string                               `json:"exporters"`
+	Years            []string                               `json:"years"`
+	DataTypes        []string                               `json:"data_types"`
+	RateTypes        []string                               `json:"rate_types"`
+	Products         []validationStrategicProductDescriptor `json:"products"`
+	Partitions       []validationTariffPartition            `json:"partitions"`
+	ObservationCount int                                    `json:"observation_count"`
+}
+
+type validationTariffPartition struct {
+	ImporterISO3 string `json:"importer_iso3"`
+	Year         string `json:"year"`
+	Href         string `json:"href"`
+	RowCount     int    `json:"row_count"`
+}
+
+type validationTariffFile struct {
+	SchemaVersion string                `json:"schema_version"`
+	GeneratedAt   string                `json:"generated_at"`
+	Provider      string                `json:"provider"`
+	Level         int                   `json:"level"`
+	ImporterISO3  string                `json:"importer_iso3"`
+	Year          string                `json:"year"`
+	Rows          []validationTariffRow `json:"rows"`
+}
+
+type validationTariffRow struct {
+	Classification    string   `json:"classification"`
+	Nomenclature      string   `json:"nomenclature"`
+	Code              string   `json:"code"`
+	Sector            string   `json:"sector"`
+	Label             string   `json:"label"`
+	ExporterISO3      string   `json:"exporter_iso3"`
+	ExporterCode      string   `json:"exporter_code,omitempty"`
+	DataType          string   `json:"data_type"`
+	RateType          string   `json:"rate_type"`
+	Regime            string   `json:"regime"`
+	RatePercent       float64  `json:"rate_percent"`
+	SumRatePercent    *float64 `json:"sum_rate_percent,omitempty"`
+	MinRatePercent    *float64 `json:"min_rate_percent,omitempty"`
+	MaxRatePercent    *float64 `json:"max_rate_percent,omitempty"`
+	TotalLines        int      `json:"total_lines"`
+	PreferentialLines int      `json:"preferential_lines"`
+	MFNLines          int      `json:"mfn_lines"`
+	NonAdValoremLines int      `json:"non_ad_valorem_lines"`
+	ExcludedFrom      string   `json:"excluded_from,omitempty"`
+	SourceUpdatedAt   string   `json:"source_updated_at,omitempty"`
+}
+
+type validationMatrixIndex struct {
+	SchemaVersion    string                      `json:"schema_version"`
+	GeneratedAt      string                      `json:"generated_at"`
+	Provider         string                      `json:"provider"`
+	ProductCode      string                      `json:"product_code"`
+	ProductLevel     int                         `json:"product_level"`
+	Reporters        []string                    `json:"reporters"`
+	Partners         []string                    `json:"partners"`
+	Periods          []string                    `json:"periods"`
+	Partitions       []validationMatrixPartition `json:"partitions"`
+	PartnerRowCount  int                         `json:"partner_row_count"`
+	ObservationCount int                         `json:"observation_count"`
+}
+
+type validationMatrixPartition struct {
+	ReporterISO3 string `json:"reporter_iso3"`
+	Period       string `json:"period"`
+	Href         string `json:"href"`
+	RowCount     int    `json:"row_count"`
+}
+
+type validationMatrixFile struct {
+	SchemaVersion string                    `json:"schema_version"`
+	GeneratedAt   string                    `json:"generated_at"`
+	Provider      string                    `json:"provider"`
+	ProductCode   string                    `json:"product_code"`
+	ProductLevel  int                       `json:"product_level"`
+	ReporterISO3  string                    `json:"reporter_iso3"`
+	Period        string                    `json:"period"`
+	Rows          []validationMatrixPartner `json:"rows"`
+}
+
+type validationMatrixPartner struct {
+	PartnerISO3     string  `json:"partner_iso3"`
+	ExportAvailable bool    `json:"export_available"`
+	ImportAvailable bool    `json:"import_available"`
+	ExportUSD       float64 `json:"export_usd"`
+	ImportUSD       float64 `json:"import_usd"`
+	TradeUSD        float64 `json:"trade_usd"`
+	BalanceUSD      float64 `json:"balance_usd"`
 }
 
 type validationQuality struct {
@@ -211,6 +382,34 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 	if err := validateProducts(dataDir, metadata, products); err != nil {
 		return err
 	}
+	var strategicIndex validationStrategicIndex
+	if err := readJSON(filepath.Join(dataDir, "strategic-hs6", "index.json"), &strategicIndex); err != nil {
+		return fmt.Errorf("read strategic HS6 index: %w", err)
+	}
+	if err := validateStrategic(dataDir, metadata, strategicIndex); err != nil {
+		return err
+	}
+	var tariffIndex validationTariffIndex
+	if err := readJSON(filepath.Join(dataDir, "tariffs", "index.json"), &tariffIndex); err != nil {
+		return fmt.Errorf("read tariff index: %w", err)
+	}
+	if err := validateTariffs(dataDir, metadata, tariffIndex); err != nil {
+		return err
+	}
+	var matrixIndex validationMatrixIndex
+	if err := readJSON(filepath.Join(dataDir, "bilateral-matrix", "index.json"), &matrixIndex); err != nil {
+		return fmt.Errorf("read bilateral matrix index: %w", err)
+	}
+	if err := validateMatrix(dataDir, metadata, matrixIndex); err != nil {
+		return err
+	}
+	var catalog validationCatalog
+	if err := readJSON(filepath.Join(dataDir, "catalog.json"), &catalog); err != nil {
+		return fmt.Errorf("read catalog.json: %w", err)
+	}
+	if err := validateCatalog(metadata, catalog); err != nil {
+		return err
+	}
 	if err := validateExplanations(dataDir, metadata, latest); err != nil {
 		return err
 	}
@@ -219,6 +418,400 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 		return fmt.Errorf("read context.json: %w", err)
 	}
 	return validateContext(metadata, latest, contextData)
+}
+
+func validateCatalog(metadata datasetMeta, catalog validationCatalog) error {
+	if catalog.SchemaVersion != "1.0" || catalog.GeneratedAt != metadata.GeneratedAt {
+		return errorsForExtended("catalog provenance does not match metadata")
+	}
+	seen := make(map[string]validationCatalogResource, len(catalog.Resources))
+	for _, resource := range catalog.Resources {
+		if strings.TrimSpace(resource.ID) == "" || strings.TrimSpace(resource.Title) == "" || strings.TrimSpace(resource.Grain) == "" || strings.TrimSpace(resource.Partitioning) == "" {
+			return fmt.Errorf("catalog resource is incomplete: %+v", resource)
+		}
+		if _, exists := seen[resource.ID]; exists {
+			return fmt.Errorf("catalog has duplicate resource %q", resource.ID)
+		}
+		if resource.Status != "ready" && resource.Status != "partial" && resource.Status != "planned" {
+			return fmt.Errorf("catalog resource %s has invalid status %q", resource.ID, resource.Status)
+		}
+		if resource.Status == "planned" && resource.Href != "" {
+			return fmt.Errorf("planned catalog resource %s must not claim a published href", resource.ID)
+		}
+		if resource.Status != "planned" && (!strings.HasPrefix(resource.Href, "./") || strings.Contains(resource.Href, "..")) {
+			return fmt.Errorf("published catalog resource %s has invalid relative href %q", resource.ID, resource.Href)
+		}
+		seen[resource.ID] = resource
+	}
+	for _, required := range []string{"headline_totals", "time_series", "country_context", "product_chapters", "quality", "strategic_hs6", "tariff_schedules", "bilateral_matrix", "mirror_reconciliation", "scenario_runs"} {
+		if _, ok := seen[required]; !ok {
+			return fmt.Errorf("catalog is missing resource %q", required)
+		}
+	}
+	products := seen["product_chapters"]
+	if products.Provider != metadata.ProductProvider || products.Classification != metadata.ProductClassification || products.ProductLevel != metadata.ProductLevel {
+		return errorsForExtended("catalog product resource does not match metadata")
+	}
+	strategicResource := seen["strategic_hs6"]
+	wantStrategicStatus := "partial"
+	if metadata.StrategicPartitionCount > 0 {
+		wantStrategicStatus = "ready"
+	}
+	if strategicResource.Status != wantStrategicStatus || strategicResource.Provider != metadata.StrategicProvider || strategicResource.ProductLevel != 6 || strategicResource.Href != "./strategic-hs6/index.json" {
+		return errorsForExtended("catalog strategic resource does not match metadata")
+	}
+	tariffResource := seen["tariff_schedules"]
+	wantTariffStatus := "partial"
+	if metadata.TariffPartitionCount > 0 {
+		wantTariffStatus = "ready"
+	}
+	if tariffResource.Status != wantTariffStatus || tariffResource.Provider != metadata.TariffProvider || tariffResource.ProductLevel != 6 || tariffResource.Href != "./tariffs/index.json" {
+		return errorsForExtended("catalog tariff resource does not match metadata")
+	}
+	matrixResource := seen["bilateral_matrix"]
+	wantMatrixStatus := "partial"
+	if metadata.MatrixPartitionCount > 0 {
+		wantMatrixStatus = "ready"
+	}
+	if matrixResource.Status != wantMatrixStatus || matrixResource.Provider != metadata.MatrixProvider || matrixResource.ProductLevel != 0 || matrixResource.Href != "./bilateral-matrix/index.json" {
+		return errorsForExtended("catalog bilateral matrix resource does not match metadata")
+	}
+	return nil
+}
+
+func validateStrategic(dataDir string, metadata datasetMeta, index validationStrategicIndex) error {
+	if index.SchemaVersion != metadata.SchemaVersion || index.GeneratedAt != metadata.GeneratedAt || index.Provider != metadata.StrategicProvider || index.Level != 6 || !reflect.DeepEqual(index.Partners, metadata.Partners) {
+		return errorsForExtended("strategic HS6 index does not match metadata")
+	}
+	if index.ObservationCount != metadata.StrategicObservationCount || len(index.Products) != metadata.StrategicProductCount || len(index.Reporters) != metadata.StrategicReporterCount || len(index.Partitions) != metadata.StrategicPartitionCount {
+		return errorsForExtended("strategic HS6 index counts do not match metadata")
+	}
+	if !sort.StringsAreSorted(index.Reporters) {
+		return errorsForExtended("strategic HS6 reporters must be sorted")
+	}
+	for _, period := range index.Periods {
+		if !yearPattern.MatchString(period) {
+			return fmt.Errorf("strategic HS6 index has invalid period %q", period)
+		}
+	}
+	productByCode := make(map[string]validationStrategicProductDescriptor, len(index.Products))
+	sectorSet := make(map[string]struct{})
+	for _, product := range index.Products {
+		if !regexp.MustCompile(`^\d{6}$`).MatchString(product.Code) || strings.TrimSpace(product.Sector) == "" || strings.TrimSpace(product.Label) == "" || strings.TrimSpace(product.RevisionNote) == "" {
+			return fmt.Errorf("strategic HS6 index has invalid product %+v", product)
+		}
+		if _, exists := productByCode[product.Code]; exists {
+			return fmt.Errorf("strategic HS6 index has duplicate product %s", product.Code)
+		}
+		productByCode[product.Code] = product
+		sectorSet[product.Sector] = struct{}{}
+	}
+	if len(productByCode) == 0 {
+		return errorsForExtended("strategic HS6 registry is empty")
+	}
+	if len(index.Sectors) != len(sectorSet) || !sort.StringsAreSorted(index.Sectors) {
+		return errorsForExtended("strategic HS6 sectors are incomplete or unsorted")
+	}
+	for _, sector := range index.Sectors {
+		if _, ok := sectorSet[sector]; !ok {
+			return fmt.Errorf("strategic HS6 index has unknown sector %q", sector)
+		}
+	}
+
+	partitionSet := make(map[string]struct{}, len(index.Partitions))
+	reporterSet := make(map[string]struct{})
+	periodSet := make(map[string]struct{})
+	for _, partition := range index.Partitions {
+		if !iso3Pattern.MatchString(partition.ReporterISO3) || !yearPattern.MatchString(partition.Period) || partition.RowCount < 1 {
+			return fmt.Errorf("strategic HS6 index has invalid partition %+v", partition)
+		}
+		wantHref := "./" + partition.ReporterISO3 + "/" + partition.Period + ".json"
+		if partition.Href != wantHref {
+			return fmt.Errorf("strategic HS6 partition href %q, want %q", partition.Href, wantHref)
+		}
+		key := partition.ReporterISO3 + ":" + partition.Period
+		if _, exists := partitionSet[key]; exists {
+			return fmt.Errorf("strategic HS6 index has duplicate partition %s", key)
+		}
+		partitionSet[key] = struct{}{}
+		reporterSet[partition.ReporterISO3] = struct{}{}
+		periodSet[partition.Period] = struct{}{}
+
+		var file validationStrategicFile
+		if err := readJSON(filepath.Join(dataDir, "strategic-hs6", partition.ReporterISO3, partition.Period+".json"), &file); err != nil {
+			return fmt.Errorf("read strategic HS6 partition %s: %w", key, err)
+		}
+		if file.SchemaVersion != index.SchemaVersion || file.GeneratedAt != index.GeneratedAt || file.Provider != index.Provider || file.Level != 6 || !reflect.DeepEqual(file.Partners, index.Partners) || file.ReporterISO3 != partition.ReporterISO3 || file.Period != partition.Period || len(file.Rows) != partition.RowCount {
+			return fmt.Errorf("strategic HS6 partition %s does not match its index", key)
+		}
+		seenRows := make(map[string]struct{}, len(file.Rows))
+		for _, row := range file.Rows {
+			descriptor, ok := productByCode[row.Code]
+			if !ok || row.Sector != descriptor.Sector || row.Label != descriptor.Label || row.RevisionNote != descriptor.RevisionNote || strings.TrimSpace(row.Classification) == "" {
+				return fmt.Errorf("strategic HS6 partition %s has unregistered row %+v", key, row)
+			}
+			rowKey := row.Classification + ":" + row.Code
+			if _, exists := seenRows[rowKey]; exists {
+				return fmt.Errorf("strategic HS6 partition %s has duplicate row %s", key, rowKey)
+			}
+			seenRows[rowKey] = struct{}{}
+			if err := validateSeriesBlock(partition.ReporterISO3, "USA strategic product", row.USA); err != nil {
+				return err
+			}
+			if err := validateSeriesBlock(partition.ReporterISO3, "CHN strategic product", row.CHN); err != nil {
+				return err
+			}
+			if !approximatelyEqual(row.Total, row.USA.Trade+row.CHN.Trade) {
+				return fmt.Errorf("strategic HS6 product %s has inconsistent total", row.Code)
+			}
+			wantShare := 0.0
+			if row.Total > 0 {
+				wantShare = row.CHN.Trade / row.Total
+			}
+			if !approximatelyEqual(row.ShareCN, wantShare) {
+				return fmt.Errorf("strategic HS6 product %s has inconsistent share", row.Code)
+			}
+		}
+	}
+	if len(reporterSet) != len(index.Reporters) || len(periodSet) != len(index.Periods) {
+		return errorsForExtended("strategic HS6 reporter or period discovery does not match partitions")
+	}
+	for _, reporter := range index.Reporters {
+		if _, ok := reporterSet[reporter]; !ok {
+			return fmt.Errorf("strategic HS6 reporter %s has no partition", reporter)
+		}
+	}
+	for _, period := range index.Periods {
+		if _, ok := periodSet[period]; !ok {
+			return fmt.Errorf("strategic HS6 period %s has no partition", period)
+		}
+	}
+	return nil
+}
+
+func validateTariffs(dataDir string, metadata datasetMeta, index validationTariffIndex) error {
+	if index.SchemaVersion != metadata.SchemaVersion || index.GeneratedAt != metadata.GeneratedAt || index.Provider != metadata.TariffProvider || index.Level != 6 {
+		return errorsForExtended("tariff index does not match metadata")
+	}
+	if index.ObservationCount != metadata.TariffObservationCount || len(index.Importers) != metadata.TariffImporterCount || len(index.Partitions) != metadata.TariffPartitionCount {
+		return errorsForExtended("tariff index counts do not match metadata")
+	}
+	if !sort.StringsAreSorted(index.Importers) || !sort.StringsAreSorted(index.Exporters) || !sort.StringsAreSorted(index.DataTypes) || !sort.StringsAreSorted(index.RateTypes) {
+		return errorsForExtended("tariff index dimensions must be sorted")
+	}
+	for position, year := range index.Years {
+		if !yearPattern.MatchString(year) || (position > 0 && index.Years[position-1] < year) {
+			return fmt.Errorf("tariff index has invalid or unsorted year %q", year)
+		}
+	}
+	for _, importer := range index.Importers {
+		if !iso3Pattern.MatchString(importer) {
+			return fmt.Errorf("tariff index has invalid importer %q", importer)
+		}
+	}
+	for _, exporter := range index.Exporters {
+		if !iso3Pattern.MatchString(exporter) {
+			return fmt.Errorf("tariff index has invalid exporter %q", exporter)
+		}
+	}
+	for _, dataType := range index.DataTypes {
+		if dataType != "reported" && dataType != "ave_estimated" {
+			return fmt.Errorf("tariff index has unsupported data type %q", dataType)
+		}
+	}
+	for _, rateType := range index.RateTypes {
+		if !validTariffRateType(rateType) {
+			return fmt.Errorf("tariff index has unsupported rate type %q", rateType)
+		}
+	}
+	productByCode := make(map[string]validationStrategicProductDescriptor, len(index.Products))
+	for _, product := range index.Products {
+		if !hs6Pattern.MatchString(product.Code) || product.Sector == "" || product.Label == "" || product.RevisionNote == "" {
+			return fmt.Errorf("tariff index has invalid product %+v", product)
+		}
+		if _, exists := productByCode[product.Code]; exists {
+			return fmt.Errorf("tariff index has duplicate product %s", product.Code)
+		}
+		productByCode[product.Code] = product
+	}
+	if len(productByCode) == 0 {
+		return errorsForExtended("tariff product registry is empty")
+	}
+
+	partitionSet := make(map[string]struct{}, len(index.Partitions))
+	importerSet := make(map[string]struct{})
+	yearSet := make(map[string]struct{})
+	exporterSet := make(map[string]struct{})
+	dataTypeSet := make(map[string]struct{})
+	rateTypeSet := make(map[string]struct{})
+	observationCount := 0
+	for _, partition := range index.Partitions {
+		if !iso3Pattern.MatchString(partition.ImporterISO3) || !yearPattern.MatchString(partition.Year) || partition.RowCount < 1 {
+			return fmt.Errorf("tariff index has invalid partition %+v", partition)
+		}
+		wantHref := "./" + partition.ImporterISO3 + "/" + partition.Year + ".json"
+		if partition.Href != wantHref {
+			return fmt.Errorf("tariff partition href %q, want %q", partition.Href, wantHref)
+		}
+		key := partition.ImporterISO3 + ":" + partition.Year
+		if _, exists := partitionSet[key]; exists {
+			return fmt.Errorf("tariff index has duplicate partition %s", key)
+		}
+		partitionSet[key] = struct{}{}
+		importerSet[partition.ImporterISO3] = struct{}{}
+		yearSet[partition.Year] = struct{}{}
+
+		var file validationTariffFile
+		if err := readJSON(filepath.Join(dataDir, "tariffs", partition.ImporterISO3, partition.Year+".json"), &file); err != nil {
+			return fmt.Errorf("read tariff partition %s: %w", key, err)
+		}
+		if file.SchemaVersion != index.SchemaVersion || file.GeneratedAt != index.GeneratedAt || file.Provider != index.Provider || file.Level != 6 || file.ImporterISO3 != partition.ImporterISO3 || file.Year != partition.Year || len(file.Rows) != partition.RowCount {
+			return fmt.Errorf("tariff partition %s does not match its index", key)
+		}
+		seenRows := make(map[string]struct{}, len(file.Rows))
+		for _, row := range file.Rows {
+			descriptor, ok := productByCode[row.Code]
+			if !ok || row.Sector != descriptor.Sector || row.Label != descriptor.Label || strings.TrimSpace(row.Classification) == "" || strings.TrimSpace(row.Nomenclature) == "" {
+				return fmt.Errorf("tariff partition %s has unregistered row %+v", key, row)
+			}
+			if !iso3Pattern.MatchString(row.ExporterISO3) || (row.ExporterCode != "" && len(row.ExporterCode) != 3) {
+				return fmt.Errorf("tariff partition %s has invalid exporter %+v", key, row)
+			}
+			if row.DataType != "reported" && row.DataType != "ave_estimated" {
+				return fmt.Errorf("tariff partition %s has invalid data type %q", key, row.DataType)
+			}
+			if !validTariffRateType(row.RateType) || strings.TrimSpace(row.Regime) == "" {
+				return fmt.Errorf("tariff partition %s has invalid rate identity %+v", key, row)
+			}
+			rowKey := strings.Join([]string{row.Classification, row.Code, row.ExporterISO3, row.DataType, row.RateType, row.Regime}, ":")
+			if _, exists := seenRows[rowKey]; exists {
+				return fmt.Errorf("tariff partition %s has duplicate row %s", key, rowKey)
+			}
+			seenRows[rowKey] = struct{}{}
+			for label, value := range map[string]*float64{"rate": &row.RatePercent, "sum": row.SumRatePercent, "minimum": row.MinRatePercent, "maximum": row.MaxRatePercent} {
+				if value != nil && (!isFinite(*value) || *value < 0) {
+					return fmt.Errorf("tariff partition %s has invalid %s rate %v", key, label, *value)
+				}
+			}
+			if row.TotalLines < 0 || row.PreferentialLines < 0 || row.MFNLines < 0 || row.NonAdValoremLines < 0 {
+				return fmt.Errorf("tariff partition %s has negative line counts", key)
+			}
+			if row.SourceUpdatedAt != "" {
+				if _, err := time.Parse(time.RFC3339, row.SourceUpdatedAt); err != nil {
+					return fmt.Errorf("tariff partition %s has invalid source_updated_at %q", key, row.SourceUpdatedAt)
+				}
+			}
+			exporterSet[row.ExporterISO3] = struct{}{}
+			dataTypeSet[row.DataType] = struct{}{}
+			rateTypeSet[row.RateType] = struct{}{}
+			observationCount++
+		}
+	}
+	if observationCount != index.ObservationCount || !sameStringSet(index.Importers, importerSet) || !sameStringSet(index.Years, yearSet) || !sameStringSet(index.Exporters, exporterSet) || !sameStringSet(index.DataTypes, dataTypeSet) || !sameStringSet(index.RateTypes, rateTypeSet) {
+		return errorsForExtended("tariff partition discovery does not match index dimensions")
+	}
+	return nil
+}
+
+func validTariffRateType(value string) bool {
+	return value == "mfn_applied" || value == "effectively_applied" || value == "preferential"
+}
+
+func validateMatrix(dataDir string, metadata datasetMeta, index validationMatrixIndex) error {
+	if index.SchemaVersion != metadata.SchemaVersion || index.GeneratedAt != metadata.GeneratedAt || index.Provider != metadata.MatrixProvider || index.ProductCode != "TOTAL" || index.ProductLevel != 0 {
+		return errorsForExtended("bilateral matrix index does not match metadata")
+	}
+	if len(index.Reporters) != metadata.MatrixReporterCount || len(index.Partitions) != metadata.MatrixPartitionCount || index.PartnerRowCount != metadata.MatrixPartnerRowCount || index.ObservationCount != metadata.MatrixObservationCount {
+		return errorsForExtended("bilateral matrix index counts do not match metadata")
+	}
+	if !sort.StringsAreSorted(index.Reporters) || !sort.StringsAreSorted(index.Partners) {
+		return errorsForExtended("bilateral matrix dimensions must be sorted")
+	}
+	for position, period := range index.Periods {
+		if !yearPattern.MatchString(period) || (position > 0 && index.Periods[position-1] < period) {
+			return fmt.Errorf("bilateral matrix has invalid or unsorted period %q", period)
+		}
+	}
+	partitionSet := make(map[string]struct{}, len(index.Partitions))
+	reporterSet := make(map[string]struct{})
+	partnerSet := make(map[string]struct{})
+	periodSet := make(map[string]struct{})
+	partnerRowCount := 0
+	observationCount := 0
+	for _, partition := range index.Partitions {
+		if !iso3Pattern.MatchString(partition.ReporterISO3) || !yearPattern.MatchString(partition.Period) || partition.RowCount < 1 {
+			return fmt.Errorf("bilateral matrix has invalid partition %+v", partition)
+		}
+		wantHref := "./" + partition.ReporterISO3 + "/" + partition.Period + ".json"
+		if partition.Href != wantHref {
+			return fmt.Errorf("bilateral matrix partition href %q, want %q", partition.Href, wantHref)
+		}
+		key := partition.ReporterISO3 + ":" + partition.Period
+		if _, exists := partitionSet[key]; exists {
+			return fmt.Errorf("bilateral matrix has duplicate partition %s", key)
+		}
+		partitionSet[key] = struct{}{}
+		reporterSet[partition.ReporterISO3] = struct{}{}
+		periodSet[partition.Period] = struct{}{}
+
+		var file validationMatrixFile
+		if err := readJSON(filepath.Join(dataDir, "bilateral-matrix", partition.ReporterISO3, partition.Period+".json"), &file); err != nil {
+			return fmt.Errorf("read bilateral matrix partition %s: %w", key, err)
+		}
+		if file.SchemaVersion != index.SchemaVersion || file.GeneratedAt != index.GeneratedAt || file.Provider != index.Provider || file.ProductCode != "TOTAL" || file.ProductLevel != 0 || file.ReporterISO3 != partition.ReporterISO3 || file.Period != partition.Period || len(file.Rows) != partition.RowCount {
+			return fmt.Errorf("bilateral matrix partition %s does not match its index", key)
+		}
+		seenPartners := make(map[string]struct{}, len(file.Rows))
+		previousTrade := math.Inf(1)
+		for _, row := range file.Rows {
+			if !iso3Pattern.MatchString(row.PartnerISO3) || row.PartnerISO3 == partition.ReporterISO3 || row.PartnerISO3 == "WLD" || (!row.ExportAvailable && !row.ImportAvailable) {
+				return fmt.Errorf("bilateral matrix partition %s has invalid partner row %+v", key, row)
+			}
+			if _, exists := seenPartners[row.PartnerISO3]; exists {
+				return fmt.Errorf("bilateral matrix partition %s has duplicate partner %s", key, row.PartnerISO3)
+			}
+			seenPartners[row.PartnerISO3] = struct{}{}
+			for label, value := range map[string]float64{"export": row.ExportUSD, "import": row.ImportUSD, "trade": row.TradeUSD} {
+				if !isFinite(value) || value < 0 {
+					return fmt.Errorf("bilateral matrix partition %s has invalid %s value %v", key, label, value)
+				}
+			}
+			if !isFinite(row.BalanceUSD) || !approximatelyEqual(row.TradeUSD, row.ExportUSD+row.ImportUSD) || !approximatelyEqual(row.BalanceUSD, row.ExportUSD-row.ImportUSD) {
+				return fmt.Errorf("bilateral matrix partition %s has inconsistent partner row %+v", key, row)
+			}
+			if !row.ExportAvailable && row.ExportUSD != 0 || !row.ImportAvailable && row.ImportUSD != 0 {
+				return fmt.Errorf("bilateral matrix partition %s has values marked unavailable", key)
+			}
+			if row.TradeUSD > previousTrade {
+				return fmt.Errorf("bilateral matrix partition %s rows are not sorted by trade", key)
+			}
+			previousTrade = row.TradeUSD
+			partnerSet[row.PartnerISO3] = struct{}{}
+			partnerRowCount++
+			if row.ExportAvailable {
+				observationCount++
+			}
+			if row.ImportAvailable {
+				observationCount++
+			}
+		}
+	}
+	if partnerRowCount != index.PartnerRowCount || observationCount != index.ObservationCount || !sameStringSet(index.Reporters, reporterSet) || !sameStringSet(index.Partners, partnerSet) || !sameStringSet(index.Periods, periodSet) {
+		return errorsForExtended("bilateral matrix partition discovery does not match index dimensions")
+	}
+	return nil
+}
+
+func sameStringSet(values []string, set map[string]struct{}) bool {
+	if len(values) != len(set) {
+		return false
+	}
+	for _, value := range values {
+		if _, ok := set[value]; !ok {
+			return false
+		}
+	}
+	return true
 }
 
 func validateExplanations(dataDir string, metadata datasetMeta, latest datasetLatest) error {

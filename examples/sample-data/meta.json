@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-15T12:28:31Z",
+  "generated_at": "2026-07-15T14:10:35Z",
   "provider": "wits",
   "partners": [
     "USA",
@@ -25,5 +25,20 @@
   "product_level": 2,
   "product_reporter_count": 3,
   "product_observation_count": 36,
-  "context_status": "success"
+  "context_status": "success",
+  "strategic_provider": "comtrade",
+  "strategic_level": 6,
+  "strategic_product_count": 18,
+  "strategic_reporter_count": 0,
+  "strategic_partition_count": 0,
+  "strategic_observation_count": 0,
+  "tariff_provider": "trains",
+  "tariff_importer_count": 3,
+  "tariff_partition_count": 3,
+  "tariff_observation_count": 9,
+  "matrix_provider": "comtrade",
+  "matrix_reporter_count": 3,
+  "matrix_partition_count": 3,
+  "matrix_partner_row_count": 15,
+  "matrix_observation_count": 30
 }

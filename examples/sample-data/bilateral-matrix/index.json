@@ -1,0 +1,44 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T14:10:35Z",
+  "provider": "comtrade",
+  "product_code": "TOTAL",
+  "product_level": 0,
+  "reporters": [
+    "DEU",
+    "JPN",
+    "KOR"
+  ],
+  "partners": [
+    "AUS",
+    "CHN",
+    "MEX",
+    "USA",
+    "VNM"
+  ],
+  "periods": [
+    "2023"
+  ],
+  "partitions": [
+    {
+      "reporter_iso3": "DEU",
+      "period": "2023",
+      "href": "./DEU/2023.json",
+      "row_count": 5
+    },
+    {
+      "reporter_iso3": "JPN",
+      "period": "2023",
+      "href": "./JPN/2023.json",
+      "row_count": 5
+    },
+    {
+      "reporter_iso3": "KOR",
+      "period": "2023",
+      "href": "./KOR/2023.json",
+      "row_count": 5
+    }
+  ],
+  "partner_row_count": 15,
+  "observation_count": 30
+}

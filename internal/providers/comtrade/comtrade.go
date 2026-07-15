@@ -45,6 +45,7 @@ const (
 
 var ErrNoRecords = errors.New("comtrade: no records found")
 var ErrQuotaExceeded = errors.New("comtrade: quota exceeded")
+var ErrTruncated = errors.New("comtrade: response may be truncated")
 
 type Config struct {
 	BaseURL           string
@@ -332,6 +333,150 @@ func (p *Provider) FetchProducts(ctx context.Context, reporterISO3, partnerISO3 
 		return nil, ErrNoRecords
 	}
 	return filtered, nil
+}
+
+// FetchProductCodes requests a bounded comma-separated list of HS codes. This
+// follows UN Comtrade's multi-criterion API convention and filters the response
+// back to the exact requested codes so aggregate or residual rows cannot leak
+// into the strategic dataset.
+func (p *Provider) FetchProductCodes(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow, year string, level int, codes []string) ([]model.Observation, error) {
+	if level != 6 {
+		return nil, fmt.Errorf("comtrade: selected product collection requires HS6, got level %d", level)
+	}
+	normalized, err := normalizeProductCodes(codes, level)
+	if err != nil {
+		return nil, err
+	}
+	yearValue, ok := parseYear(year)
+	if !ok {
+		return nil, fmt.Errorf("comtrade: invalid product year %q", year)
+	}
+	refsErr := p.ensureReferences(ctx)
+	reporterISO3 = strings.ToUpper(strings.TrimSpace(reporterISO3))
+	partnerISO3 = strings.ToUpper(strings.TrimSpace(partnerISO3))
+	reporterCode, partnerCode := reporterISO3, partnerISO3
+	if refsErr == nil {
+		reporterCode, err = p.resolveReporterCode(reporterISO3)
+		if err != nil {
+			return nil, err
+		}
+		partnerCode, err = p.resolvePartnerCode(partnerISO3)
+		if err != nil {
+			return nil, err
+		}
+	} else if !p.config.AllowISO3Fallback {
+		return nil, refsErr
+	}
+
+	observations, err := p.fetchYear(ctx, reporterISO3, partnerISO3, reporterCode, partnerCode, flow, p.flowCode(flow), yearValue, strings.Join(normalized, ","))
+	if err != nil {
+		return nil, err
+	}
+	wanted := make(map[string]struct{}, len(normalized))
+	for _, code := range normalized {
+		wanted[code] = struct{}{}
+	}
+	filtered := make([]model.Observation, 0, len(observations))
+	for _, observation := range observations {
+		if observation.ProductLevel != level {
+			continue
+		}
+		if _, ok := wanted[observation.ProductCode]; ok {
+			filtered = append(filtered, observation)
+		}
+	}
+	if len(filtered) == 0 {
+		return nil, ErrNoRecords
+	}
+	return filtered, nil
+}
+
+// FetchPartnerMatrix omits partnerCode, which the UN Comtrade API defines as
+// an all-partners breakdown. It is intentionally separate from partnerCode=0,
+// which represents the World aggregate rather than bilateral rows.
+func (p *Provider) FetchPartnerMatrix(ctx context.Context, reporterISO3 string, flow model.Flow, year string) ([]model.Observation, error) {
+	yearValue, ok := parseYear(year)
+	if !ok {
+		return nil, fmt.Errorf("comtrade: invalid matrix year %q", year)
+	}
+	if err := p.ensureReferences(ctx); err != nil {
+		return nil, err
+	}
+	reporterISO3 = strings.ToUpper(strings.TrimSpace(reporterISO3))
+	reporterCode, err := p.resolveReporterCode(reporterISO3)
+	if err != nil {
+		return nil, err
+	}
+	params := url.Values{}
+	params.Set("reporterCode", reporterCode)
+	params.Set("flowCode", p.flowCode(flow))
+	params.Set("period", strconv.Itoa(yearValue))
+	params.Set("cmdCode", "TOTAL")
+	params.Set("partner2Code", "0")
+	params.Set("customsCode", "C00")
+	params.Set("motCode", "0")
+	params.Set("breakdownMode", "classic")
+	params.Set("format", p.config.Format)
+	if p.config.MaxRecords > 0 {
+		params.Set("maxRecords", strconv.Itoa(p.config.MaxRecords))
+	}
+	body, err := p.doRequest(ctx, p.dataURL(), params)
+	if err != nil {
+		return nil, err
+	}
+	p.mu.Lock()
+	partnerISOByCode := make(map[string]string, len(p.partnerCode))
+	knownPartners := make(map[string]struct{}, len(p.partnerCode))
+	for iso3, code := range p.partnerCode {
+		partnerISOByCode[code] = iso3
+		knownPartners[iso3] = struct{}{}
+	}
+	p.mu.Unlock()
+	observations, err := parseMatrixObservations(body, flow, reporterISO3, partnerISOByCode, p.config.ValueMultiplier)
+	if err != nil {
+		return nil, err
+	}
+	if p.config.MaxRecords > 0 && len(observations) >= p.config.MaxRecords {
+		return nil, fmt.Errorf("%w: reporter=%s year=%s flow=%s records=%d", ErrTruncated, reporterISO3, year, flow, len(observations))
+	}
+	filtered := make([]model.Observation, 0, len(observations))
+	for _, observation := range observations {
+		partner := strings.ToUpper(strings.TrimSpace(observation.PartnerISO3))
+		if partner == "" || partner == "WLD" || partner == reporterISO3 {
+			continue
+		}
+		if _, ok := knownPartners[partner]; !ok {
+			continue
+		}
+		observation.Provider = p.Name()
+		observation.ProductCode = "TOTAL"
+		observation.ProductLevel = 0
+		filtered = append(filtered, observation)
+	}
+	if len(filtered) == 0 {
+		return nil, ErrNoRecords
+	}
+	return filtered, nil
+}
+
+func normalizeProductCodes(codes []string, level int) ([]string, error) {
+	if len(codes) == 0 {
+		return nil, errors.New("comtrade: at least one selected product code is required")
+	}
+	seen := make(map[string]struct{}, len(codes))
+	normalized := make([]string, 0, len(codes))
+	for _, raw := range codes {
+		code := strings.TrimSpace(raw)
+		if len(code) != level || !isDigits(code) {
+			return nil, fmt.Errorf("comtrade: invalid HS%d product code %q", level, raw)
+		}
+		if _, exists := seen[code]; exists {
+			continue
+		}
+		seen[code] = struct{}{}
+		normalized = append(normalized, code)
+	}
+	return normalized, nil
 }
 
 func (p *Provider) ensureReferences(ctx context.Context) error {
@@ -753,6 +898,55 @@ func parseObservations(body []byte, fallbackFlow model.Flow, reporterISO3, partn
 	return observations, nil
 }
 
+// parseMatrixObservations resolves numeric partner codes because the public
+// preview endpoint may omit partner ISO fields even though it returns the full
+// country breakdown. World and aggregate group codes are intentionally ignored.
+func parseMatrixObservations(body []byte, fallbackFlow model.Flow, reporterISO3 string, partnerISOByCode map[string]string, multiplier float64) ([]model.Observation, error) {
+	var payload any
+	if err := json.Unmarshal(body, &payload); err != nil {
+		return nil, err
+	}
+	rows, err := extractRows(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	observations := make([]model.Observation, 0, len(rows))
+	for _, row := range rows {
+		partnerISO, _ := getString(row, "pt3ISO", "PartnerISO3", "partnerISO3", "partnerISO")
+		partnerISO = strings.ToUpper(strings.TrimSpace(partnerISO))
+		if partnerISO == "" {
+			partnerCode, ok := getString(row, "partnerCode", "PartnerCode", "ptCode")
+			if !ok || strings.TrimSpace(partnerCode) == "0" {
+				continue
+			}
+			partnerISO = partnerISOByCode[strings.TrimSpace(partnerCode)]
+		}
+		if !isAlphabeticISO3(partnerISO) || partnerISO == "WLD" {
+			continue
+		}
+		observation, err := rowToObservation(row, reporterISO3, partnerISO, fallbackFlow, multiplier)
+		if err != nil {
+			continue
+		}
+		observations = append(observations, observation)
+	}
+	return observations, nil
+}
+
+func isAlphabeticISO3(value string) bool {
+	value = strings.ToUpper(strings.TrimSpace(value))
+	if len(value) != 3 {
+		return false
+	}
+	for _, character := range value {
+		if character < 'A' || character > 'Z' {
+			return false
+		}
+	}
+	return true
+}
+
 func rowToObservation(row map[string]any, reporterISO3, partnerISO3 string, flow model.Flow, multiplier float64) (model.Observation, error) {
 	value, ok := getFloat(row, "TradeValue", "tradeValue", "TradeValueUSD", "TradeValueUS$", "Value", "value", "primaryValue")
 	if !ok {
@@ -766,11 +960,11 @@ func rowToObservation(row map[string]any, reporterISO3, partnerISO3 string, flow
 	}
 
 	reporter := reporterISO3
-	if value, ok := getString(row, "rt3ISO", "ReporterISO3", "reporterISO3", "Reporter", "reporter"); ok {
+	if value, ok := getString(row, "rt3ISO", "ReporterISO3", "reporterISO3", "reporterISO", "Reporter", "reporter"); ok {
 		reporter = value
 	}
 	partner := partnerISO3
-	if value, ok := getString(row, "pt3ISO", "PartnerISO3", "partnerISO3", "Partner", "partner"); ok {
+	if value, ok := getString(row, "pt3ISO", "PartnerISO3", "partnerISO3", "partnerISO", "Partner", "partner"); ok {
 		partner = value
 	}
 	classification, _ := getString(row, "classificationSearchCode", "classificationCode", "clCode")
@@ -1269,3 +1463,4 @@ func getenvBool(key string, fallback bool) bool {
 
 var _ providers.Provider = (*Provider)(nil)
 var _ providers.ProductProvider = (*Provider)(nil)
+var _ providers.PartnerMatrixProvider = (*Provider)(nil)

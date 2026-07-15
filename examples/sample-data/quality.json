@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-15T12:28:31Z",
+  "generated_at": "2026-07-15T14:10:35Z",
   "primary_provider": "wits",
   "dominant_period": "Y:2023",
   "summary": {
@@ -13,6 +13,36 @@
   },
   "reporter_issues": [],
   "collection_runs": [
+    {
+      "run_id": "sample-comtrade-matrix",
+      "provider": "comtrade",
+      "mode": "bilateral-matrix",
+      "started_at": "2026-01-01T00:06:00Z",
+      "finished_at": "2026-01-01T00:07:00Z",
+      "status": "success",
+      "reporter_count": 3,
+      "request_count": 6,
+      "success_count": 6,
+      "failure_count": 0,
+      "skipped_count": 0,
+      "stored_count": 30,
+      "errors": []
+    },
+    {
+      "run_id": "sample-trains-tariffs",
+      "provider": "trains",
+      "mode": "tariffs-strategic-hs6",
+      "started_at": "2026-01-01T00:04:00Z",
+      "finished_at": "2026-01-01T00:05:00Z",
+      "status": "success",
+      "reporter_count": 3,
+      "request_count": 3,
+      "success_count": 3,
+      "failure_count": 0,
+      "skipped_count": 0,
+      "stored_count": 9,
+      "errors": []
+    },
     {
       "run_id": "sample-comtrade-products",
       "provider": "comtrade",
