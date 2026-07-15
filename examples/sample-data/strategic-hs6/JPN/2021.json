@@ -1,0 +1,161 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T19:53:00Z",
+  "provider": "comtrade",
+  "level": 6,
+  "partners": [
+    "USA",
+    "CHN"
+  ],
+  "reporter_iso3": "JPN",
+  "period": "2021",
+  "rows": [
+    {
+      "classification": "H6",
+      "code": "851762",
+      "sector": "data_infrastructure",
+      "label": "Network transmission equipment",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 9132032000.000004,
+        "import": 7175168000.000002,
+        "trade": 16307200000.000006
+      },
+      "chn": {
+        "available": true,
+        "export": 9862594560.000004,
+        "import": 7749181440.000002,
+        "trade": 17611776000.000008
+      },
+      "total": 33918976000.000015,
+      "share_cn": 0.5192307692307693
+    },
+    {
+      "classification": "H6",
+      "code": "854231",
+      "sector": "semiconductors",
+      "label": "Processors and controllers",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 16859136000.000006,
+        "import": 13246464000.000004,
+        "trade": 30105600000.000008
+      },
+      "chn": {
+        "available": true,
+        "export": 18207866880.000008,
+        "import": 14306181120.000006,
+        "trade": 32514048000.000015
+      },
+      "total": 62619648000.00002,
+      "share_cn": 0.5192307692307693
+    },
+    {
+      "classification": "H6",
+      "code": "854232",
+      "sector": "semiconductors",
+      "label": "Memories",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 14049280000.000006,
+        "import": 11038720000.000004,
+        "trade": 25088000000.000008
+      },
+      "chn": {
+        "available": true,
+        "export": 15173222400.000008,
+        "import": 11921817600.000006,
+        "trade": 27095040000.000015
+      },
+      "total": 52183040000.00002,
+      "share_cn": 0.5192307692307693
+    },
+    {
+      "classification": "H6",
+      "code": "848620",
+      "sector": "semiconductors",
+      "label": "Semiconductor manufacturing machinery",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 5268480000.000002,
+        "import": 4139520000.000001,
+        "trade": 9408000000.000004
+      },
+      "chn": {
+        "available": true,
+        "export": 5689958400.000002,
+        "import": 4470681600.000001,
+        "trade": 10160640000.000004
+      },
+      "total": 19568640000.000008,
+      "share_cn": 0.5192307692307693
+    },
+    {
+      "classification": "H6",
+      "code": "854129",
+      "sector": "semiconductors",
+      "label": "Other transistors",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 2950348800.000001,
+        "import": 2318131200.0000005,
+        "trade": 5268480000.000002
+      },
+      "chn": {
+        "available": true,
+        "export": 3186376704.000001,
+        "import": 2503581696.0000005,
+        "trade": 5689958400.000002
+      },
+      "total": 10958438400.000004,
+      "share_cn": 0.5192307692307693
+    },
+    {
+      "classification": "H6",
+      "code": "854290",
+      "sector": "semiconductors",
+      "label": "Integrated-circuit parts",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 2388377600.000001,
+        "import": 1876582400.0000005,
+        "trade": 4264960000.0000014
+      },
+      "chn": {
+        "available": true,
+        "export": 2579447808.000001,
+        "import": 2026708992.0000005,
+        "trade": 4606156800.000002
+      },
+      "total": 8871116800.000004,
+      "share_cn": 0.5192307692307693
+    },
+    {
+      "classification": "H6",
+      "code": "280461",
+      "sector": "semiconductors",
+      "label": "High-purity silicon",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 1264435200.0000005,
+        "import": 993484800.0000002,
+        "trade": 2257920000.000001
+      },
+      "chn": {
+        "available": true,
+        "export": 1365590016.0000005,
+        "import": 1072963584.0000002,
+        "trade": 2438553600.000001
+      },
+      "total": 4696473600.000002,
+      "share_cn": 0.5192307692307693
+    }
+  ]
+}

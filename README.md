@@ -6,11 +6,12 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![User study recruiting](https://img.shields.io/badge/user%20study-recruiting-008672.svg)](https://github.com/elecpapaya/TradeGravity/issues/3)
 
-TradeGravity is an open-source pipeline and tabbed static intelligence dashboard for exploring global trade and supply-chain exposure. It combines same-period US/China headline comparisons, reported multi-partner networks, 5–10 year trends, HS2 chapters, curated strategic HS6 products, WITS/TRAINS tariffs, country context, transparent scenario sensitivity, and explicit quality signals in a deployment that needs no application server.
+TradeGravity is an open-source pipeline and static intelligence dashboard for understanding how economies and strategic supply chains sit—and move—between the United States and China. It does not try to be a neutral catalogue of every global trade fact: the observations remain reported and unadjusted, while the analytical lens is deliberately explicit. Same-period US/China comparisons, annual and focused monthly product flows, mirror-reporting checks, policy context, and transparent sensitivity calculations are published without an application server or a paid data dependency.
 
 - **Live demo:** https://elecpapaya.github.io/TradeGravity/
 - **System design:** [DESIGN.md](DESIGN.md)
 - **Published data schema:** [docs/DATA_SCHEMA.md](docs/DATA_SCHEMA.md)
+- **Semiconductor atlas methodology:** [docs/SEMICONDUCTOR_ATLAS.md](docs/SEMICONDUCTOR_ATLAS.md)
 - **Reuse examples:** [docs/USAGE.md](docs/USAGE.md)
 - **Data rights and attribution:** [docs/DATA_RIGHTS.md](docs/DATA_RIGHTS.md)
 - **Project roadmap:** [ROADMAP.md](ROADMAP.md)
@@ -31,13 +32,15 @@ TradeGravity is an open-source pipeline and tabbed static intelligence dashboard
 
 ## Why this project exists
 
-Public trade data is valuable but often difficult to compare quickly across many countries. Source APIs use different response shapes, countries can have different latest reporting periods, and a raw table makes the relative scale of US- and China-linked trade hard to see.
+Public trade data is valuable but often difficult to turn into a strategic answer. Source APIs use different response shapes, countries can have different latest reporting periods, and a raw global table does not answer whether a connector economy is leaning toward US demand, China demand, or both—and whether that position is changing.
 
-TradeGravity provides a reproducible path from public source data to a lightweight visualization. The code, transformation rules, deployment workflow, and generated-data schema are public so that researchers, students, and developers can inspect or adapt the process.
+TradeGravity therefore applies one consistent question to public evidence: **where is the selected country, product, or semiconductor stage positioned between the USA and China, and in which direction is it moving?** The code, formulas, transformation rules, source register, deployment workflow, and generated-data schema are public so that researchers, students, and developers can inspect, challenge, or adapt the perspective.
+
+The governing principle is **neutral reported observations, explicit US–China lens**. A positive or negative position is not a political-alignment score, and TradeGravity never changes source values to fit the lens.
 
 ## Project status
 
-TradeGravity is an early-stage project under active maintenance. A scheduled GitHub Actions workflow currently refreshes and deploys the public dataset every day. The default allowlist publishes 51 reporter countries; coverage can be changed through configuration.
+TradeGravity is an early-stage project under active maintenance. A scheduled GitHub Actions workflow currently refreshes and deploys the public dataset every day. The default allowlist tracks 52 reporter economies; a publication can contain fewer when a provider has no usable observation for an allowlisted reporter. Coverage can be changed through configuration.
 
 **Help test v0.1.1:** we are recruiting three students, researchers, or developers for a 15-minute, task-based evaluation. No setup or trade-data expertise is required. Start with [the public study tracker](https://github.com/elecpapaya/TradeGravity/issues/3) or reuse the [recruitment invitation](docs/USER_RECRUITMENT.md), then submit only nonidentifying feedback through the linked form. Participation is voluntary, and public feedback is recorded only with consent.
 
@@ -51,6 +54,7 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 - Ten-year WITS history collection and published country time series.
 - UN Comtrade HS2 product chapters, with public-preview and authenticated modes.
 - Curated strategic HS6 trade partitions and revision-aware WITS/TRAINS MFN tariff schedules.
+- A US–China Chip Supply Chain Lens with an eight-stage model, 30 mapped HS6 codes, country-stage positions, focused 12-month turning points, a country-role matrix, dated policy/project context, coverage gates, and transparent disruption sensitivity.
 - Reported UN Comtrade multi-partner `TOTAL` matrices, with export/import availability kept separate.
 - SQLite persistence for repeatable collection and publishing runs.
 - Static JSON output for a low-cost, serverless web viewer.
@@ -62,10 +66,11 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 - Global current/partial/degraded publication status with retry guidance, plus explicit separation of trade-observation, pipeline-refresh, and recent-headline clocks.
 - Searchable accessible data table and selected-country 5–10 year trend.
 - HS2 product mix for the selected reporter, kept separate from WITS headline totals.
-- Shareable Overview, Intelligence, Products, Data & Quality, and Scenario Lab tabs with synchronized filters, country, product, tariff, and scenario-assumption state.
-- Two-anchor concentration, balance, growth-divergence, and ranking views whose USA/China-only scope is visible in the UI, plus a selected-country multi-partner network when its matrix exists.
+- Shareable Overview, US–China Lens, Chip Lens, Products, Data & Quality, and Scenario Lab tabs with synchronized filters, country, semiconductor stage/context, product, tariff, and scenario-assumption state.
+- Two-anchor position metrics whose formulas are visible: USA share, China share, exposure balance, position shift, dual exposure, and anchor-growth divergence.
+- Unadjusted bilateral mirror-reporting diagnostics that compare both countries' reports without choosing either as ground truth or treating the difference as fraud, evasion, rerouting, or an adjusted estimate.
 - An illustrative HS6 tariff sensitivity lab that can load a published MFN rate and product import baseline while exposing elasticity, pass-through, fallback, and source assumptions.
-- A machine-readable `catalog.json` that separates ready, partial, and planned resources. Strategic HS6, tariffs, and bilateral matrices are published; reconciliation, value-added, and versioned scenario outputs remain planned.
+- A machine-readable `catalog.json` that separates ready, partial, and planned resources. Strategic HS6, focused monthly semiconductor signals, tariffs, bilateral matrices, and mirror diagnostics are published; computed value-added and versioned scenario outputs remain planned.
 - Build-time evidence-grounded explanations with citation validation and deterministic fallback.
 - Year-over-year growth coloring when prior-period data is available.
 - Optional World Bank indicators and an experimental GDELT trade/supply-chain headline panel with a 14-day window, title relevance checks, deduplication, source-country scope, and visible caveats.
@@ -99,10 +104,27 @@ World Bank context ----------/                  |                    |
 | [UN Comtrade](https://comtradeplus.un.org/) | HS2/strategic HS6 trade and reported multi-partner totals |
 | [World Bank Open Data](https://data.worldbank.org/) | Optional country indicators in the viewer |
 | [GDELT](https://www.gdeltproject.org/) | Optional, experimental trade/supply-chain headline context; keyword-filtered by publisher source country and never used in trade metrics |
+| [OECD ICIO](https://www.oecd.org/en/data/datasets/inter-country-input-output-tables.html) | Free industry-level value-added/input-output context; its aggregation and release lag are kept explicit and it is never substituted for HS6 observations |
+| NIST, BIS, European Commission, METI, China NDRC/MOFCOM, and other official public pages | Dated semiconductor policy and project context linked from the reference; never substituted for customs observations or operating capacity |
+| SEMI public releases | Publicly accessible industry context only; no paid market or proprietary capacity dataset is required for a published TradeGravity metric |
 
 Exports and imports are reported from each reporter country's perspective, with `USA` or `CHN` on the partner side. Trade is calculated as exports plus imports. The publisher retains the period and period type used for each partner block so users can see data freshness.
 
 Source availability, revisions, and classification choices can affect results. TradeGravity does not modify or guarantee the accuracy of upstream data.
+
+### US–China lens formulas
+
+For a selected metric within the two-anchor scope:
+
+```text
+USA share        = USA value / (USA value + China value)
+China share      = China value / (USA value + China value)
+exposure balance = USA share − China share
+dual exposure    = 2 × min(USA share, China share)
+position shift   = current exposure balance − previous comparable exposure balance
+```
+
+Positive balance or shift means toward the USA; negative means toward China. `dual exposure` reaches 100% when the two observed anchor shares are equal and 0% when only one anchor is observed. These are bounded descriptive signals—not whole-world dependency, political alignment, causal impact, or supply-chain route estimates.
 
 ## Reusing and citing the data
 
@@ -113,8 +135,11 @@ The public deployment exposes stable machine-readable endpoints:
 - `https://elecpapaya.github.io/TradeGravity/data/series.json`
 - `https://elecpapaya.github.io/TradeGravity/data/products/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/strategic-hs6/index.json`
+- `https://elecpapaya.github.io/TradeGravity/data/semiconductors/reference.json`
+- `https://elecpapaya.github.io/TradeGravity/data/semiconductors/monthly/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/tariffs/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/bilateral-matrix/index.json`
+- `https://elecpapaya.github.io/TradeGravity/data/mirror/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/quality.json`
 - `https://elecpapaya.github.io/TradeGravity/data/catalog.json`
 - `https://elecpapaya.github.io/TradeGravity/data/explanations/index.json`
@@ -137,7 +162,8 @@ Apache-2.0 covers the project code and original documentation, not rights in ups
 go run ./cmd/context
 go run ./cmd/collector run -provider wits -history-years 9
 go run ./cmd/collector products -provider comtrade -primary-provider wits -year auto
-go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto
+go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto -history-years 4
+COMTRADE_FREQUENCY=M go run ./cmd/collector chip-monthly -provider comtrade -months 12
 go run ./cmd/collector matrix -provider comtrade -primary-provider wits -year auto
 go run ./cmd/collector tariffs -provider trains -year auto -data-type aveestimated
 go run ./cmd/publisher build -out site/data -series-years 10
@@ -170,7 +196,7 @@ To run the automated checks:
 ```bash
 go test ./...
 go vet ./...
-node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/experience-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
+node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/semiconductor-tools.test.cjs site/experience-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
 ```
 
 ## Collector configuration
@@ -217,6 +243,8 @@ Common flags:
 - `COMTRADE_REPORTERS_URL`
 - `COMTRADE_PARTNERS_URL`
 
+The focused semiconductor command uses `COMTRADE_FREQUENCY=M`, the 30-code reference, and [`configs/chip_connectors.csv`](configs/chip_connectors.csv). It requests one bounded period/code batch per reporter, anchor, and flow for at most 36 months; the scheduled workflow publishes the latest 12 complete months. It is a turning-point layer, not a complete semiconductor market database.
+
 The `matrix` collector omits `partnerCode` to request the partner breakdown. It never treats `partnerCode=0` (World) as a country row. Public preview responses may provide only numeric partner codes; TradeGravity resolves them through the official partner reference and excludes non-alphabetic special aggregates.
 
 ### WITS/TRAINS tariff environment variables
@@ -244,7 +272,7 @@ This repository reads operating-system environment variables and does not load a
 ## Generated files and deployment
 
 - Local SQLite database: `tradegravity.db`
-- Published JSON: `meta.json`, `catalog.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, `strategic-hs6/`, `tariffs/`, `bilateral-matrix/`, and `explanations/` under `site/data/`
+- Published JSON: `meta.json`, `catalog.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, `strategic-hs6/`, `semiconductors/reference.json`, `semiconductors/monthly/`, `tariffs/`, `bilateral-matrix/`, `mirror/`, and `explanations/` under `site/data/`
 
 Generated data and the local database are intentionally not committed to the default branch. The scheduled or manually dispatched data workflow runs the collectors and publisher, validates the result, and deploys `site/` to the `gh-pages` branch. A `main` push uses the latest validated `data/` directory from `gh-pages` and redeploys the site without calling WITS, UN Comtrade, WITS/TRAINS, or World Bank APIs. This keeps code-only deployments fast while the daily refresh remains the source of new published observations.
 

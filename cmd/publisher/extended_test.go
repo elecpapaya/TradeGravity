@@ -75,6 +75,8 @@ func TestBuildDataCatalogSeparatesReadyAndPlannedResources(t *testing.T) {
 		strategicIndexFile{Provider: "comtrade", Level: 6, Partitions: []strategicPartition{{ReporterISO3: "KOR", Period: "2023"}}},
 		tariffIndexFile{Provider: "trains", Level: 6, Partitions: []tariffPartition{{ImporterISO3: "KOR", Year: "2023"}}},
 		matrixIndexFile{Provider: "comtrade", ProductCode: "TOTAL", Partitions: []matrixPartition{{ReporterISO3: "KOR", Period: "2023"}}},
+		mirrorIndexFile{Provider: "comtrade", Partitions: []mirrorPartition{{ReporterISO3: "KOR", Period: "2023"}}},
+		semiconductorMonthlyIndexFile{Provider: "comtrade", Partitions: []semiconductorMonthlyPartition{{ReporterISO3: "KOR"}}},
 	)
 	if catalog.SchemaVersion != "1.0" || len(catalog.Resources) < 10 {
 		t.Fatalf("unexpected catalog shape: %+v", catalog)
@@ -94,6 +96,27 @@ func TestBuildDataCatalogSeparatesReadyAndPlannedResources(t *testing.T) {
 	}
 	if byID["bilateral_matrix"].Status != "ready" || byID["bilateral_matrix"].Href != "./bilateral-matrix/index.json" || byID["bilateral_matrix"].Provider != "comtrade" {
 		t.Fatalf("matrix resource is not published: %+v", byID["bilateral_matrix"])
+	}
+	if byID["mirror_reconciliation"].Status != "ready" || byID["mirror_reconciliation"].Href != "./mirror/index.json" {
+		t.Fatalf("mirror diagnostics resource is not published: %+v", byID["mirror_reconciliation"])
+	}
+}
+
+func TestBuildMirrorFilesComparesBothReportedDirectionsWithoutChoosingTruth(t *testing.T) {
+	matrixFiles := map[string]matrixFile{
+		"KOR/2023.json": {ReporterISO3: "KOR", Period: "2023", Rows: []matrixPartner{{PartnerISO3: "USA", ExportAvailable: true, ImportAvailable: true, ExportUSD: 100, ImportUSD: 80}}},
+		"USA/2023.json": {ReporterISO3: "USA", Period: "2023", Rows: []matrixPartner{{PartnerISO3: "KOR", ExportAvailable: true, ImportAvailable: true, ExportUSD: 70, ImportUSD: 110}}},
+	}
+	index, files := buildMirrorFiles("2026-01-01T00:00:00Z", "comtrade", matrixFiles)
+	if len(index.Partitions) != 1 || index.ComparisonCount != 2 || index.Partitions[0].Href != "./KOR/2023.json" {
+		t.Fatalf("unexpected mirror index: %+v", index)
+	}
+	row := files["KOR/2023.json"].Rows[0]
+	if row.AnchorISO3 != "USA" || row.ExportGapUSD == nil || *row.ExportGapUSD != -10 || row.ImportGapUSD == nil || *row.ImportGapUSD != 10 {
+		t.Fatalf("unexpected mirror row: %+v", row)
+	}
+	if files["KOR/2023.json"].Scope == "" || len(files["KOR/2023.json"].Caveats) < 2 {
+		t.Fatal("mirror diagnostics must disclose scope and caveats")
 	}
 }
 

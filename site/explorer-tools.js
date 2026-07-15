@@ -9,7 +9,7 @@
   const COLORS = new Set(["value", "growth"]);
   const MODES = new Set(["comparable", "all"]);
   const NORMALIZATIONS = new Set(["raw", "per_capita", "gdp_share"]);
-  const TABS = new Set(["overview", "intelligence", "products", "quality", "lab"]);
+  const TABS = new Set(["overview", "intelligence", "semiconductors", "products", "quality", "lab"]);
   const SCENARIO_PARTNERS = new Set(["usa", "chn"]);
 
   function clean(value, max = 100) {
@@ -21,6 +21,7 @@
       metric: "trade", color: "value", top: 25, mode: "comparable",
       period: "latest", region: "", income: "", group: "",
       normalization: "raw", country: "", query: "", tab: "overview", sector: "all",
+      chipStage: "all", chipCountry: "KOR",
       scenarioPartner: "usa", scenarioProduct: "", tariffBase: 0,
       tariffChange: 10, elasticity: -1.5, passThrough: 1,
     };
@@ -57,6 +58,8 @@
       query: clean(params.get("q")),
       tab: TABS.has(clean(params.get("tab"))) ? clean(params.get("tab")) : defaults.tab,
       sector: /^(all|[a-z0-9_-]{1,40})$/.test(clean(params.get("sector"))) ? clean(params.get("sector")) : defaults.sector,
+      chipStage: /^(all|[a-z0-9_-]{1,40})$/.test(clean(params.get("chip_stage"))) ? clean(params.get("chip_stage")) : defaults.chipStage,
+      chipCountry: /^[A-Z]{3}$/.test(clean(params.get("chip_country"), 3).toUpperCase()) ? clean(params.get("chip_country"), 3).toUpperCase() : defaults.chipCountry,
       scenarioPartner: SCENARIO_PARTNERS.has(scenarioPartner) ? scenarioPartner : defaults.scenarioPartner,
       scenarioProduct: /^\d{6}$/.test(scenarioProduct) ? scenarioProduct : defaults.scenarioProduct,
       tariffBase: boundedNumber(params, "tariff_base", defaults.tariffBase, 0, 300),
@@ -83,6 +86,8 @@
     if (values.query) params.set("q", clean(values.query));
     if (values.tab !== defaults.tab && TABS.has(values.tab)) params.set("tab", values.tab);
     if (values.sector !== defaults.sector && /^(all|[a-z0-9_-]{1,40})$/.test(values.sector)) params.set("sector", values.sector);
+    if (values.chipStage !== defaults.chipStage && /^(all|[a-z0-9_-]{1,40})$/.test(values.chipStage)) params.set("chip_stage", values.chipStage);
+    if (values.chipCountry !== defaults.chipCountry && /^[A-Z]{3}$/.test(String(values.chipCountry || ""))) params.set("chip_country", values.chipCountry);
     if (values.scenarioPartner !== defaults.scenarioPartner && SCENARIO_PARTNERS.has(values.scenarioPartner)) params.set("scenario_partner", values.scenarioPartner);
     if (values.scenarioProduct && /^\d{6}$/.test(values.scenarioProduct)) params.set("scenario_product", values.scenarioProduct);
     if (Number(values.tariffBase) !== defaults.tariffBase) params.set("tariff_base", String(Number(values.tariffBase)));

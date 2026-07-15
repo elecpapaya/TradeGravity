@@ -1,26 +1,27 @@
 # TradeGravity design
 
-TradeGravity is a reproducible public-data pipeline and static explorer for comparing reporters' trade with the United States and China. The design favors visible provenance, same-period comparison, and deployability without an application server.
+TradeGravity is a reproducible public-data pipeline and static explorer with an explicit United States–China analytical perspective. Source observations remain neutral and unadjusted; the application organizes them around position, movement, contributors, and evidence limits between the two anchors. The design favors free/public inputs, visible provenance, same-period comparison, and deployability without an application server.
 
 ## Supported user flow
 
-The reference task is to compare ASEAN reporters for an exact period, select a country, inspect its 5–10 year trend and HS2 product mix, then share and export the evidence. The implementation treats that as one continuous workflow rather than independent demo widgets.
+The reference task is to compare ASEAN reporters for an exact period, select a country, determine its current USA/China position and direction, inspect the products and evidence that contribute to it, then share and export the result. The implementation treats that as one continuous workflow rather than independent demo widgets.
 
 ## Architecture
 
 ```text
-WITS SDMX totals/history ─┐
-UN Comtrade HS2 ──────────┼─> collector ─> SQLite ─> publisher ─> static JSON
-World Bank country data ──┘       │                       │             │
+WITS SDMX totals/history ─────────┐
+UN Comtrade annual/monthly/matrix ┼─> collector ─> SQLite ─> publisher ─> static JSON
+World Bank country data ──────────┘       │                       │             │
+public policy/reference registry ────────────────────────────────┘             │
                                   └─ ingest_runs          └─ explainer ┘
                                                                         │
                                                         HTML/CSS/SVG/JS explorer
 ```
 
-- `cmd/collector` normalizes WITS totals/history and Comtrade HS2 chapters. Reporter-level concurrency is bounded and provider rate limits remain global.
+- `cmd/collector` normalizes WITS totals/history and annual/monthly Comtrade product and partner observations. Reporter-level concurrency is bounded and provider rate limits remain global.
 - `internal/store/sqlite` uses schema-aware idempotent keys and migrates version 1 total-only databases.
 - `cmd/context` publishes country labels, region, income, project groups, population, and GDP.
-- `cmd/publisher` emits schema 2 totals, time series, product files, quality signals, context-enriched latest rows, and a resource catalog for chunk discovery.
+- `cmd/publisher` emits schema 2 totals, time series, annual and monthly product files, bilateral matrices, unadjusted mirror diagnostics, quality signals, context-enriched latest rows, and a resource catalog for chunk discovery.
 - `cmd/explainer` generates build-time explanations whose statements cite evidence IDs. OpenAI use is optional; deterministic fallback covers every reporter.
 - `cmd/validator` rejects internally inconsistent or incompletely grounded artifact sets before deployment.
 - `site/` is a static tabbed client. It never receives provider or OpenAI credentials.
@@ -30,7 +31,8 @@ World Bank country data ──┘       │                       │           
 The client separates workflows without duplicating data state:
 
 - **Overview** preserves the two-anchor treemap, country snapshot, trend, and evidence-grounded explanation.
-- **Intelligence** derives scoped concentration, balance, growth-divergence signals, a two-anchor network, and an accessible ranking from the active filters.
+- **US–China Lens** derives anchor shares, exposure balance, position shift, dual exposure, growth divergence, a two-anchor network, country ranking, and mirror-reporting checks from the active filters.
+- **Chip Lens** applies the same position and direction grammar to stage-mapped annual and focused monthly HS6 observations, while keeping qualitative roles, dated policies, project signals, and transparent stage-shock sensitivity separate. A coverage gate prevents a narrow sample from being described as a global measurement.
 - **Products** loads reporter-partitioned HS2 files and exposes the planned HS6/tariff boundary.
 - **Data & Quality** combines the resource catalog, quality report, accessible table, and exports.
 - **Scenario Lab** provides an explicitly illustrative constant-elasticity tariff sensitivity calculation. It is not presented as SMART, a causal forecast, or a GDP/welfare model.
@@ -39,7 +41,21 @@ The selected reporter and all filters are shared across tabs. The enumerated `ta
 
 ## Growth path for high-volume data
 
-`catalog.json` decouples resource discovery from individual artifact schemas. Every resource identifies grain, readiness, and partitioning. Current product data already uses an index plus reporter chunks; strategic HS6, tariff, bilateral-matrix, reconciliation, value-added, and scenario resources have planned contracts but no fabricated observations or URLs. New high-volume publishers should emit small manifests and bounded chunks rather than append millions of rows to `latest.json`.
+`catalog.json` decouples resource discovery from individual artifact schemas. Every resource identifies grain, readiness, and partitioning. Products, strategic HS6, tariffs, bilateral matrices, focused monthly semiconductor observations, and unadjusted mirror diagnostics use small indexes plus bounded chunks. Computed value-added and versioned scenario resources remain planned and have no fabricated observations or URLs. New high-volume publishers should follow the same pattern rather than append millions of rows to `latest.json`.
+
+## Analytical lens
+
+TradeGravity does not claim to be perspective-free. It computes a shared vocabulary for a reporter, product, or semiconductor stage:
+
+```text
+USA share        = USA value / (USA value + China value)
+China share      = China value / (USA value + China value)
+exposure balance = USA share − China share
+dual exposure    = 2 × min(USA share, China share)
+position shift   = current exposure balance − previous comparable exposure balance
+```
+
+Positive balance or shift means toward the USA and negative means toward China. Threshold labels summarize these values but never modify the underlying observations. The metrics are scoped to the two anchors and must not be described as whole-world dependency, political alignment, causal pressure, or a physical supply-chain route.
 
 ## Observation model
 
@@ -89,13 +105,13 @@ Any failure produces deterministic rules output. The viewer shows generator meta
 
 ## Static explorer state
 
-The query string preserves tab, metric, color, Top N, period, comparison mode, region, income, project group, normalization, reporter search, and selected country. URL parsing accepts only enumerated values and bounded strings. Popstate restores the view.
+The query string preserves tab, metric, color, Top N, period, comparison mode, region, income, project group, normalization, reporter search, selected country, and Chip Lens stage/country context. URL parsing accepts only enumerated values and bounded strings. Popstate restores the view.
 
 Filtering affects treemaps, the accessible table, and downloads. CSV is a raw flattened convenience export; filtered JSON records the view state. Machine consumers should prefer the canonical schema 2 artifacts documented in `docs/DATA_SCHEMA.md`.
 
 ## Deployment sequence
 
-The scheduled workflow runs tests and vet, builds country context, collects ten-year WITS history, collects HS2 product chapters, publishes JSON, builds explanations, validates every artifact, and deploys `site/` to GitHub Pages.
+The scheduled workflow runs tests and vet, builds country context, collects ten-year WITS history, annual HS2/strategic HS6 data, a focused 12-month semiconductor panel, tariffs and bilateral matrices, publishes JSON, builds explanations, validates every artifact, and deploys `site/` to GitHub Pages. A main-branch code push reuses the last validated dataset instead of calling upstream APIs.
 
 The first release uses schema 2.0. Breaking field or meaning changes require a schema-version change and release note. Additive fields may ship within 2.x.
 
@@ -104,8 +120,10 @@ The first release uses schema 2.0. Breaking field or meaning changes require a s
 - Upstream APIs can lag, revise data, throttle requests, or omit reporters.
 - Public Comtrade preview and authenticated endpoints can have different limits.
 - Current values are not inflation-adjusted.
-- Product collection currently publishes one selected year per scheduled run.
+- HS2 collection publishes one selected year per scheduled run; the strategic HS6 collector publishes the selected year plus four prior years for semiconductor trend coverage.
+- Focused monthly semiconductor collection covers a bounded 30-code/connector allowlist and at most 36 months; it is a turning-point signal, not a complete market.
 - Explanations summarize observed evidence and do not infer causes.
 - Intelligence concentration covers only the published USA/China partner universe and is not a whole-world concentration measure.
+- Mirror differences can reflect CIF/FOB valuation, timing, classification, partner attribution, re-exports, and revisions. Neither report is treated as truth, and no adjusted estimate is produced.
 - The scenario lab uses user-supplied elasticity, tariff, and pass-through assumptions; production trade-diversion analysis still requires tariff schedules, substitution parameters, model versioning, and backtests.
 - External usability findings must be gathered from real, consented participants; the protocol is in `docs/USER_TESTING.md`.

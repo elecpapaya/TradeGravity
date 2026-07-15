@@ -46,10 +46,10 @@ jobs:
         run: go run ./cmd/validator -dir examples/sample-data -min-reporters 3
 
       - name: Check browser JavaScript
-        run: node --check site/app.js && node --check site/security.js && node --check site/data-tools.js && node --check site/explorer-tools.js && node --check site/intelligence-tools.js && node --check site/experience-tools.js && node --check site/news-tools.js
+        run: node --check site/app.js && node --check site/security.js && node --check site/data-tools.js && node --check site/explorer-tools.js && node --check site/intelligence-tools.js && node --check site/semiconductor-tools.js && node --check site/experience-tools.js && node --check site/news-tools.js
 
       - name: Test browser data helpers
-        run: node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/experience-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
+        run: node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/semiconductor-tools.test.cjs site/experience-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
 
       - name: Validate citation metadata
         run: |

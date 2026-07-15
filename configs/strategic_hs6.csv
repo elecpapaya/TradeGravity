@@ -1,10 +1,31 @@
 code,sector,label,revision_note,notes
+280461,semiconductors,High-purity silicon,Compatible HS revisions,Silicon containing at least 99.99 percent by weight; broad upstream material proxy rather than semiconductor-grade certification
+370710,semiconductors,Sensitising emulsions,Compatible HS revisions,Broad photolithography-chemicals proxy; end use is not observable in customs data
+370790,semiconductors,Other photographic chemicals,Compatible HS revisions,Broad photoresist and lithography-chemicals proxy; includes non-semiconductor uses
+381800,semiconductors,Doped electronic wafers and chemical elements,Compatible HS revisions,Chemical elements doped for use in electronics in discs wafers or similar forms
+848610,semiconductors,Wafer and boule manufacturing machinery,HS 2007 and later,Machinery for manufacturing semiconductor boules or wafers
 848620,semiconductors,Semiconductor manufacturing machinery,Compatible HS revisions,Wafer and semiconductor-device manufacturing equipment
+848640,semiconductors,Specified semiconductor assembly machinery,HS 2007 and later,Machinery covered by semiconductor and electronic assembly provisions; verify source revision
+848690,semiconductors,Semiconductor equipment parts and accessories,HS 2007 and later,Parts and accessories of machines and apparatus under heading 8486
+853400,semiconductors,Printed circuits,Compatible HS revisions,Broad downstream substrate and interconnect proxy; not limited to advanced semiconductor packaging
+854110,semiconductors,Diodes other than photosensitive or LED,Compatible HS revisions,Discrete semiconductor devices
+854121,semiconductors,Transistors with dissipation below one watt,Compatible HS revisions,Discrete low-power transistors
+854129,semiconductors,Other transistors,Compatible HS revisions,Discrete transistor trade without process-node detail
+854130,semiconductors,Thyristors diacs and triacs,Compatible HS revisions,Power and switching semiconductor devices
+854141,semiconductors,Light-emitting diodes,HS 2022 and later,HS 2022 split; keep separate from legacy photosensitive-device groups
+854149,semiconductors,Other photosensitive semiconductor devices,HS 2022 and later,HS 2022 split excluding separately classified photovoltaic cells and LEDs
+854150,semiconductors,Other semiconductor devices legacy group,Through HS 2017,Legacy group replaced by more detailed HS 2022 semiconductor-device codes
+854151,semiconductors,Semiconductor transducers,HS 2022 and later,HS 2022 category for semiconductor-based transducers
+854159,semiconductors,Other semiconductor devices,HS 2022 and later,HS 2022 residual semiconductor-device category
+854190,semiconductors,Parts of semiconductor devices,Compatible HS revisions,Parts of devices under heading 8541
 854231,semiconductors,Processors and controllers,HS 2007 and later,Electronic integrated circuits
 854232,semiconductors,Memories,HS 2007 and later,Electronic integrated circuits
 854233,semiconductors,Amplifiers,HS 2007 and later,Electronic integrated circuits
 854239,semiconductors,Other integrated circuits,HS 2007 and later,Electronic integrated circuits not covered by the selected functional codes
 854290,semiconductors,Integrated-circuit parts,Compatible HS revisions,Parts of electronic integrated circuits
+903082,semiconductors,Semiconductor wafer and device measuring instruments,HS 2007 through HS 2017,Dedicated electrical measuring and checking instruments before the HS 2022 inspection split
+903090,semiconductors,Parts of measuring and checking instruments,Compatible HS revisions,Broad parts category that includes but is not limited to semiconductor test equipment
+903141,semiconductors,Optical semiconductor inspection instruments,HS 2022 and later,Optical instruments for inspecting semiconductor wafers devices photomasks or reticles
 850760,ev_batteries,Lithium-ion accumulators,Compatible HS revisions,Finished lithium-ion cells and batteries
 850790,ev_batteries,Electric accumulator parts,Compatible HS revisions,Broader accumulator parts exposure
 870380,ev_batteries,Battery-electric passenger vehicles,HS 2017 and later,Passenger vehicles with only an electric motor for propulsion

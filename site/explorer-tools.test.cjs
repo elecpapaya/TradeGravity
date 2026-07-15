@@ -37,6 +37,11 @@ test("view state round-trips supported filters and rejects unsafe values", () =>
   assert.equal(parseViewState("?metric=bogus&period=javascript:alert(1)").period, "latest");
   assert.equal(parseViewState("?tab=javascript:alert(1)").tab, "overview");
   assert.equal(parseViewState("?sector=../../secret").sector, "all");
+  const chipView = parseViewState("?tab=semiconductors&chip_stage=memory_hbm&chip_country=kor");
+  assert.equal(chipView.tab, "semiconductors");
+  assert.equal(chipView.chipStage, "memory_hbm");
+  assert.equal(chipView.chipCountry, "KOR");
+  assert.match(serializeViewState(chipView), /chip_stage=memory_hbm/);
   const bounded = parseViewState("?scenario_partner=evil&scenario_product=../../x&tariff_base=999&tariff_change=-999&elasticity=2&pass_through=9");
   assert.equal(bounded.scenarioPartner, "usa");
   assert.equal(bounded.scenarioProduct, "");

@@ -1,0 +1,51 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T19:53:00Z",
+  "provider": "comtrade",
+  "level": 6,
+  "partners": [
+    "USA",
+    "CHN"
+  ],
+  "reporters": [
+    "DEU",
+    "JPN",
+    "KOR"
+  ],
+  "periods": [
+    "2023-01",
+    "2023-02",
+    "2023-03",
+    "2023-04",
+    "2023-05",
+    "2023-06",
+    "2023-07",
+    "2023-08",
+    "2023-09",
+    "2023-10",
+    "2023-11",
+    "2023-12"
+  ],
+  "partitions": [
+    {
+      "reporter_iso3": "DEU",
+      "href": "./DEU.json",
+      "row_count": 84,
+      "period_count": 12
+    },
+    {
+      "reporter_iso3": "JPN",
+      "href": "./JPN.json",
+      "row_count": 84,
+      "period_count": 12
+    },
+    {
+      "reporter_iso3": "KOR",
+      "href": "./KOR.json",
+      "row_count": 84,
+      "period_count": 12
+    }
+  ],
+  "observation_count": 1008,
+  "scope": "Selected monthly UN Comtrade HS6 observations against USA and China; a turning-point signal, not a complete semiconductor market or physical route"
+}

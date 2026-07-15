@@ -20,6 +20,7 @@
   const TAB_LIMITS = Object.freeze({
     overview: "Bilateral observations cover the United States and China anchors only; they are not a country's complete world trade.",
     intelligence: "Exposure signals are descriptive screening indicators, not shipment routes, causal estimates, fraud findings, or investment advice.",
+    semiconductors: "Stage-mapped HS6 observations do not reveal process nodes, capacity, firms, design services, HBM generations, advanced-packaging technology, or physical shipment routes.",
     products: "HS2 and curated HS6 partitions may use a different provider or observation period from headline totals; compare their labels before interpreting them together.",
     quality: "Provider differences can reflect reporter, classification, valuation, revision, and period choices; a delta alone does not identify an error.",
     lab: "Scenario results are transparent sensitivity arithmetic, not GDP, welfare, trade-diversion, or causal forecasts.",

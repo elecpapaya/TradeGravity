@@ -36,6 +36,15 @@ jobs:
           test -s .published-site/data/meta.json
           rm -rf site/data
           cp -a .published-site/data site/data
+          mkdir -p site/data/semiconductors
+          if test -s site/data/semiconductors/reference.json; then
+            jq --slurp '.[0] + {generated_at: .[1].generated_at, publication: .[1].publication}' \
+              configs/semiconductor_reference.json site/data/semiconductors/reference.json \
+              > site/data/semiconductors/reference.tmp.json
+            mv site/data/semiconductors/reference.tmp.json site/data/semiconductors/reference.json
+          else
+            cp configs/semiconductor_reference.json site/data/semiconductors/reference.json
+          fi
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

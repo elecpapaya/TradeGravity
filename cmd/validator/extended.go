@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"path/filepath"
@@ -9,6 +10,9 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"tradegravity/internal/semiconductor"
+	"tradegravity/internal/strategic"
 )
 
 var (
@@ -246,6 +250,93 @@ type validationMatrixPartner struct {
 	BalanceUSD      float64 `json:"balance_usd"`
 }
 
+type validationMirrorIndex struct {
+	SchemaVersion   string                      `json:"schema_version"`
+	GeneratedAt     string                      `json:"generated_at"`
+	Provider        string                      `json:"provider"`
+	Anchors         []string                    `json:"anchors"`
+	Reporters       []string                    `json:"reporters"`
+	Periods         []string                    `json:"periods"`
+	Partitions      []validationMirrorPartition `json:"partitions"`
+	ComparisonCount int                         `json:"comparison_count"`
+}
+
+type validationMirrorPartition struct {
+	ReporterISO3    string `json:"reporter_iso3"`
+	Period          string `json:"period"`
+	Href            string `json:"href"`
+	ComparisonCount int    `json:"comparison_count"`
+}
+
+type validationMirrorFile struct {
+	SchemaVersion string                       `json:"schema_version"`
+	GeneratedAt   string                       `json:"generated_at"`
+	Provider      string                       `json:"provider"`
+	ReporterISO3  string                       `json:"reporter_iso3"`
+	Period        string                       `json:"period"`
+	Scope         string                       `json:"scope"`
+	Caveats       []string                     `json:"caveats"`
+	Rows          []validationMirrorAnchorPair `json:"rows"`
+}
+
+type validationMirrorAnchorPair struct {
+	AnchorISO3              string   `json:"anchor_iso3"`
+	ReporterExportAvailable bool     `json:"reporter_export_available"`
+	AnchorImportAvailable   bool     `json:"anchor_import_available"`
+	ReporterExportUSD       float64  `json:"reporter_export_usd"`
+	AnchorImportUSD         float64  `json:"anchor_import_usd"`
+	ExportGapUSD            *float64 `json:"export_gap_usd,omitempty"`
+	ExportSymmetricGapRatio *float64 `json:"export_symmetric_gap_ratio,omitempty"`
+	ReporterImportAvailable bool     `json:"reporter_import_available"`
+	AnchorExportAvailable   bool     `json:"anchor_export_available"`
+	ReporterImportUSD       float64  `json:"reporter_import_usd"`
+	AnchorExportUSD         float64  `json:"anchor_export_usd"`
+	ImportGapUSD            *float64 `json:"import_gap_usd,omitempty"`
+	ImportSymmetricGapRatio *float64 `json:"import_symmetric_gap_ratio,omitempty"`
+}
+
+type validationSemiconductorMonthlyIndex struct {
+	SchemaVersion    string                                    `json:"schema_version"`
+	GeneratedAt      string                                    `json:"generated_at"`
+	Provider         string                                    `json:"provider"`
+	Level            int                                       `json:"level"`
+	Partners         []string                                  `json:"partners"`
+	Reporters        []string                                  `json:"reporters"`
+	Periods          []string                                  `json:"periods"`
+	Partitions       []validationSemiconductorMonthlyPartition `json:"partitions"`
+	ObservationCount int                                       `json:"observation_count"`
+	Scope            string                                    `json:"scope"`
+}
+
+type validationSemiconductorMonthlyPartition struct {
+	ReporterISO3 string `json:"reporter_iso3"`
+	Href         string `json:"href"`
+	RowCount     int    `json:"row_count"`
+	PeriodCount  int    `json:"period_count"`
+}
+
+type validationSemiconductorMonthlyFile struct {
+	SchemaVersion string                                       `json:"schema_version"`
+	GeneratedAt   string                                       `json:"generated_at"`
+	Provider      string                                       `json:"provider"`
+	Level         int                                          `json:"level"`
+	Partners      []string                                     `json:"partners"`
+	ReporterISO3  string                                       `json:"reporter_iso3"`
+	Periods       []string                                     `json:"periods"`
+	Rows          []validationSemiconductorMonthlyProductEntry `json:"rows"`
+}
+
+type validationSemiconductorMonthlyProductEntry struct {
+	Period         string                `json:"period"`
+	Classification string                `json:"classification"`
+	Code           string                `json:"code"`
+	Label          string                `json:"label"`
+	USA            validationSeriesBlock `json:"usa"`
+	CHN            validationSeriesBlock `json:"chn"`
+	Total          float64               `json:"total"`
+	ShareCN        float64               `json:"share_cn"`
+}
+
 type validationQuality struct {
 	SchemaVersion      string                         `json:"schema_version"`
 	GeneratedAt        string                         `json:"generated_at"`
@@ -389,6 +480,27 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 	if err := validateStrategic(dataDir, metadata, strategicIndex); err != nil {
 		return err
 	}
+	semiconductorReference, err := semiconductor.Load(filepath.Join(dataDir, "semiconductors", "reference.json"))
+	if err != nil {
+		return fmt.Errorf("read semiconductor reference: %w", err)
+	}
+	strategicProducts := make([]strategic.Product, 0, len(strategicIndex.Products))
+	for _, product := range strategicIndex.Products {
+		strategicProducts = append(strategicProducts, strategic.Product{Code: product.Code, Sector: product.Sector, Label: product.Label, RevisionNote: product.RevisionNote, Notes: product.Notes})
+	}
+	if err := semiconductor.ValidateStrategicRegistry(semiconductorReference, strategicProducts); err != nil {
+		return err
+	}
+	if err := validateSemiconductor(metadata, semiconductorReference); err != nil {
+		return err
+	}
+	var semiconductorMonthlyIndex validationSemiconductorMonthlyIndex
+	if err := readJSON(filepath.Join(dataDir, "semiconductors", "monthly", "index.json"), &semiconductorMonthlyIndex); err != nil {
+		return fmt.Errorf("read monthly semiconductor index: %w", err)
+	}
+	if err := validateSemiconductorMonthly(dataDir, metadata, semiconductorReference, semiconductorMonthlyIndex); err != nil {
+		return err
+	}
 	var tariffIndex validationTariffIndex
 	if err := readJSON(filepath.Join(dataDir, "tariffs", "index.json"), &tariffIndex); err != nil {
 		return fmt.Errorf("read tariff index: %w", err)
@@ -401,6 +513,13 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 		return fmt.Errorf("read bilateral matrix index: %w", err)
 	}
 	if err := validateMatrix(dataDir, metadata, matrixIndex); err != nil {
+		return err
+	}
+	var mirrorIndex validationMirrorIndex
+	if err := readJSON(filepath.Join(dataDir, "mirror", "index.json"), &mirrorIndex); err != nil {
+		return fmt.Errorf("read mirror diagnostics index: %w", err)
+	}
+	if err := validateMirror(dataDir, metadata, mirrorIndex); err != nil {
 		return err
 	}
 	var catalog validationCatalog
@@ -443,7 +562,7 @@ func validateCatalog(metadata datasetMeta, catalog validationCatalog) error {
 		}
 		seen[resource.ID] = resource
 	}
-	for _, required := range []string{"headline_totals", "time_series", "country_context", "product_chapters", "quality", "strategic_hs6", "tariff_schedules", "bilateral_matrix", "mirror_reconciliation", "scenario_runs"} {
+	for _, required := range []string{"headline_totals", "time_series", "country_context", "product_chapters", "quality", "strategic_hs6", "tariff_schedules", "bilateral_matrix", "semiconductor_atlas", "semiconductor_monthly", "mirror_reconciliation", "scenario_runs"} {
 		if _, ok := seen[required]; !ok {
 			return fmt.Errorf("catalog is missing resource %q", required)
 		}
@@ -475,6 +594,113 @@ func validateCatalog(metadata datasetMeta, catalog validationCatalog) error {
 	}
 	if matrixResource.Status != wantMatrixStatus || matrixResource.Provider != metadata.MatrixProvider || matrixResource.ProductLevel != 0 || matrixResource.Href != "./bilateral-matrix/index.json" {
 		return errorsForExtended("catalog bilateral matrix resource does not match metadata")
+	}
+	mirrorResource := seen["mirror_reconciliation"]
+	wantMirrorStatus := "partial"
+	if metadata.MirrorPartitionCount > 0 {
+		wantMirrorStatus = "ready"
+	}
+	if mirrorResource.Status != wantMirrorStatus || mirrorResource.Provider != metadata.MirrorProvider || mirrorResource.ProductLevel != 0 || mirrorResource.Href != "./mirror/index.json" {
+		return errorsForExtended("catalog mirror diagnostics resource does not match metadata")
+	}
+	monthlyResource := seen["semiconductor_monthly"]
+	wantMonthlyStatus := "partial"
+	if metadata.SemiconductorMonthlyReporterCount > 0 {
+		wantMonthlyStatus = "ready"
+	}
+	if monthlyResource.Status != wantMonthlyStatus || monthlyResource.Provider != metadata.SemiconductorMonthlyProvider || monthlyResource.ProductLevel != 6 || monthlyResource.Href != "./semiconductors/monthly/index.json" {
+		return errorsForExtended("catalog monthly semiconductor resource does not match metadata")
+	}
+	return nil
+}
+
+func validateSemiconductor(metadata datasetMeta, reference semiconductor.Reference) error {
+	publication := reference.Publication
+	if reference.GeneratedAt != metadata.GeneratedAt {
+		return fmt.Errorf("semiconductor generated_at mismatch: meta=%q reference=%q", metadata.GeneratedAt, reference.GeneratedAt)
+	}
+	if publication.Status != "reference_only" && publication.Status != "limited" && publication.Status != "research_ready" {
+		return fmt.Errorf("semiconductor publication has invalid status %q", publication.Status)
+	}
+	if publication.RegisteredCodeCount != len(semiconductor.Codes(reference)) || publication.RegisteredCodeCount < 30 {
+		return fmt.Errorf("semiconductor registered code count mismatch or below minimum: publication=%d mapped=%d", publication.RegisteredCodeCount, len(semiconductor.Codes(reference)))
+	}
+	if metadata.SemiconductorStatus != publication.Status || metadata.SemiconductorCodeCount != publication.RegisteredCodeCount || metadata.SemiconductorReporterCount != publication.ObservedReporterCount || metadata.SemiconductorPeriodCount != publication.ObservedPeriodCount {
+		return errorsForExtended("semiconductor metadata does not match reference publication")
+	}
+	if publication.Status == "research_ready" && (publication.ObservedReporterCount < publication.MinimumReporterTarget || publication.ObservedPeriodCount < publication.MinimumPeriodTarget || publication.RegisteredCodeCount < publication.MinimumCodeTarget) {
+		return errorsForExtended("semiconductor publication claims research_ready below its coverage gate")
+	}
+	return nil
+}
+
+func validateSemiconductorMonthly(dataDir string, metadata datasetMeta, reference semiconductor.Reference, index validationSemiconductorMonthlyIndex) error {
+	if index.SchemaVersion != metadata.SchemaVersion || index.GeneratedAt != metadata.GeneratedAt || index.Provider != metadata.SemiconductorMonthlyProvider || index.Level != 6 || !reflect.DeepEqual(index.Partners, metadata.Partners) || strings.TrimSpace(index.Scope) == "" {
+		return errorsForExtended("monthly semiconductor index does not match metadata")
+	}
+	if len(index.Reporters) != metadata.SemiconductorMonthlyReporterCount || len(index.Periods) != metadata.SemiconductorMonthlyPeriodCount || index.ObservationCount != metadata.SemiconductorMonthlyObservationCount || len(index.Partitions) != len(index.Reporters) {
+		return errorsForExtended("monthly semiconductor counts do not match metadata")
+	}
+	if !sort.StringsAreSorted(index.Reporters) || !sort.StringsAreSorted(index.Periods) {
+		return errorsForExtended("monthly semiconductor dimensions must be sorted")
+	}
+	codeSet := make(map[string]struct{})
+	for _, code := range semiconductor.Codes(reference) {
+		codeSet[code] = struct{}{}
+	}
+	for _, period := range index.Periods {
+		if !monthPattern.MatchString(period) {
+			return fmt.Errorf("monthly semiconductor index has invalid period %q", period)
+		}
+	}
+	reporterSet := make(map[string]struct{})
+	periodSet := make(map[string]struct{})
+	for _, partition := range index.Partitions {
+		if !iso3Pattern.MatchString(partition.ReporterISO3) || partition.Href != "./"+partition.ReporterISO3+".json" || partition.RowCount < 1 || partition.PeriodCount < 1 {
+			return fmt.Errorf("monthly semiconductor index has invalid partition %+v", partition)
+		}
+		if _, exists := reporterSet[partition.ReporterISO3]; exists {
+			return fmt.Errorf("monthly semiconductor index repeats reporter %s", partition.ReporterISO3)
+		}
+		reporterSet[partition.ReporterISO3] = struct{}{}
+		var file validationSemiconductorMonthlyFile
+		if err := readJSON(filepath.Join(dataDir, "semiconductors", "monthly", partition.ReporterISO3+".json"), &file); err != nil {
+			return fmt.Errorf("read monthly semiconductor partition %s: %w", partition.ReporterISO3, err)
+		}
+		if file.SchemaVersion != index.SchemaVersion || file.GeneratedAt != index.GeneratedAt || file.Provider != index.Provider || file.Level != 6 || !reflect.DeepEqual(file.Partners, index.Partners) || file.ReporterISO3 != partition.ReporterISO3 || len(file.Rows) != partition.RowCount || len(file.Periods) != partition.PeriodCount || !sort.StringsAreSorted(file.Periods) {
+			return fmt.Errorf("monthly semiconductor partition %s does not match its index", partition.ReporterISO3)
+		}
+		filePeriods := make(map[string]struct{})
+		previousPeriod := ""
+		for _, row := range file.Rows {
+			if !monthPattern.MatchString(row.Period) || strings.TrimSpace(row.Classification) == "" || strings.TrimSpace(row.Label) == "" {
+				return fmt.Errorf("monthly semiconductor partition %s has incomplete row %+v", partition.ReporterISO3, row)
+			}
+			if _, ok := codeSet[row.Code]; !ok {
+				return fmt.Errorf("monthly semiconductor partition %s has unmapped code %s", partition.ReporterISO3, row.Code)
+			}
+			if previousPeriod != "" && row.Period < previousPeriod {
+				return fmt.Errorf("monthly semiconductor partition %s periods are not ascending", partition.ReporterISO3)
+			}
+			previousPeriod = row.Period
+			if err := validateSeriesBlock(partition.ReporterISO3, "USA", row.USA); err != nil {
+				return fmt.Errorf("monthly semiconductor partition %s USA block: %w", partition.ReporterISO3, err)
+			}
+			if err := validateSeriesBlock(partition.ReporterISO3, "CHN", row.CHN); err != nil {
+				return fmt.Errorf("monthly semiconductor partition %s CHN block: %w", partition.ReporterISO3, err)
+			}
+			if !approximatelyEqual(row.Total, row.USA.Trade+row.CHN.Trade) || row.Total < 0 || !isFinite(row.ShareCN) || row.ShareCN < 0 || row.ShareCN > 1 || (row.Total > 0 && !approximatelyEqual(row.ShareCN, row.CHN.Trade/row.Total)) {
+				return fmt.Errorf("monthly semiconductor partition %s has inconsistent totals %+v", partition.ReporterISO3, row)
+			}
+			filePeriods[row.Period] = struct{}{}
+			periodSet[row.Period] = struct{}{}
+		}
+		if !sameStringSet(file.Periods, filePeriods) {
+			return fmt.Errorf("monthly semiconductor partition %s period discovery mismatch", partition.ReporterISO3)
+		}
+	}
+	if index.ObservationCount < 0 || !sameStringSet(index.Reporters, reporterSet) || !sameStringSet(index.Periods, periodSet) {
+		return errorsForExtended("monthly semiconductor partition discovery does not match index")
 	}
 	return nil
 }
@@ -798,6 +1024,111 @@ func validateMatrix(dataDir string, metadata datasetMeta, index validationMatrix
 	}
 	if partnerRowCount != index.PartnerRowCount || observationCount != index.ObservationCount || !sameStringSet(index.Reporters, reporterSet) || !sameStringSet(index.Partners, partnerSet) || !sameStringSet(index.Periods, periodSet) {
 		return errorsForExtended("bilateral matrix partition discovery does not match index dimensions")
+	}
+	return nil
+}
+
+func validateMirror(dataDir string, metadata datasetMeta, index validationMirrorIndex) error {
+	if index.SchemaVersion != metadata.SchemaVersion || index.GeneratedAt != metadata.GeneratedAt || index.Provider != metadata.MirrorProvider {
+		return errorsForExtended("mirror diagnostics index does not match metadata")
+	}
+	if !reflect.DeepEqual(index.Anchors, []string{"USA", "CHN"}) || len(index.Reporters) != metadata.MirrorReporterCount || len(index.Partitions) != metadata.MirrorPartitionCount || index.ComparisonCount != metadata.MirrorComparisonCount {
+		return errorsForExtended("mirror diagnostics dimensions do not match metadata")
+	}
+	if !sort.StringsAreSorted(index.Reporters) {
+		return errorsForExtended("mirror diagnostics reporters must be sorted")
+	}
+	for position, period := range index.Periods {
+		if !yearPattern.MatchString(period) || (position > 0 && index.Periods[position-1] < period) {
+			return fmt.Errorf("mirror diagnostics has invalid or unsorted period %q", period)
+		}
+	}
+	reporterSet := make(map[string]struct{})
+	periodSet := make(map[string]struct{})
+	partitionSet := make(map[string]struct{})
+	comparisonCount := 0
+	for _, partition := range index.Partitions {
+		if !iso3Pattern.MatchString(partition.ReporterISO3) || partition.ReporterISO3 == "USA" || partition.ReporterISO3 == "CHN" || !yearPattern.MatchString(partition.Period) || partition.ComparisonCount < 0 {
+			return fmt.Errorf("mirror diagnostics has invalid partition %+v", partition)
+		}
+		wantHref := "./" + partition.ReporterISO3 + "/" + partition.Period + ".json"
+		if partition.Href != wantHref {
+			return fmt.Errorf("mirror diagnostics partition href %q, want %q", partition.Href, wantHref)
+		}
+		key := partition.ReporterISO3 + ":" + partition.Period
+		if _, exists := partitionSet[key]; exists {
+			return fmt.Errorf("mirror diagnostics has duplicate partition %s", key)
+		}
+		partitionSet[key] = struct{}{}
+		reporterSet[partition.ReporterISO3] = struct{}{}
+		periodSet[partition.Period] = struct{}{}
+
+		var file validationMirrorFile
+		if err := readJSON(filepath.Join(dataDir, "mirror", partition.ReporterISO3, partition.Period+".json"), &file); err != nil {
+			return fmt.Errorf("read mirror diagnostics partition %s: %w", key, err)
+		}
+		if file.SchemaVersion != index.SchemaVersion || file.GeneratedAt != index.GeneratedAt || file.Provider != index.Provider || file.ReporterISO3 != partition.ReporterISO3 || file.Period != partition.Period || strings.TrimSpace(file.Scope) == "" || len(file.Caveats) < 2 || len(file.Rows) == 0 {
+			return fmt.Errorf("mirror diagnostics partition %s does not match its index or lacks disclosure", key)
+		}
+		seenAnchors := make(map[string]struct{})
+		fileComparisons := 0
+		for _, row := range file.Rows {
+			if row.AnchorISO3 != "USA" && row.AnchorISO3 != "CHN" {
+				return fmt.Errorf("mirror diagnostics partition %s has invalid anchor %q", key, row.AnchorISO3)
+			}
+			if _, exists := seenAnchors[row.AnchorISO3]; exists {
+				return fmt.Errorf("mirror diagnostics partition %s repeats anchor %s", key, row.AnchorISO3)
+			}
+			seenAnchors[row.AnchorISO3] = struct{}{}
+			for label, value := range map[string]float64{"reporter export": row.ReporterExportUSD, "anchor import": row.AnchorImportUSD, "reporter import": row.ReporterImportUSD, "anchor export": row.AnchorExportUSD} {
+				if !isFinite(value) || value < 0 {
+					return fmt.Errorf("mirror diagnostics partition %s has invalid %s value %v", key, label, value)
+				}
+			}
+			if err := validateMirrorPair(row.ReporterExportAvailable, row.AnchorImportAvailable, row.ReporterExportUSD, row.AnchorImportUSD, row.ExportGapUSD, row.ExportSymmetricGapRatio); err != nil {
+				return fmt.Errorf("mirror diagnostics partition %s export pair: %w", key, err)
+			}
+			if row.ReporterExportAvailable && row.AnchorImportAvailable {
+				fileComparisons++
+			}
+			if err := validateMirrorPair(row.ReporterImportAvailable, row.AnchorExportAvailable, row.ReporterImportUSD, row.AnchorExportUSD, row.ImportGapUSD, row.ImportSymmetricGapRatio); err != nil {
+				return fmt.Errorf("mirror diagnostics partition %s import pair: %w", key, err)
+			}
+			if row.ReporterImportAvailable && row.AnchorExportAvailable {
+				fileComparisons++
+			}
+		}
+		if fileComparisons != partition.ComparisonCount {
+			return fmt.Errorf("mirror diagnostics partition %s comparison count mismatch", key)
+		}
+		comparisonCount += fileComparisons
+	}
+	if comparisonCount != index.ComparisonCount || !sameStringSet(index.Reporters, reporterSet) || !sameStringSet(index.Periods, periodSet) {
+		return errorsForExtended("mirror diagnostics discovery does not match index dimensions")
+	}
+	return nil
+}
+
+func validateMirrorPair(firstAvailable, secondAvailable bool, first, second float64, gap, ratio *float64) error {
+	comparable := firstAvailable && secondAvailable
+	if !firstAvailable && first != 0 || !secondAvailable && second != 0 {
+		return errors.New("unavailable mirror value is non-zero")
+	}
+	if !comparable {
+		if gap != nil || ratio != nil {
+			return errors.New("non-comparable pair publishes a gap")
+		}
+		return nil
+	}
+	if gap == nil || ratio == nil || !isFinite(*gap) || !isFinite(*ratio) || !approximatelyEqual(*gap, first-second) {
+		return errors.New("comparable pair has inconsistent gap")
+	}
+	wantRatio := 0.0
+	if average := (first + second) / 2; average > 0 {
+		wantRatio = (first - second) / average
+	}
+	if !approximatelyEqual(*ratio, wantRatio) {
+		return errors.New("comparable pair has inconsistent symmetric gap ratio")
 	}
 	return nil
 }

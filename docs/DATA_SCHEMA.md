@@ -1,6 +1,6 @@
 # Published data schema 2.0
 
-TradeGravity publishes one versioned artifact set under `site/data/`. Headline, product, strategic HS6, tariff, bilateral-matrix, quality, and explanation artifacts share the trade `schema_version` and publisher `generated_at`. `catalog.json` has an independent additive catalog schema and the same publisher timestamp. `context.json` has its own refresh time because it is built before the trade publisher.
+TradeGravity publishes one versioned artifact set under `site/data/`. Headline, product, strategic HS6, semiconductor, tariff, bilateral-matrix, mirror-diagnostic, quality, and explanation artifacts share the trade publication timestamp. The semiconductor reference has its own additive schema and records both its editorial update date and publisher `generated_at`. `catalog.json` has an independent additive catalog schema and the same publisher timestamp. `context.json` has its own refresh time because it is built before the trade publisher.
 
 ## Time and comparison semantics
 
@@ -20,10 +20,15 @@ TradeGravity publishes one versioned artifact set under `site/data/`. Headline, 
 | `products/{ISO3}.json` | HS2 chapters by reporter and period | UN Comtrade |
 | `strategic-hs6/index.json` | Curated code registry and partition discovery | UN Comtrade + project registry |
 | `strategic-hs6/{ISO3}/{YEAR}.json` | USA/China strategic HS6 flows | UN Comtrade |
+| `semiconductors/reference.json` | Stage taxonomy, roles, trends, policy/project signals, sources, coverage gate | Project registry + cited official/intergovernmental sources |
+| `semiconductors/monthly/index.json` | Focused monthly reporter/period discovery | UN Comtrade + semiconductor registry |
+| `semiconductors/monthly/{ISO3}.json` | Selected HS6 monthly USA/China flows | UN Comtrade |
 | `tariffs/index.json` | Importer/year tariff partition discovery | WITS/TRAINS |
 | `tariffs/{ISO3}/{YEAR}.json` | Revision-aware strategic HS6 tariff rows | WITS/TRAINS |
 | `bilateral-matrix/index.json` | Multi-partner `TOTAL` partition discovery | UN Comtrade |
 | `bilateral-matrix/{ISO3}/{YEAR}.json` | Reported partner exports/imports and availability | UN Comtrade |
+| `mirror/index.json` | Unadjusted mirror-diagnostic partition discovery | Derived from bilateral matrices |
+| `mirror/{ISO3}/{YEAR}.json` | Reporter/USA/China counterpart gaps | Derived from both reporters' UN Comtrade totals |
 | `quality.json` | Missing/stale data, collection runs, provider comparisons | Pipeline calculations |
 | `catalog.json` | Resource discovery, grain, partitioning, and readiness | Publisher |
 | `explanations/index.json` | Explanation coverage and generator counts | Explainer |
@@ -33,13 +38,13 @@ TradeGravity publishes one versioned artifact set under `site/data/`. Headline, 
 
 The catalog is the stable discovery layer for a dashboard that may grow beyond a few single-file datasets. Each resource declares an `id`, display title, `status`, analytical `grain`, `partitioning`, and an `href` only when an artifact is published. Current statuses are `ready`, `partial`, and `planned`.
 
-`strategic_hs6`, `tariff_schedules`, and `bilateral_matrix` are published resources. Mirror/reconciled estimates, value-added networks, and versioned scenario results remain planned contracts and do not claim that those observations exist. Published resources use relative same-origin paths; the validator rejects duplicate IDs, invalid statuses, unsafe paths, and metadata that conflicts with `meta.json`.
+`strategic_hs6`, `semiconductor_atlas`, `semiconductor_monthly`, `tariff_schedules`, `bilateral_matrix`, and `mirror_reconciliation` are published resources. The last ID is retained for catalog compatibility, but its title and artifact explicitly describe **unadjusted mirror-reporting diagnostics**, not a reconciled truth. Computed value-added networks and versioned scenario results remain planned contracts and do not claim that those observations exist. Published resources use relative same-origin paths; the validator rejects duplicate IDs, invalid statuses, unsafe paths, and metadata that conflicts with `meta.json`.
 
 The current product resource demonstrates the intended scaling pattern: a small discovery index plus one reporter file. Higher-volume resources should use period, reporter, importer, industry, or sector chunks named in the catalog rather than expanding `latest.json`.
 
 ## `meta.json`
 
-Important fields include:
+Important fields include. The values below illustrate the schema shape; consumers must read the active publication rather than treat these counts or timestamps as the latest dataset:
 
 ```json
 {
@@ -55,14 +60,26 @@ Important fields include:
   "series_reporter_count": 51,
   "series_point_count": 500,
   "product_provider": "comtrade",
-  "product_classification": "H6",
+  "product_classification": "HS",
   "product_level": 2,
   "product_reporter_count": 49,
   "context_status": "success",
   "strategic_partition_count": 49,
   "tariff_importer_count": 5,
   "matrix_reporter_count": 49,
-  "matrix_partner_row_count": 10586
+  "matrix_partner_row_count": 10586,
+  "mirror_provider": "comtrade",
+  "mirror_reporter_count": 47,
+  "mirror_partition_count": 47,
+  "mirror_comparison_count": 188,
+  "semiconductor_status": "limited",
+  "semiconductor_code_count": 30,
+  "semiconductor_reporter_count": 1,
+  "semiconductor_period_count": 1,
+  "semiconductor_monthly_provider": "comtrade",
+  "semiconductor_monthly_reporter_count": 12,
+  "semiconductor_monthly_period_count": 12,
+  "semiconductor_monthly_observation_count": 17280
 }
 ```
 
@@ -130,6 +147,41 @@ Product data is never substituted for the WITS headline series. `quality.json` m
 
 `tariffs/index.json` discovers importer/year partitions and enumerates data types and rate types. A tariff row includes source classification and nomenclature, exporter/regime, `reported` or `ave_estimated`, rate identity, average/minimum/maximum rates when supplied, line counts, exclusions, and the source update timestamp. The UI prefers World MFN AVE rows only as an explicit display rule; it does not merge them with preferential rates.
 
+## Semiconductor reference and US–China metrics
+
+`semiconductors/reference.json` uses schema `1.0` and contains `perspective`, `data_policy`, `open_datasets`, `stages`, `country_roles`, `trends`, `policy_events`, `capacity_signals`, `sources`, `scenario_defaults`, and a publisher-added `publication` block. The perspective must be `us_china` with anchors `USA` and `CHN`; the data policy must be `free_public_only`. Dataset and dated-context entries declare access/reuse notes, and the validator rejects paid/proprietary access types. Stage codes must exist in the strategic registry. Trend, policy, and capacity records must resolve to a declared HTTPS source; policy and capacity stages must resolve to a declared stage.
+
+The publication block records `status`, registered-code count, observed reporters/periods/rows, minimum coverage targets, measurement scope, and the concrete observed dimension values. `research_ready` requires at least 30 mapped codes, 15 observed reporters, and five annual periods. This is a descriptive coverage gate, not a claim of production-capacity or physical-route coverage. See [SEMICONDUCTOR_ATLAS.md](SEMICONDUCTOR_ATLAS.md) for formulas and interpretation boundaries.
+
+The browser derives the explicit two-anchor metrics without changing published values:
+
+```text
+exposure_balance = usa_share − china_share
+dual_exposure = 2 × min(usa_share, china_share)
+position_shift = current_exposure_balance − previous_exposure_balance
+```
+
+Positive balance/shift means toward USA and negative means toward China. These client-derived fields are not whole-world shares or political-alignment scores.
+
+## Focused monthly semiconductor observations
+
+`semiconductors/monthly/index.json` declares provider, level 6, anchors, sorted reporters/periods, partition metadata, raw source-observation count, and scope. Each reporter file contains one aggregated row per `period × classification × code`:
+
+```json
+{
+  "period": "2026-05",
+  "classification": "H6",
+  "code": "854232",
+  "label": "Memories",
+  "usa": {"available": true, "export": 10, "import": 5, "trade": 15},
+  "chn": {"available": true, "export": 12, "import": 8, "trade": 20},
+  "total": 35,
+  "share_cn": 0.5714285714
+}
+```
+
+Only mapped HS6 codes, monthly periods, and USA/CHN partners are admitted. The index observation count is the number of accepted source flow rows, while partition `row_count` is the number of aggregated product-month rows. Missing data remain unavailable and are never interpolated.
+
 ## Multi-partner bilateral matrix
 
 The matrix index has `product_code: "TOTAL"`, `product_level: 0`, sorted reporter/partner/period dimensions, partition counts, partner-row counts, and source-observation counts. Each reporter/year file contains one row per alphabetic ISO3 partner:
@@ -147,6 +199,15 @@ The matrix index has `product_code: "TOTAL"`, `product_level: 0`, sorted reporte
 ```
 
 `trade_usd = export_usd + import_usd` and `balance_usd = export_usd - import_usd`. Availability flags distinguish a missing flow from a reported zero. World (`partnerCode=0`), regional groups, non-alphabetic special codes, and the reporter itself are excluded. These rows are reported bilateral totals, not shipment legs, firm relationships, value-added origin, or proof of rerouting.
+
+## Mirror-reporting diagnostics
+
+`mirror/index.json` declares the fixed anchors `USA` and `CHN`, sorted reporter/year partitions, and the number of available flow-pair comparisons. A row in `mirror/{ISO3}/{YEAR}.json` pairs:
+
+- reporter exports with anchor-reported imports; and
+- reporter imports with anchor-reported exports.
+
+For each available pair, `gap_usd = reporter_value − anchor_value` and `symmetric_gap_ratio = gap_usd / ((reporter_value + anchor_value) / 2)`. A zero denominator yields no ratio. Each file carries scope and caveats; neither reporter is ground truth. The artifact is not an adjusted series and cannot support a fraud, evasion, transshipment, or physical-route claim.
 
 ## Quality and collection runs
 
@@ -168,7 +229,7 @@ Run the same validation used before deployment:
 go run ./cmd/validator -dir site/data -min-reporters 40
 ```
 
-The validator checks cross-file provenance and counts, reporter and period uniqueness, finite numbers, calculated totals/shares/balances, flow-availability identities, strategic registry membership, tariff rate identities, catalog contracts, context coverage, collection-run metadata, and every explanation citation.
+The validator checks cross-file provenance and counts, reporter and period uniqueness, finite numbers, calculated totals/shares/balances, monthly product identities, mirror-pair arithmetic and disclosure, flow-availability identities, strategic registry membership, free/public reference policy, tariff rate identities, catalog contracts, context coverage, collection-run metadata, and every explanation citation.
 
 ## CSV and filtered JSON
 

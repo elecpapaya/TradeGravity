@@ -12,11 +12,12 @@ test("index loads trusted helpers before the application and keeps D3 pinned", (
   const dataToolsIndex = html.indexOf('src="./data-tools.js"');
   const explorerToolsIndex = html.indexOf('src="./explorer-tools.js"');
   const intelligenceToolsIndex = html.indexOf('src="./intelligence-tools.js"');
+  const semiconductorToolsIndex = html.indexOf('src="./semiconductor-tools.js"');
   const experienceToolsIndex = html.indexOf('src="./experience-tools.js"');
   const newsToolsIndex = html.indexOf('src="./news-tools.js"');
   const d3Index = html.indexOf('src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"');
   const appIndex = html.indexOf('src="./app.js"');
-  assert.ok(securityIndex >= 0 && dataToolsIndex > securityIndex && explorerToolsIndex > dataToolsIndex && intelligenceToolsIndex > explorerToolsIndex && experienceToolsIndex > intelligenceToolsIndex && newsToolsIndex > experienceToolsIndex && d3Index > newsToolsIndex && appIndex > d3Index);
+  assert.ok(securityIndex >= 0 && dataToolsIndex > securityIndex && explorerToolsIndex > dataToolsIndex && intelligenceToolsIndex > explorerToolsIndex && semiconductorToolsIndex > intelligenceToolsIndex && experienceToolsIndex > semiconductorToolsIndex && newsToolsIndex > experienceToolsIndex && d3Index > newsToolsIndex && appIndex > d3Index);
   assert.match(html, /integrity="sha384-[A-Za-z0-9+/=]+"/);
   assert.match(html, /Content-Security-Policy/);
 });
@@ -42,7 +43,7 @@ test("first-visit onboarding, inline definitions, and export actions are wired o
   }
   assert.match(html, /30-second orientation/);
   assert.match(html, /Pipeline refresh and recent headlines use different dates/);
-  assert.match(html, /China divided by USA plus China in this two-anchor view/);
+  assert.match(html, /Each anchor divided by USA plus China in this two-anchor view/);
   assert.match(app, /tradegravity:onboarding:v1/);
   assert.match(app, /function startVietNamSample/);
   assert.match(app, /function downloadPNGSnapshot/);
@@ -84,17 +85,41 @@ test("accessible table controls and targets appear exactly once", () => {
 
 test("dashboard tabs and scalable intelligence targets appear exactly once", () => {
   for (const id of [
-    "dashboardTabs", "tab-overview", "tab-intelligence", "tab-products", "tab-quality", "tab-lab",
+    "dashboardTabs", "tab-overview", "tab-intelligence", "tab-semiconductors", "tab-products", "tab-quality", "tab-lab",
     "intelligenceSummary", "networkChart", "exposureRankingBody", "dataCatalog",
+    "mirrorDiagnostics",
     "scenarioForm", "scenarioPartner", "scenarioProduct", "scenarioTariffSource", "scenarioResult",
     "strategicSectorFilter", "strategicProducts", "strategicCapabilityStatus", "tariffCapabilityStatus",
   ]) {
     assert.equal((html.match(new RegExp(`id=["']${id}["']`, "g")) || []).length, 1, `expected one #${id}`);
   }
-  assert.equal((html.match(/role="tab"/g) || []).length, 5);
-  assert.equal((html.match(/role="tabpanel"/g) || []).length, 5);
+  assert.equal((html.match(/role="tab"/g) || []).length, 6);
+  assert.equal((html.match(/role="tabpanel"/g) || []).length, 6);
   assert.match(html, /not an inferred physical supply-chain route/i);
   assert.match(html, /does not estimate GDP/i);
+});
+
+test("chip lens exposes coverage, stages, roles, monthly signals, policy, evidence, and transparent sensitivity", () => {
+  for (const id of [
+    "chipCoverageBadge", "chipCoverageSummary", "chipStageFilter", "chipCountryFilter", "chipDownloadCSV",
+    "chipTrends", "chipValueChain", "chipRoleLandscape", "chipDistribution", "chipCountryProfile", "chipTimeline", "chipCapacitySignals",
+    "chipMonthlySignals",
+    "chipScenarioForm", "chipDisruption", "chipSubstitution", "chipScenarioBaseline", "chipScenarioResult",
+    "chipSources", "chipCaveats",
+  ]) {
+    assert.equal((html.match(new RegExp(`id=["']${id}["']`, "g")) || []).length, 1, `expected one #${id}`);
+  }
+  assert.match(html, /Customs observations, context, and estimates remain separate/i);
+  assert.match(html, /not global supplier share or production capacity/i);
+  assert.match(html, /open\/public data only/i);
+  assert.match(app, /function loadSemiconductorPartitions/);
+  assert.match(app, /async function loadSelectedChipMonthly/);
+  assert.match(app, /async function renderMirrorDiagnostics/);
+  assert.match(app, /function runChipScenario/);
+  assert.match(css, /\.chipValueChain/);
+  assert.match(css, /\.policyTimeline/);
+  assert.match(css, /\.chipRoleTable/);
+  assert.match(html, /announcements are never counted as operating capacity/i);
 });
 
 test("overview treemaps survive hidden-tab resizes and redraw when shown", () => {

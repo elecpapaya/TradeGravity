@@ -17,49 +17,62 @@ import (
 	_ "modernc.org/sqlite"
 
 	"tradegravity/internal/model"
+	"tradegravity/internal/semiconductor"
 	"tradegravity/internal/strategic"
 )
 
 const schemaVersion = "2.0"
 
 type metaFile struct {
-	SchemaVersion             string         `json:"schema_version"`
-	GeneratedAt               string         `json:"generated_at"`
-	Provider                  string         `json:"provider"`
-	Partners                  []string       `json:"partners"`
-	ReporterCount             int            `json:"reporter_count"`
-	ObservationCount          int            `json:"observation_count"`
-	ExpectedPartnerBlocks     int            `json:"expected_partner_blocks"`
-	AvailablePartnerBlocks    int            `json:"available_partner_blocks"`
-	MissingPartnerBlocks      int            `json:"missing_partner_blocks"`
-	PeriodCounts              map[string]int `json:"period_counts"`
-	DominantPeriod            string         `json:"dominant_period"`
-	ComparableReporters       int            `json:"comparable_reporters"`
-	IncomparableReporters     int            `json:"incomparable_reporters"`
-	StalePartnerBlocks        int            `json:"stale_partner_blocks"`
-	SeriesReporterCount       int            `json:"series_reporter_count"`
-	SeriesPointCount          int            `json:"series_point_count"`
-	ProductProvider           string         `json:"product_provider,omitempty"`
-	ProductClassification     string         `json:"product_classification,omitempty"`
-	ProductLevel              int            `json:"product_level,omitempty"`
-	ProductReporterCount      int            `json:"product_reporter_count"`
-	ProductObservationCount   int            `json:"product_observation_count"`
-	ContextStatus             string         `json:"context_status"`
-	StrategicProvider         string         `json:"strategic_provider,omitempty"`
-	StrategicLevel            int            `json:"strategic_level,omitempty"`
-	StrategicProductCount     int            `json:"strategic_product_count"`
-	StrategicReporterCount    int            `json:"strategic_reporter_count"`
-	StrategicPartitionCount   int            `json:"strategic_partition_count"`
-	StrategicObservationCount int            `json:"strategic_observation_count"`
-	TariffProvider            string         `json:"tariff_provider,omitempty"`
-	TariffImporterCount       int            `json:"tariff_importer_count"`
-	TariffPartitionCount      int            `json:"tariff_partition_count"`
-	TariffObservationCount    int            `json:"tariff_observation_count"`
-	MatrixProvider            string         `json:"matrix_provider,omitempty"`
-	MatrixReporterCount       int            `json:"matrix_reporter_count"`
-	MatrixPartitionCount      int            `json:"matrix_partition_count"`
-	MatrixPartnerRowCount     int            `json:"matrix_partner_row_count"`
-	MatrixObservationCount    int            `json:"matrix_observation_count"`
+	SchemaVersion                        string         `json:"schema_version"`
+	GeneratedAt                          string         `json:"generated_at"`
+	Provider                             string         `json:"provider"`
+	Partners                             []string       `json:"partners"`
+	ReporterCount                        int            `json:"reporter_count"`
+	ObservationCount                     int            `json:"observation_count"`
+	ExpectedPartnerBlocks                int            `json:"expected_partner_blocks"`
+	AvailablePartnerBlocks               int            `json:"available_partner_blocks"`
+	MissingPartnerBlocks                 int            `json:"missing_partner_blocks"`
+	PeriodCounts                         map[string]int `json:"period_counts"`
+	DominantPeriod                       string         `json:"dominant_period"`
+	ComparableReporters                  int            `json:"comparable_reporters"`
+	IncomparableReporters                int            `json:"incomparable_reporters"`
+	StalePartnerBlocks                   int            `json:"stale_partner_blocks"`
+	SeriesReporterCount                  int            `json:"series_reporter_count"`
+	SeriesPointCount                     int            `json:"series_point_count"`
+	ProductProvider                      string         `json:"product_provider,omitempty"`
+	ProductClassification                string         `json:"product_classification,omitempty"`
+	ProductLevel                         int            `json:"product_level,omitempty"`
+	ProductReporterCount                 int            `json:"product_reporter_count"`
+	ProductObservationCount              int            `json:"product_observation_count"`
+	ContextStatus                        string         `json:"context_status"`
+	StrategicProvider                    string         `json:"strategic_provider,omitempty"`
+	StrategicLevel                       int            `json:"strategic_level,omitempty"`
+	StrategicProductCount                int            `json:"strategic_product_count"`
+	StrategicReporterCount               int            `json:"strategic_reporter_count"`
+	StrategicPartitionCount              int            `json:"strategic_partition_count"`
+	StrategicObservationCount            int            `json:"strategic_observation_count"`
+	TariffProvider                       string         `json:"tariff_provider,omitempty"`
+	TariffImporterCount                  int            `json:"tariff_importer_count"`
+	TariffPartitionCount                 int            `json:"tariff_partition_count"`
+	TariffObservationCount               int            `json:"tariff_observation_count"`
+	MatrixProvider                       string         `json:"matrix_provider,omitempty"`
+	MatrixReporterCount                  int            `json:"matrix_reporter_count"`
+	MatrixPartitionCount                 int            `json:"matrix_partition_count"`
+	MatrixPartnerRowCount                int            `json:"matrix_partner_row_count"`
+	MatrixObservationCount               int            `json:"matrix_observation_count"`
+	MirrorProvider                       string         `json:"mirror_provider,omitempty"`
+	MirrorReporterCount                  int            `json:"mirror_reporter_count"`
+	MirrorPartitionCount                 int            `json:"mirror_partition_count"`
+	MirrorComparisonCount                int            `json:"mirror_comparison_count"`
+	SemiconductorStatus                  string         `json:"semiconductor_status,omitempty"`
+	SemiconductorCodeCount               int            `json:"semiconductor_code_count"`
+	SemiconductorReporterCount           int            `json:"semiconductor_reporter_count"`
+	SemiconductorPeriodCount             int            `json:"semiconductor_period_count"`
+	SemiconductorMonthlyProvider         string         `json:"semiconductor_monthly_provider,omitempty"`
+	SemiconductorMonthlyReporterCount    int            `json:"semiconductor_monthly_reporter_count"`
+	SemiconductorMonthlyPeriodCount      int            `json:"semiconductor_monthly_period_count"`
+	SemiconductorMonthlyObservationCount int            `json:"semiconductor_monthly_observation_count"`
 }
 
 type latestFile struct {
@@ -151,6 +164,7 @@ func build(args []string) {
 	productLevel := fs.Int("product-level", 2, "product aggregation level")
 	hs2Path := fs.String("hs2", "configs/hs2.csv", "HS2 labels CSV")
 	strategicRegistryPath := fs.String("strategic-registry", "configs/strategic_hs6.csv", "strategic HS6 registry CSV")
+	semiconductorReferencePath := fs.String("semiconductor-reference", "configs/semiconductor_reference.json", "semiconductor value-chain reference JSON")
 	seriesYears := fs.Int("series-years", 10, "maximum number of annual periods per reporter")
 	fs.Parse(args)
 
@@ -202,6 +216,18 @@ func build(args []string) {
 		os.Exit(1)
 	}
 	strategicIndex, strategicFiles := buildStrategicFiles(now, *productProvider, partners, strategicRows, strategicProducts)
+	semiconductorReference, err := semiconductor.Load(*semiconductorReferencePath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "failed to load semiconductor reference:", err)
+		os.Exit(1)
+	}
+	if err := semiconductor.ValidateStrategicRegistry(semiconductorReference, strategicProducts); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to validate semiconductor reference:", err)
+		os.Exit(1)
+	}
+	semiconductorReference.GeneratedAt = now
+	semiconductorReference.Publication = buildSemiconductorPublication(semiconductorReference, strategicFiles)
+	semiconductorMonthlyIndex, semiconductorMonthlyFiles := buildSemiconductorMonthlyFiles(now, *productProvider, partners, strategicRows, strategicProducts, semiconductorReference)
 	tariffRows, err := loadTariffObservations(*dbPath, "trains")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "failed to load tariff observations:", err)
@@ -214,18 +240,22 @@ func build(args []string) {
 		os.Exit(1)
 	}
 	matrixIndex, matrixFiles := buildMatrixFiles(now, *matrixProvider, matrixRows)
+	mirrorIndex, mirrorFiles := buildMirrorFiles(now, *matrixProvider, matrixFiles)
 	runs, err := loadIngestRuns(*dbPath, 20)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "failed to load ingest runs:", err)
 		os.Exit(1)
 	}
 	quality := buildQualityFile(now, *provider, latest, rows, productRows, runs)
-	catalog := buildDataCatalog(now, *provider, contextData.Status, seriesOutput, productIndex, strategicIndex, tariffIndex, matrixIndex)
+	catalog := buildDataCatalog(now, *provider, contextData.Status, seriesOutput, productIndex, strategicIndex, tariffIndex, matrixIndex, mirrorIndex, semiconductorMonthlyIndex, semiconductorReference)
 	metadata := buildMeta(now, *provider, partners, rows, latest)
 	augmentMeta(&metadata, latest, seriesOutput, productIndex, len(productRows), contextData.Status)
 	augmentStrategicMeta(&metadata, strategicIndex)
 	augmentTariffMeta(&metadata, tariffIndex)
 	augmentMatrixMeta(&metadata, matrixIndex)
+	augmentMirrorMeta(&metadata, mirrorIndex)
+	augmentSemiconductorMeta(&metadata, semiconductorReference)
+	augmentSemiconductorMonthlyMeta(&metadata, semiconductorMonthlyIndex)
 	if err := writeJSON(filepath.Join(*outDir, "meta.json"), metadata); err != nil {
 		fmt.Fprintln(os.Stderr, "failed to write meta.json:", err)
 		os.Exit(1)
@@ -289,6 +319,30 @@ func build(args []string) {
 			os.Exit(1)
 		}
 	}
+	semiconductorDir := filepath.Join(*outDir, "semiconductors")
+	if err := os.MkdirAll(semiconductorDir, 0o755); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to create semiconductor data dir:", err)
+		os.Exit(1)
+	}
+	if err := writeJSON(filepath.Join(semiconductorDir, "reference.json"), semiconductorReference); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write semiconductor reference:", err)
+		os.Exit(1)
+	}
+	semiconductorMonthlyDir := filepath.Join(semiconductorDir, "monthly")
+	if err := os.MkdirAll(semiconductorMonthlyDir, 0o755); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to create monthly semiconductor data dir:", err)
+		os.Exit(1)
+	}
+	if err := writeJSON(filepath.Join(semiconductorMonthlyDir, "index.json"), semiconductorMonthlyIndex); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write monthly semiconductor index:", err)
+		os.Exit(1)
+	}
+	for relativePath, file := range semiconductorMonthlyFiles {
+		if err := writeJSON(filepath.Join(semiconductorMonthlyDir, relativePath), file); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to write monthly semiconductor partition %s: %v\n", relativePath, err)
+			os.Exit(1)
+		}
+	}
 	tariffDir := filepath.Join(*outDir, "tariffs")
 	if err := os.MkdirAll(tariffDir, 0o755); err != nil {
 		fmt.Fprintln(os.Stderr, "failed to create tariff dir:", err)
@@ -329,6 +383,26 @@ func build(args []string) {
 			os.Exit(1)
 		}
 	}
+	mirrorDir := filepath.Join(*outDir, "mirror")
+	if err := os.MkdirAll(mirrorDir, 0o755); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to create mirror diagnostics dir:", err)
+		os.Exit(1)
+	}
+	if err := writeJSON(filepath.Join(mirrorDir, "index.json"), mirrorIndex); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write mirror diagnostics index:", err)
+		os.Exit(1)
+	}
+	for relativePath, file := range mirrorFiles {
+		path := filepath.Join(mirrorDir, filepath.FromSlash(relativePath))
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to create mirror diagnostics partition directory for %s: %v\n", relativePath, err)
+			os.Exit(1)
+		}
+		if err := writeJSON(path, file); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to write mirror diagnostics partition %s: %v\n", relativePath, err)
+			os.Exit(1)
+		}
+	}
 
 	fmt.Printf("publisher build complete (out=%s)\n", *outDir)
 }
@@ -358,6 +432,7 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "  -matrix-provider   bilateral matrix provider (default: comtrade)")
 	fmt.Fprintln(os.Stderr, "  -product-level   product level (default: 2)")
 	fmt.Fprintln(os.Stderr, "  -strategic-registry   strategic HS6 registry CSV")
+	fmt.Fprintln(os.Stderr, "  -semiconductor-reference   semiconductor value-chain reference JSON")
 	fmt.Fprintln(os.Stderr, "  -series-years   annual history window (default: 10)")
 }
 

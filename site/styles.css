@@ -630,6 +630,10 @@ select option{background:#fff;color:#111}
 .signalMetric{padding:11px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.025)}
 .signalMetric span{display:block;color:var(--muted2);font-size:10px}
 .signalMetric b{display:block;margin-top:5px;font:700 17px var(--mono)}
+.positionHeadline{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.025)}
+.positionHeadline strong{font-size:1.05rem;color:var(--text)}
+.positionHeadline small{color:var(--muted);margin-left:auto}
+.monthlyTableScroll{max-height:340px;margin-top:14px}
 .signalList{display:flex;flex-direction:column;gap:7px;margin-top:10px}
 .signalItem{padding:8px 10px;border-left:3px solid var(--muted2);background:rgba(255,255,255,.025);font-size:11px;line-height:1.4}
 .signalItem.attention{border-left-color:var(--hi)}
@@ -674,17 +678,125 @@ select option{background:#fff;color:#111}
 .modelRoadmap b{font-size:12px}
 .modelRoadmap span{margin-top:5px;color:var(--muted);font-size:10px;line-height:1.45}
 
+.chipIntro{background:linear-gradient(120deg,rgba(24,43,72,.92),rgba(17,17,24,.96) 55%,rgba(48,35,22,.75));border-color:rgba(231,211,124,.18)}
+.chipControlBar{display:grid;grid-template-columns:minmax(190px,240px) minmax(190px,240px) minmax(280px,1fr) auto;gap:10px;align-items:end;margin:12px 24px 0;padding:14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--panel)}
+.chipControlBar .field{min-width:0}
+.chipControlBar select{width:100%}
+.chipCoverageSummary{display:flex;min-height:46px;flex-wrap:wrap;align-content:center;gap:3px 10px;padding:4px 8px}
+.chipCoverageSummary b{color:var(--hi);font:700 12px var(--mono)}
+.chipCoverageSummary span{font:11px var(--mono)}
+.chipCoverageSummary small{flex-basis:100%;color:var(--muted2);font-size:9px}
+.chipTrendStrip,.chipAtlasSection{margin:12px 24px 0;padding:18px;border:1px solid var(--border);border-radius:var(--radius);background:var(--panel)}
+.chipSectionHeading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.chipSectionHeading h2{margin:3px 0 0;font-size:17px}
+.chipSectionHeading .analysisNote{max-width:520px;margin:0;text-align:right}
+.chipTrendGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.chipTrendCard{min-width:0;padding:14px;border:1px solid var(--border);border-radius:11px;background:linear-gradient(145deg,rgba(90,162,255,.055),rgba(255,255,255,.015))}
+.chipTrendCard > span{color:var(--hi);font:9px var(--mono)}
+.chipTrendCard h3{margin:8px 0 6px;font-size:12px}
+.chipTrendCard p{min-height:62px;margin:0;color:var(--muted);font-size:10px;line-height:1.5}
+.chipTrendCard div{margin-top:10px;color:var(--muted2);font-size:9px;line-height:1.4}
+.chipValueChain{display:flex;min-width:0;gap:0;overflow-x:auto;padding:2px 0 8px;scrollbar-width:thin}
+.chipStageWrap{display:flex;flex:1 0 155px;min-width:155px;align-items:center}
+.chipStageCard{display:flex;width:100%;min-height:154px;flex-direction:column;align-items:flex-start;padding:13px;border:1px solid var(--border);border-radius:11px;background:rgba(255,255,255,.018);color:var(--text);text-align:left;cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
+.chipStageCard:hover,.chipStageCard:focus-visible{border-color:rgba(90,162,255,.5);background:rgba(90,162,255,.07);transform:translateY(-1px);outline:none}
+.chipStageCard.is-active{border-color:var(--hi);background:rgba(231,211,124,.08);box-shadow:inset 0 0 0 1px rgba(231,211,124,.25)}
+.chipStageOrder{color:var(--accent);font:700 9px var(--mono)}
+.chipStageCard b{margin-top:8px;font-size:11px;line-height:1.25}
+.chipStageCard small{margin-top:5px;color:var(--muted2);font:8px var(--mono);line-height:1.35}
+.chipStageCard strong{margin-top:auto;padding-top:12px;font:700 10px var(--mono)}
+.chipStageCard em{margin-top:4px;color:var(--muted2);font:normal 8px var(--mono)}
+.chipStageArrow{flex:0 0 18px;color:rgba(231,211,124,.5);font:16px var(--mono);text-align:center}
+.chipRoleLandscape{min-width:0}
+.chipRoleScroll{max-height:440px;border:1px solid var(--border);border-radius:10px}
+.chipRoleTable{width:100%;min-width:940px;border-collapse:separate;border-spacing:0;font-size:9px}
+.chipRoleTable th,.chipRoleTable td{padding:8px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center}
+.chipRoleTable thead th{position:sticky;top:0;z-index:2;background:#12151b;color:var(--muted);font:8px var(--mono)}
+.chipRoleTable thead th:first-child{left:0;z-index:3;text-align:left}
+.chipRoleTable tbody th{position:sticky;left:0;z-index:1;min-width:180px;background:#101319;text-align:left}
+.chipRoleTable tbody th button{border:0;background:none;color:var(--text);font:10px var(--sans);cursor:pointer;text-align:left}
+.chipRoleTable tbody th button:hover{color:var(--accent)}
+.chipRoleTable tbody th small{margin-left:4px;color:var(--muted2);font:8px var(--mono)}
+.chipRoleTable tbody tr.is-selected th,.chipRoleTable tbody tr.is-selected td{background-color:rgba(231,211,124,.045)}
+.chipRoleCell span{color:rgba(255,255,255,.12)}
+.chipRoleCell.has-role span{color:var(--growth-pos);text-shadow:0 0 10px rgba(92,216,156,.35)}
+.roleLegendDot{display:inline-block;width:7px;height:7px;border-radius:50%}
+.chipAnalysisGrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:12px;padding:12px 24px 0}
+.chipLowerGrid{grid-template-columns:minmax(0,1.08fr) minmax(380px,.92fr)}
+.chipEvidenceGrid{padding-bottom:24px}
+.chipSignalMetrics{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:14px}
+.chipBarChart{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.chipBarRow{display:grid;grid-template-columns:44px minmax(70px,1fr) minmax(92px,auto) 48px;gap:8px;align-items:center;font:9px var(--mono)}
+.chipBarRow button{padding:2px;border:0;background:none;color:var(--accent);font:inherit;text-align:left;cursor:pointer}
+.chipBarRow button:hover{text-decoration:underline}
+.chipBarRow > span{height:8px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.045)}
+.chipBarRow i{display:block;width:var(--bar);height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--hi))}
+.chipBarRow b,.chipBarRow em{text-align:right;white-space:nowrap}
+.chipBarRow em{color:var(--muted);font-style:normal}
+.chipCodeList{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.chipCodeTag{display:inline-flex;max-width:100%;gap:5px;padding:5px 7px;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:8px;line-height:1.3}
+.chipCodeTag b{flex:none;color:var(--accent);font:8px var(--mono)}
+.emptyState{display:flex;min-height:180px;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center}
+.emptyState b{font-size:14px}
+.emptyState span{max-width:520px;color:var(--muted);font-size:11px;line-height:1.55}
+.chipCountryHeading{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.countryFlag{display:flex;width:42px;height:30px;flex:0 0 auto;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--border);border-radius:5px;background:rgba(255,255,255,.04)}
+.countryFlag img{width:100%;height:100%;object-fit:cover}
+.chipCountryHeading h3{margin:0 0 5px;font-size:16px}.chipCountryHeading h3 small{color:var(--muted);font:10px var(--mono)}
+.chipCountryHeading p{margin:0;color:var(--muted);font-size:10px;line-height:1.5}
+.chipRoleTags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.policyTimeline{position:relative;margin:0;padding:0;list-style:none}
+.policyTimeline::before{content:"";position:absolute;top:5px;bottom:5px;left:69px;width:1px;background:var(--border)}
+.policyTimeline li{position:relative;display:grid;grid-template-columns:58px 1fr;gap:24px;padding:0 0 17px}
+.policyTimeline li::before{content:"";position:absolute;top:5px;left:65px;width:7px;height:7px;border:2px solid var(--panel);border-radius:50%;background:var(--hi)}
+.policyTimeline time{padding-top:2px;color:var(--muted2);font:8px var(--mono)}
+.policyTimeline h3{margin:7px 0 4px;font-size:11px;line-height:1.35}.policyTimeline h3 a{color:var(--text)}
+.policyTimeline p{margin:0;color:var(--muted2);font:9px var(--mono);line-height:1.4}
+.chipScenarioForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:16px}
+.chipScenarioForm .scenarioSourceNote{grid-column:1/-1;padding:10px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.02);color:var(--muted);font-size:10px;line-height:1.45}
+.chipScenarioForm label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:10px}
+.chipScenarioForm input{width:100%}
+.chipScenarioForm .btn{grid-column:1/-1}
+.chipScenarioWide{grid-column:1/-1}
+.capacitySignalList{display:flex;flex-direction:column;gap:8px}
+.capacitySignalList article{padding:12px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.018)}
+.capacitySignalList article > div{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.capacitySignalList time{color:var(--hi);font:8px var(--mono)}
+.capacitySignalList h3{margin:8px 0 5px;font-size:11px;line-height:1.4}.capacitySignalList h3 a{color:var(--text)}
+.capacitySignalList p{margin:0;color:var(--muted);font-size:9px;line-height:1.5}
+.capacitySignalList footer{margin-top:8px;color:var(--muted2);font:8px var(--mono);line-height:1.4}
+.sourceRegister{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sourceRegister article{padding:11px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.018)}
+.sourceRegister span{color:var(--muted2);font:8px var(--mono);text-transform:capitalize}
+.sourceRegister h3{margin:6px 0 4px;font-size:10px;line-height:1.4}.sourceRegister h3 a{color:var(--text)}
+.sourceRegister p{margin:0;color:var(--muted);font-size:9px}
+.caveatList{display:flex;flex-direction:column;gap:10px;margin:0;padding-left:18px;color:var(--muted);font-size:10px;line-height:1.55}
+.measurementLegend{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;padding-top:12px;border-top:1px solid var(--border);color:var(--muted2);font:8px var(--mono)}
+.measurementLegend span{display:flex;align-items:center;gap:5px}.measurementLegend i{width:7px;height:7px;border-radius:50%}
+.observedDot{background:var(--accent)}.contextDot{background:var(--growth-pos)}.estimateDot{background:var(--hi)}
+
 @media (max-width: 1000px){
-  .intelligenceGrid,.productLayout,.labGrid,.singleTop{grid-template-columns:1fr}
+  .intelligenceGrid,.productLayout,.labGrid,.singleTop,.chipAnalysisGrid{grid-template-columns:1fr}
   .rankingCard,.roadmapCard{grid-column:auto}
   .capabilityRail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
   .modelRoadmap{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .chipControlBar{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .chipCoverageSummary{grid-column:1/-1}
+  .chipTrendGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width: 650px){
   .tabBar{padding:0 10px}
   .sectionIntro{margin:10px 10px 0;padding:17px;flex-direction:column}
   .sectionIntro h1{font-size:20px}
   .intelligenceGrid,.productLayout,.labGrid{padding:10px}
+  .chipControlBar,.chipTrendStrip,.chipAtlasSection{margin:10px 10px 0}
+  .chipControlBar{grid-template-columns:1fr}
+  .chipAnalysisGrid{padding:10px 10px 0}
+  .chipEvidenceGrid{padding-bottom:10px}
+  .chipTrendGrid,.sourceRegister,.chipScenarioForm{grid-template-columns:1fr}
+  .chipTrendCard p{min-height:0}
+  .chipSignalMetrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .chipSectionHeading{flex-direction:column}.chipSectionHeading .analysisNote{text-align:left}
   .capabilityRail,.modelRoadmap,.scenarioForm{grid-template-columns:1fr}
   .scenarioForm label:first-child{grid-column:auto}
   .scenarioSource{grid-column:auto}
