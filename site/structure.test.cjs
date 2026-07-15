@@ -4,6 +4,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const html = fs.readFileSync(path.join(__dirname, "index.html"), "utf8");
+const app = fs.readFileSync(path.join(__dirname, "app.js"), "utf8");
+const css = fs.readFileSync(path.join(__dirname, "styles.css"), "utf8");
 
 test("index loads trusted helpers before the application and keeps D3 pinned", () => {
   const securityIndex = html.indexOf('src="./security.js"');
@@ -49,6 +51,40 @@ test("dashboard tabs and scalable intelligence targets appear exactly once", () 
   assert.equal((html.match(/role="tabpanel"/g) || []).length, 5);
   assert.match(html, /not an inferred physical supply-chain route/i);
   assert.match(html, /does not estimate GDP/i);
+});
+
+test("overview treemaps survive hidden-tab resizes and redraw when shown", () => {
+  const treemapStart = app.indexOf("function buildTreemap");
+  const treemapSource = app.slice(treemapStart, treemapStart + 500);
+  const measureIndex = treemapSource.indexOf("getBoundingClientRect");
+  const visibilityGuardIndex = treemapSource.indexOf("if (width <= 0 || height <= 0) return");
+  const clearIndex = treemapSource.indexOf('svg.selectAll("*").remove()');
+  assert.ok(treemapStart >= 0 && measureIndex >= 0, "expected treemap dimension measurement");
+  assert.ok(visibilityGuardIndex > measureIndex, "expected a hidden-SVG dimension guard");
+  assert.ok(clearIndex > visibilityGuardIndex, "expected existing tiles to survive hidden-tab renders");
+
+  const tabStart = app.indexOf("function setActiveTab");
+  const tabSource = app.slice(tabStart, tabStart + 1400);
+  assert.match(tabSource, /state\.tab === "overview"/);
+  assert.match(tabSource, /requestAnimationFrame/);
+  assert.match(tabSource, /buildTreemap\(els\.svgUSA/);
+  assert.match(tabSource, /buildTreemap\(els\.svgCHN/);
+});
+
+test("treemap labels use compact values and stay clipped to their tiles", () => {
+  const treemapStart = app.indexOf("function buildTreemap");
+  const treemapEnd = app.indexOf("function currentViewState", treemapStart);
+  const treemapSource = app.slice(treemapStart, treemapEnd);
+  assert.match(app, /function formatCompactMetricValue/);
+  assert.match(treemapSource, /formatCompactMetricValue\(d\.data\.value\)/);
+  assert.match(treemapSource, /width >= value\.length \* 7 \+ 12/);
+  assert.equal((treemapSource.match(/\.attr\("clip-path"/g) || []).length, 3);
+});
+
+test("treemap focus styling stays on the tile rectangle", () => {
+  assert.match(css, /\.tile:focus\{outline:none\}/);
+  assert.match(css, /\.tile:focus-visible > rect\{[^}]*stroke:/);
+  assert.doesNotMatch(css, /\.tile:focus-visible[^{]*\{[^}]*outline/);
 });
 
 test("advanced explorer controls and analysis targets appear exactly once", () => {
