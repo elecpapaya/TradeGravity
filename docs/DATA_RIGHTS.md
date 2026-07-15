@@ -6,15 +6,15 @@ TradeGravity separates the license for this repository from the terms that gover
 
 The Apache License 2.0 applies to TradeGravity source code and original project documentation unless a file says otherwise. It does not grant rights in third-party datasets, API responses, trademarks, flags, news articles, or other externally supplied material.
 
-Generated `meta.json`, `latest.json`, charts, and CSV exports may contain transformed or summarized third-party observations. Anyone reusing those outputs is responsible for checking the current terms and metadata of the selected provider and underlying dataset.
+Generated JSON, charts, explanations, and CSV exports may contain transformed or summarized third-party observations. Anyone reusing those outputs is responsible for checking the current terms and metadata of the selected provider and underlying dataset.
 
 ## Provider-specific references
 
 | Provider or service | How TradeGravity uses it | Terms and attribution reference |
 | --- | --- | --- |
 | WITS | Default source for bilateral trade observations | [WITS legal page](https://wits.worldbank.org/wits/legal.html); WITS notes that content rights can belong to the respective content owner. Check the specific database metadata exposed through WITS. |
-| UN Comtrade | Optional bilateral trade provider | [UN Comtrade usage agreement](https://comtrade.un.org/licenseagreement.html) and [UN Comtrade data-use explanation](https://comtrade.un.org/labs/data-explorer/About.html). UN Comtrade data are copyrighted by the United Nations and reuse is governed by its policy. |
-| World Bank Open Data | Country indicators fetched in the browser after a reporter is selected; not included in `latest.json` | [World Bank dataset terms summary](https://data.worldbank.org/summary-terms-of-use). Dataset-specific metadata can add or change conditions, especially for third-party indicators. |
+| UN Comtrade | HS2 product chapters and optional headline provider | [UN Comtrade usage agreement](https://comtrade.un.org/licenseagreement.html) and [UN Comtrade data-use explanation](https://comtrade.un.org/labs/data-explorer/About.html). UN Comtrade data are copyrighted by the United Nations and reuse is governed by its policy. |
+| World Bank Open Data | Region, income, population, and GDP context published in `context.json` and joined into `latest.json`; optional live snapshot fields | [World Bank dataset terms summary](https://data.worldbank.org/summary-terms-of-use). Dataset-specific metadata can add or change conditions, especially for third-party indicators. |
 | GDELT | Recent headline metadata fetched in the browser; not included in `latest.json` | [GDELT terms of use](https://www.gdeltproject.org/about.html). GDELT asks users and redistributors to cite and link to the GDELT Project. Linked news articles remain on their publishers' sites. |
 
 Terms can change. These links are references, not a replacement for reading the controlling terms for an intended use.

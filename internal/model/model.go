@@ -27,6 +27,9 @@ type Reporter struct {
 
 type Observation struct {
 	Provider        string
+	Classification  string
+	ProductCode     string
+	ProductLevel    int
 	ReporterISO3    string
 	PartnerISO3     string
 	Flow            Flow
@@ -35,4 +38,22 @@ type Observation struct {
 	ValueUSD        float64
 	IngestedAt      time.Time
 	SourceUpdatedAt time.Time
+}
+
+// IngestRun records one collector invocation so published quality metadata can
+// distinguish complete, partial, and failed refreshes.
+type IngestRun struct {
+	RunID         string
+	Provider      string
+	Mode          string
+	StartedAt     time.Time
+	FinishedAt    time.Time
+	Status        string
+	ReporterCount int
+	RequestCount  int
+	SuccessCount  int
+	FailureCount  int
+	SkippedCount  int
+	StoredCount   int
+	Errors        []string
 }

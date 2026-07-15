@@ -5,7 +5,7 @@
 [![CodeQL](https://github.com/elecpapaya/TradeGravity/actions/workflows/codeql.yml/badge.svg)](https://github.com/elecpapaya/TradeGravity/actions/workflows/codeql.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-TradeGravity is an open-source pipeline and static web viewer for comparing how reporter countries trade with the United States and China. It collects public trade observations, normalizes them into a small SQLite dataset, and publishes an interactive treemap that can be hosted without an application server.
+TradeGravity is an open-source pipeline and static web explorer for comparing how reporter countries trade with the United States and China. It combines same-period headline comparisons, 5–10 year trends, HS2 product chapters, country context, and explicit quality signals in a static deployment that needs no application server.
 
 - **Live demo:** https://elecpapaya.github.io/TradeGravity/
 - **System design:** [DESIGN.md](DESIGN.md)
@@ -25,18 +25,24 @@ TradeGravity provides a reproducible path from public source data to a lightweig
 
 TradeGravity is an early-stage project under active maintenance. A scheduled GitHub Actions workflow currently refreshes and deploys the public dataset every day. The default allowlist publishes 51 reporter countries; coverage can be changed through configuration.
 
-The viewer is intended for exploration and education, not financial, legal, or policy advice. Reporting periods can differ by country, so the period shown in the interface should always be considered when comparing values.
+The viewer is intended for exploration and education, not financial, legal, or policy advice. Its default comparison mode includes only reporters whose USA and China values use the same observation period. Users can opt into all available values, where mixed or stale periods remain visibly flagged.
 
 The pipeline refresh timestamp indicates when TradeGravity generated the site; it does not imply that every source observation is from that date or year. The viewer and `meta.json` expose provider, coverage, and observation-period counts explicitly.
 
 ## Features
 
 - WITS SDMX ingestion with automatic latest-year selection.
-- Optional UN Comtrade ingestion with quota-aware retry behavior.
+- Ten-year WITS history collection and published country time series.
+- UN Comtrade HS2 product chapters, with public-preview and authenticated modes.
 - SQLite persistence for repeatable collection and publishing runs.
 - Static JSON output for a low-cost, serverless web viewer.
 - Linked US/China treemaps with hover highlighting and flag overlays.
-- Searchable accessible data table and safe CSV export.
+- Same-period comparison by default, explicit stale/missing warnings, and a data-quality dashboard.
+- Region, income, ASEAN/EU, per-capita, and GDP-share filters.
+- Shareable view URLs plus spreadsheet-safe CSV and filtered JSON export.
+- Searchable accessible data table and selected-country 5–10 year trend.
+- HS2 product mix for the selected reporter, kept separate from WITS headline totals.
+- Build-time evidence-grounded explanations with citation validation and deterministic fallback.
 - Year-over-year growth coloring when prior-period data is available.
 - Optional World Bank indicator and GDELT headline panels.
 - Reporter allowlist for controlled coverage.
@@ -45,18 +51,18 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 ## How it works
 
 ```text
-WITS or UN Comtrade
-        |
-        v
-Go collector  --->  SQLite  --->  Go publisher  --->  static JSON
-                                                        |
-                                                        v
-                                              HTML/CSS/JavaScript viewer
+WITS totals/history ----\
+UN Comtrade HS2 ---------> SQLite ---> publisher ---> versioned static JSON
+World Bank context ------/                  |                    |
+                                             v                    v
+                                  grounded explainer     static web explorer
 ```
 
 - `cmd/collector` fetches and normalizes observations.
 - `internal/store/sqlite` persists observations using an idempotent key.
-- `cmd/publisher` calculates latest values, totals, shares, and YoY growth.
+- `cmd/context` publishes region, income, population, and GDP context.
+- `cmd/publisher` calculates latest values, same-period flags, time series, products, quality, totals, shares, and growth.
+- `cmd/explainer` builds citation-checked explanations; it never sends an API key to the browser.
 - `site` renders the generated JSON as a static interactive viewer.
 
 ## Data sources and interpretation
@@ -78,6 +84,10 @@ The public deployment exposes stable machine-readable endpoints:
 
 - `https://elecpapaya.github.io/TradeGravity/data/meta.json`
 - `https://elecpapaya.github.io/TradeGravity/data/latest.json`
+- `https://elecpapaya.github.io/TradeGravity/data/series.json`
+- `https://elecpapaya.github.io/TradeGravity/data/products/index.json`
+- `https://elecpapaya.github.io/TradeGravity/data/quality.json`
+- `https://elecpapaya.github.io/TradeGravity/data/explanations/index.json`
 
 `latest.json` is the canonical published dataset. The viewer's **Download CSV** button creates a spreadsheet-safe convenience export of the currently filtered reporters, including schema version, provider, pipeline timestamp, observation periods, flows, growth values, totals, and China share. See [docs/DATA_SCHEMA.md](docs/DATA_SCHEMA.md) before comparing reporters with different periods.
 
@@ -94,8 +104,12 @@ Apache-2.0 covers the project code and original documentation, not rights in ups
 ## Quick start
 
 ```bash
-go run ./cmd/collector run
-go run ./cmd/publisher build -out site/data
+go run ./cmd/context
+go run ./cmd/collector run -provider wits -history-years 9
+go run ./cmd/collector products -provider comtrade -primary-provider wits -year auto
+go run ./cmd/publisher build -out site/data -series-years 10
+go run ./cmd/explainer -dir site/data
+go run ./cmd/validator -dir site/data -min-reporters 40
 cd site
 python -m http.server 8080
 ```
@@ -108,12 +122,12 @@ The production collector requires network access and can take several minutes. F
 
 ```powershell
 New-Item -ItemType Directory -Force site/data
-Copy-Item examples/sample-data/*.json site/data/
+Copy-Item examples/sample-data/* site/data/ -Recurse -Force
 ```
 
 ```bash
 mkdir -p site/data
-cp examples/sample-data/*.json site/data/
+cp -R examples/sample-data/. site/data/
 ```
 
 Then serve `site/` as shown above. The three sample reporters and values are synthetic and are not evidence about real trade.
@@ -124,18 +138,20 @@ To run the automated checks:
 go test ./...
 go vet ./...
 node --test site/security.test.cjs site/data-tools.test.cjs site/structure.test.cjs
+node --test site/explorer-tools.test.cjs
 ```
 
 ## Collector configuration
 
-Example with explicit partners, flows, and one year of history:
+Example with explicit partners, flows, ten published years, and bounded concurrency:
 
 ```bash
 go run ./cmd/collector run \
   -partners USA,CHN \
   -flows export,import \
   -allowlist configs/allowlist.csv \
-  -history-years 1
+  -history-years 9 \
+  -concurrency 6
 ```
 
 Common flags:
@@ -147,6 +163,7 @@ Common flags:
 | `-flows` | Comma-separated flows | `export,import` |
 | `-allowlist` | Reporter allowlist CSV; empty disables filtering | `configs/allowlist.csv` |
 | `-history-years` | Prior years to fetch for growth calculation | `1` |
+| `-concurrency` | Maximum reporter jobs in flight | `6` |
 | `-db` | SQLite output path; empty disables persistence | `tradegravity.db` |
 
 ### WITS environment variables
@@ -158,7 +175,7 @@ Common flags:
 
 ### UN Comtrade environment variables
 
-- `COMTRADE_PRIMARY_KEY` (required)
+- `COMTRADE_PRIMARY_KEY` (optional; without it, public preview endpoints are used)
 - `COMTRADE_SECONDARY_KEY` (optional fallback)
 - `COMTRADE_BASE_URL` (default `https://comtradeapi.un.org/`)
 - `COMTRADE_DATA_PATH` (default `data/v1/get/{type}/{freq}/{cl}`)
@@ -168,7 +185,7 @@ Common flags:
 - `COMTRADE_REPORTERS_URL`
 - `COMTRADE_PARTNERS_URL`
 
-Set the primary key for the current shell without committing it:
+Set an optional primary key for the current shell without committing it:
 
 ```powershell
 $env:COMTRADE_PRIMARY_KEY = "YOUR_KEY"
@@ -178,16 +195,16 @@ $env:COMTRADE_PRIMARY_KEY = "YOUR_KEY"
 export COMTRADE_PRIMARY_KEY="YOUR_KEY"
 ```
 
-This repository reads operating-system environment variables and does not load a `.env` file. For GitHub Actions, store keys as repository secrets named `COMTRADE_PRIMARY_KEY` and, if used, `COMTRADE_SECONDARY_KEY`.
+This repository reads operating-system environment variables and does not load a `.env` file. For GitHub Actions, store keys as repository secrets named `COMTRADE_PRIMARY_KEY` and, if used, `COMTRADE_SECONDARY_KEY`. Provider transport errors redact request URLs and credentials, but keys should still be rotated immediately if they appear in any external log.
 
 ## Generated files and deployment
 
 - Local SQLite database: `tradegravity.db`
-- Published JSON: `site/data/meta.json` and `site/data/latest.json`
+- Published JSON: `meta.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, and `explanations/` under `site/data/`
 
 Generated data and the local database are intentionally not committed to the default branch. The daily workflow runs the collector and publisher, then deploys `site/` to the `gh-pages` branch.
 
-Before deployment, `cmd/validator` checks schema agreement, reporter uniqueness, country and period formats, non-negative finite values, calculated totals and shares, and metadata coverage counts.
+Before deployment, `cmd/validator` checks provenance across every artifact, reporter uniqueness, periods, non-negative finite values, totals and shares, quality counts, product keys, context coverage, and explanation evidence references.
 
 ## Maintenance and contributing
 

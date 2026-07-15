@@ -19,19 +19,31 @@ import (
 	"tradegravity/internal/model"
 )
 
-const schemaVersion = "1.0"
+const schemaVersion = "2.0"
 
 type metaFile struct {
-	SchemaVersion          string         `json:"schema_version"`
-	GeneratedAt            string         `json:"generated_at"`
-	Provider               string         `json:"provider"`
-	Partners               []string       `json:"partners"`
-	ReporterCount          int            `json:"reporter_count"`
-	ObservationCount       int            `json:"observation_count"`
-	ExpectedPartnerBlocks  int            `json:"expected_partner_blocks"`
-	AvailablePartnerBlocks int            `json:"available_partner_blocks"`
-	MissingPartnerBlocks   int            `json:"missing_partner_blocks"`
-	PeriodCounts           map[string]int `json:"period_counts"`
+	SchemaVersion           string         `json:"schema_version"`
+	GeneratedAt             string         `json:"generated_at"`
+	Provider                string         `json:"provider"`
+	Partners                []string       `json:"partners"`
+	ReporterCount           int            `json:"reporter_count"`
+	ObservationCount        int            `json:"observation_count"`
+	ExpectedPartnerBlocks   int            `json:"expected_partner_blocks"`
+	AvailablePartnerBlocks  int            `json:"available_partner_blocks"`
+	MissingPartnerBlocks    int            `json:"missing_partner_blocks"`
+	PeriodCounts            map[string]int `json:"period_counts"`
+	DominantPeriod          string         `json:"dominant_period"`
+	ComparableReporters     int            `json:"comparable_reporters"`
+	IncomparableReporters   int            `json:"incomparable_reporters"`
+	StalePartnerBlocks      int            `json:"stale_partner_blocks"`
+	SeriesReporterCount     int            `json:"series_reporter_count"`
+	SeriesPointCount        int            `json:"series_point_count"`
+	ProductProvider         string         `json:"product_provider,omitempty"`
+	ProductClassification   string         `json:"product_classification,omitempty"`
+	ProductLevel            int            `json:"product_level,omitempty"`
+	ProductReporterCount    int            `json:"product_reporter_count"`
+	ProductObservationCount int            `json:"product_observation_count"`
+	ContextStatus           string         `json:"context_status"`
 }
 
 type latestFile struct {
@@ -43,11 +55,20 @@ type latestFile struct {
 }
 
 type latestEntry struct {
-	ISO3    string       `json:"iso3"`
-	USA     partnerBlock `json:"usa"`
-	CHN     partnerBlock `json:"chn"`
-	Total   float64      `json:"total"`
-	ShareCN float64      `json:"share_cn"`
+	ISO3             string        `json:"iso3"`
+	ISO2             string        `json:"iso2,omitempty"`
+	Name             string        `json:"name,omitempty"`
+	Region           string        `json:"region,omitempty"`
+	IncomeGroup      string        `json:"income_group,omitempty"`
+	Groups           []string      `json:"groups,omitempty"`
+	Population       contextMetric `json:"population"`
+	GDP              contextMetric `json:"gdp"`
+	USA              partnerBlock  `json:"usa"`
+	CHN              partnerBlock  `json:"chn"`
+	Total            float64       `json:"total"`
+	ShareCN          float64       `json:"share_cn"`
+	SamePeriod       bool          `json:"same_period"`
+	ComparisonPeriod string        `json:"comparison_period,omitempty"`
 }
 
 type partnerBlock struct {
@@ -68,13 +89,16 @@ type growthBlock struct {
 }
 
 type observationRow struct {
-	Provider    string
-	ReporterISO string
-	PartnerISO  string
-	Flow        model.Flow
-	PeriodType  model.PeriodType
-	Period      string
-	ValueUSD    float64
+	Provider       string
+	ReporterISO    string
+	PartnerISO     string
+	Flow           model.Flow
+	PeriodType     model.PeriodType
+	Period         string
+	ValueUSD       float64
+	Classification string
+	ProductCode    string
+	ProductLevel   int
 }
 
 type latestValue struct {
@@ -105,6 +129,11 @@ func build(args []string) {
 	dbPath := fs.String("db", "tradegravity.db", "sqlite database path")
 	provider := fs.String("provider", "wits", "provider id")
 	partnersCSV := fs.String("partners", "USA,CHN", "comma-separated partner ISO3 list (expects USA,CHN)")
+	contextPath := fs.String("context", "site/data/context.json", "country context JSON (optional)")
+	productProvider := fs.String("product-provider", "comtrade", "HS2 product provider")
+	productLevel := fs.Int("product-level", 2, "product aggregation level")
+	hs2Path := fs.String("hs2", "configs/hs2.csv", "HS2 labels CSV")
+	seriesYears := fs.Int("series-years", 10, "maximum number of annual periods per reporter")
 	fs.Parse(args)
 
 	if err := os.MkdirAll(*outDir, 0o755); err != nil {
@@ -126,7 +155,32 @@ func build(args []string) {
 
 	now := time.Now().UTC().Format(time.RFC3339)
 	latest := buildLatest(rows)
+	contextData, err := loadContext(*contextPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "failed to load country context:", err)
+		os.Exit(1)
+	}
+	enrichLatest(latest, contextData.Countries)
+	seriesOutput := buildSeriesFile(now, *provider, partners, rows, *seriesYears)
+	productRows, err := loadProductObservations(*dbPath, *productProvider, *productLevel, partners)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "failed to load product observations:", err)
+		os.Exit(1)
+	}
+	hs2Labels, err := loadProductLabels(*hs2Path)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "failed to load product labels:", err)
+		os.Exit(1)
+	}
+	productIndex, productFiles := buildProductFiles(now, *productProvider, *productLevel, partners, productRows, hs2Labels)
+	runs, err := loadIngestRuns(*dbPath, 20)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "failed to load ingest runs:", err)
+		os.Exit(1)
+	}
+	quality := buildQualityFile(now, *provider, latest, rows, productRows, runs)
 	metadata := buildMeta(now, *provider, partners, rows, latest)
+	augmentMeta(&metadata, latest, seriesOutput, productIndex, len(productRows), contextData.Status)
 	if err := writeJSON(filepath.Join(*outDir, "meta.json"), metadata); err != nil {
 		fmt.Fprintln(os.Stderr, "failed to write meta.json:", err)
 		os.Exit(1)
@@ -142,6 +196,29 @@ func build(args []string) {
 	if err := writeJSON(filepath.Join(*outDir, "latest.json"), output); err != nil {
 		fmt.Fprintln(os.Stderr, "failed to write latest.json:", err)
 		os.Exit(1)
+	}
+	if err := writeJSON(filepath.Join(*outDir, "series.json"), seriesOutput); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write series.json:", err)
+		os.Exit(1)
+	}
+	if err := writeJSON(filepath.Join(*outDir, "quality.json"), quality); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write quality.json:", err)
+		os.Exit(1)
+	}
+	productsDir := filepath.Join(*outDir, "products")
+	if err := os.MkdirAll(productsDir, 0o755); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to create products dir:", err)
+		os.Exit(1)
+	}
+	if err := writeJSON(filepath.Join(productsDir, "index.json"), productIndex); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write product index:", err)
+		os.Exit(1)
+	}
+	for iso3, file := range productFiles {
+		if err := writeJSON(filepath.Join(productsDir, iso3+".json"), file); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to write products for %s: %v\n", iso3, err)
+			os.Exit(1)
+		}
 	}
 
 	fmt.Printf("publisher build complete (out=%s)\n", *outDir)
@@ -167,6 +244,10 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "  -db    sqlite database path (default: tradegravity.db)")
 	fmt.Fprintln(os.Stderr, "  -provider   provider id (default: wits)")
 	fmt.Fprintln(os.Stderr, "  -partners   comma-separated partner ISO3 list (default: USA,CHN)")
+	fmt.Fprintln(os.Stderr, "  -context   country context JSON (default: site/data/context.json)")
+	fmt.Fprintln(os.Stderr, "  -product-provider   HS2 provider (default: comtrade)")
+	fmt.Fprintln(os.Stderr, "  -product-level   product level (default: 2)")
+	fmt.Fprintln(os.Stderr, "  -series-years   annual history window (default: 10)")
 }
 
 func loadObservations(dbPath, provider string, partners []string) ([]observationRow, error) {
@@ -183,7 +264,7 @@ func loadObservations(dbPath, provider string, partners []string) ([]observation
 	query := `
 		SELECT provider, reporter_iso3, partner_iso3, flow, period_type, period, value_usd
 		FROM trade_observations
-		WHERE flow IN ('export','import')
+		WHERE flow IN ('export','import') AND product_level = 0 AND product_code = 'TOTAL'
 	`
 	args := []any{}
 	if strings.TrimSpace(provider) != "" {
@@ -275,12 +356,19 @@ func buildLatest(rows []observationRow) []latestEntry {
 			shareCN = chn.Trade / total
 		}
 
+		samePeriod := usa.HasData() && chn.HasData() && usa.PeriodType == chn.PeriodType && usa.Period == chn.Period
+		comparisonPeriod := ""
+		if samePeriod {
+			comparisonPeriod = usa.Period
+		}
 		results = append(results, latestEntry{
-			ISO3:    reporter,
-			USA:     usa.partnerBlock,
-			CHN:     chn.partnerBlock,
-			Total:   total,
-			ShareCN: shareCN,
+			ISO3:             reporter,
+			USA:              usa.partnerBlock,
+			CHN:              chn.partnerBlock,
+			Total:            total,
+			ShareCN:          shareCN,
+			SamePeriod:       samePeriod,
+			ComparisonPeriod: comparisonPeriod,
 		})
 	}
 

@@ -1,17 +1,29 @@
 {
-  "schema_version": "1.0",
-  "generated_at": "2026-01-01T00:00:00Z",
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:28:31Z",
   "provider": "wits",
   "partners": [
     "USA",
     "CHN"
   ],
   "reporter_count": 3,
-  "observation_count": 24,
+  "observation_count": 60,
   "expected_partner_blocks": 6,
   "available_partner_blocks": 6,
   "missing_partner_blocks": 0,
   "period_counts": {
     "Y:2023": 6
-  }
+  },
+  "dominant_period": "Y:2023",
+  "comparable_reporters": 3,
+  "incomparable_reporters": 0,
+  "stale_partner_blocks": 0,
+  "series_reporter_count": 3,
+  "series_point_count": 15,
+  "product_provider": "comtrade",
+  "product_classification": "H6",
+  "product_level": 2,
+  "product_reporter_count": 3,
+  "product_observation_count": 36,
+  "context_status": "success"
 }

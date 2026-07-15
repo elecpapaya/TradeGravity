@@ -24,16 +24,28 @@ var (
 )
 
 type datasetMeta struct {
-	SchemaVersion          string         `json:"schema_version"`
-	GeneratedAt            string         `json:"generated_at"`
-	Provider               string         `json:"provider"`
-	Partners               []string       `json:"partners"`
-	ReporterCount          int            `json:"reporter_count"`
-	ObservationCount       int            `json:"observation_count"`
-	ExpectedPartnerBlocks  int            `json:"expected_partner_blocks"`
-	AvailablePartnerBlocks int            `json:"available_partner_blocks"`
-	MissingPartnerBlocks   int            `json:"missing_partner_blocks"`
-	PeriodCounts           map[string]int `json:"period_counts"`
+	SchemaVersion           string         `json:"schema_version"`
+	GeneratedAt             string         `json:"generated_at"`
+	Provider                string         `json:"provider"`
+	Partners                []string       `json:"partners"`
+	ReporterCount           int            `json:"reporter_count"`
+	ObservationCount        int            `json:"observation_count"`
+	ExpectedPartnerBlocks   int            `json:"expected_partner_blocks"`
+	AvailablePartnerBlocks  int            `json:"available_partner_blocks"`
+	MissingPartnerBlocks    int            `json:"missing_partner_blocks"`
+	PeriodCounts            map[string]int `json:"period_counts"`
+	DominantPeriod          string         `json:"dominant_period"`
+	ComparableReporters     int            `json:"comparable_reporters"`
+	IncomparableReporters   int            `json:"incomparable_reporters"`
+	StalePartnerBlocks      int            `json:"stale_partner_blocks"`
+	SeriesReporterCount     int            `json:"series_reporter_count"`
+	SeriesPointCount        int            `json:"series_point_count"`
+	ProductProvider         string         `json:"product_provider,omitempty"`
+	ProductClassification   string         `json:"product_classification,omitempty"`
+	ProductLevel            int            `json:"product_level,omitempty"`
+	ProductReporterCount    int            `json:"product_reporter_count"`
+	ProductObservationCount int            `json:"product_observation_count"`
+	ContextStatus           string         `json:"context_status"`
 }
 
 type datasetLatest struct {
@@ -45,11 +57,25 @@ type datasetLatest struct {
 }
 
 type datasetRow struct {
-	ISO3    string       `json:"iso3"`
-	USA     partnerBlock `json:"usa"`
-	CHN     partnerBlock `json:"chn"`
-	Total   float64      `json:"total"`
-	ShareCN float64      `json:"share_cn"`
+	ISO3             string        `json:"iso3"`
+	ISO2             string        `json:"iso2,omitempty"`
+	Name             string        `json:"name,omitempty"`
+	Region           string        `json:"region,omitempty"`
+	IncomeGroup      string        `json:"income_group,omitempty"`
+	Groups           []string      `json:"groups,omitempty"`
+	Population       contextMetric `json:"population"`
+	GDP              contextMetric `json:"gdp"`
+	USA              partnerBlock  `json:"usa"`
+	CHN              partnerBlock  `json:"chn"`
+	Total            float64       `json:"total"`
+	ShareCN          float64       `json:"share_cn"`
+	SamePeriod       bool          `json:"same_period"`
+	ComparisonPeriod string        `json:"comparison_period,omitempty"`
+}
+
+type contextMetric struct {
+	Value *float64 `json:"value"`
+	Year  string   `json:"year"`
 }
 
 type partnerBlock struct {
@@ -80,6 +106,10 @@ func main() {
 		os.Exit(1)
 	}
 	if err := validateDataset(metadata, latest, *minReporters); err != nil {
+		fmt.Fprintln(os.Stderr, "dataset validation failed:", err)
+		os.Exit(1)
+	}
+	if err := validateExtendedDataset(*dataDir, metadata, latest); err != nil {
 		fmt.Fprintln(os.Stderr, "dataset validation failed:", err)
 		os.Exit(1)
 	}
@@ -166,6 +196,7 @@ func validateDataset(metadata datasetMeta, latest datasetLatest, minReporters in
 	seen := make(map[string]struct{}, len(latest.Rows))
 	periodCounts := make(map[string]int)
 	availableBlocks := 0
+	comparableReporters := 0
 	for index, row := range latest.Rows {
 		if !iso3Pattern.MatchString(row.ISO3) {
 			return fmt.Errorf("row %d has invalid ISO3 %q", index, row.ISO3)
@@ -174,6 +205,15 @@ func validateDataset(metadata datasetMeta, latest datasetLatest, minReporters in
 			return fmt.Errorf("duplicate reporter %q", row.ISO3)
 		}
 		seen[row.ISO3] = struct{}{}
+		if row.ISO2 != "" && !regexp.MustCompile(`^[A-Z]{2}$`).MatchString(row.ISO2) {
+			return fmt.Errorf("%s has invalid ISO2 %q", row.ISO3, row.ISO2)
+		}
+		if err := validateContextMetric(row.ISO3, "population", row.Population); err != nil {
+			return err
+		}
+		if err := validateContextMetric(row.ISO3, "gdp", row.GDP); err != nil {
+			return err
+		}
 
 		for label, block := range map[string]partnerBlock{"USA": row.USA, "CHN": row.CHN} {
 			if err := validateBlock(row.ISO3, label, block); err != nil {
@@ -182,6 +222,21 @@ func validateDataset(metadata datasetMeta, latest datasetLatest, minReporters in
 			if block.Period != "" {
 				availableBlocks++
 				periodCounts[block.PeriodType+":"+block.Period]++
+			}
+		}
+		samePeriod := row.USA.Period != "" && row.CHN.Period != "" && row.USA.PeriodType == row.CHN.PeriodType && row.USA.Period == row.CHN.Period
+		if samePeriod {
+			comparableReporters++
+		}
+		if strings.HasPrefix(metadata.SchemaVersion, "2.") {
+			if row.SamePeriod != samePeriod {
+				return fmt.Errorf("%s same_period=%v does not match partner periods", row.ISO3, row.SamePeriod)
+			}
+			if samePeriod && row.ComparisonPeriod != row.USA.Period {
+				return fmt.Errorf("%s comparison_period=%q, want %q", row.ISO3, row.ComparisonPeriod, row.USA.Period)
+			}
+			if !samePeriod && row.ComparisonPeriod != "" {
+				return fmt.Errorf("%s has comparison_period without comparable partners", row.ISO3)
 			}
 		}
 
@@ -222,8 +277,53 @@ func validateDataset(metadata datasetMeta, latest datasetLatest, minReporters in
 	if !reflect.DeepEqual(metadata.PeriodCounts, periodCounts) {
 		return fmt.Errorf("period counts mismatch: meta=%v calculated=%v", metadata.PeriodCounts, periodCounts)
 	}
+	if strings.HasPrefix(metadata.SchemaVersion, "2.") {
+		dominant := dominantPeriod(periodCounts)
+		stale := 0
+		for _, row := range latest.Rows {
+			for _, block := range []partnerBlock{row.USA, row.CHN} {
+				if block.Period != "" && block.PeriodType+":"+block.Period != dominant {
+					stale++
+				}
+			}
+		}
+		if metadata.DominantPeriod != dominant {
+			return fmt.Errorf("dominant period mismatch: meta=%q calculated=%q", metadata.DominantPeriod, dominant)
+		}
+		if metadata.ComparableReporters != comparableReporters || metadata.IncomparableReporters != len(latest.Rows)-comparableReporters {
+			return fmt.Errorf("comparable reporter mismatch: meta=%d/%d calculated=%d/%d", metadata.ComparableReporters, metadata.IncomparableReporters, comparableReporters, len(latest.Rows)-comparableReporters)
+		}
+		if metadata.StalePartnerBlocks != stale {
+			return fmt.Errorf("stale partner block mismatch: meta=%d calculated=%d", metadata.StalePartnerBlocks, stale)
+		}
+	}
 
 	return nil
+}
+
+func validateContextMetric(reporter, label string, metric contextMetric) error {
+	if metric.Value != nil {
+		if err := finiteNonNegative(label, reporter, *metric.Value); err != nil {
+			return err
+		}
+		if !yearPattern.MatchString(metric.Year) {
+			return fmt.Errorf("%s %s has invalid year %q", reporter, label, metric.Year)
+		}
+	} else if metric.Year != "" {
+		return fmt.Errorf("%s %s has year without value", reporter, label)
+	}
+	return nil
+}
+
+func dominantPeriod(counts map[string]int) string {
+	best := ""
+	bestCount := -1
+	for key, count := range counts {
+		if count > bestCount || (count == bestCount && key > best) {
+			best, bestCount = key, count
+		}
+	}
+	return best
 }
 
 func validateBlock(reporter, partner string, block partnerBlock) error {

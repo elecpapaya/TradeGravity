@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./styles.css" />
   <script src="./security.js"></script>
   <script src="./data-tools.js"></script>
+  <script src="./explorer-tools.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -51,11 +52,51 @@
         <input id="topN" type="number" min="5" max="200" step="1" value="25" style="min-width:120px"/>
       </label>
 
+      <label class="field">
+        <span class="label">Observation period</span>
+        <select id="periodFilter" aria-label="Observation period">
+          <option value="latest">Latest by reporter</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label">Comparison mode</span>
+        <select id="comparisonMode">
+          <option value="comparable">Same-period only</option>
+          <option value="all">All available</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label">Region</span>
+        <select id="regionFilter"><option value="">All regions</option></select>
+      </label>
+
+      <label class="field">
+        <span class="label">Income group</span>
+        <select id="incomeFilter"><option value="">All income groups</option></select>
+      </label>
+
+      <label class="field">
+        <span class="label">Country group</span>
+        <select id="groupFilter"><option value="">All groups</option></select>
+      </label>
+
+      <label class="field">
+        <span class="label">Normalize values</span>
+        <select id="normalization">
+          <option value="raw">Nominal US$</option>
+          <option value="per_capita">US$ per person</option>
+          <option value="gdp_share">Share of GDP</option>
+        </select>
+      </label>
+
       <div class="growthLegend is-hidden" id="growthLegend" aria-label="Growth color scale">
         <span class="legendLabel">-50%</span>
         <div class="legendBar"><span class="legendMid">0</span></div>
         <span class="legendLabel">+50%</span>
       </div>
+      <button id="copyShareURL" class="btn" type="button">Copy view URL</button>
     </div>
   </header>
 
@@ -98,6 +139,49 @@
     </aside>
   </main>
 
+  <section class="analysisGrid" aria-label="Selected-country analysis and data quality">
+    <article class="analysisCard" aria-labelledby="trendTitle">
+      <div class="analysisHeader">
+        <div>
+          <h2 id="trendTitle">5–10 year trend</h2>
+          <p>USA and China values use the selected metric and normalization.</p>
+        </div>
+      </div>
+      <div id="timeSeries" class="analysisBody subtle" aria-live="polite">Select a country to view its time series.</div>
+    </article>
+
+    <article class="analysisCard" aria-labelledby="productsTitle">
+      <div class="analysisHeader">
+        <div>
+          <h2 id="productsTitle">HS2 product mix</h2>
+          <p>Top traded product chapters from UN Comtrade, kept separate from headline totals.</p>
+        </div>
+      </div>
+      <div id="products" class="analysisBody subtle" aria-live="polite">Select a country to view product chapters.</div>
+    </article>
+
+    <article class="analysisCard" aria-labelledby="qualityTitle">
+      <div class="analysisHeader">
+        <div>
+          <h2 id="qualityTitle">Data quality</h2>
+          <p>Coverage, period comparability, collection runs, and provider differences.</p>
+        </div>
+        <a href="./data/quality.json" target="_blank" rel="noopener noreferrer">Quality JSON</a>
+      </div>
+      <div id="qualityDashboard" class="analysisBody subtle" aria-live="polite">Loading quality report…</div>
+    </article>
+
+    <article class="analysisCard" aria-labelledby="explanationTitle">
+      <div class="analysisHeader">
+        <div>
+          <h2 id="explanationTitle">Evidence-grounded explanation</h2>
+          <p>Every statement links back to a published observation or quality signal.</p>
+        </div>
+      </div>
+      <div id="explanation" class="analysisBody subtle" aria-live="polite">Select a country to view its explanation.</div>
+    </article>
+  </section>
+
   <section class="dataTableCard" aria-labelledby="dataTableTitle" aria-describedby="dataTableHelp">
     <div class="tableHeader">
       <div>
@@ -108,6 +192,7 @@
         <label class="tableSearchLabel" for="tableSearch">Filter reporters</label>
         <input id="tableSearch" type="search" autocomplete="off" placeholder="Country or ISO3" />
         <button id="downloadCSV" class="btn" type="button">Download CSV</button>
+        <button id="downloadJSON" class="btn" type="button">Download filtered JSON</button>
       </div>
     </div>
     <div id="tableSummary" class="tableSummary" aria-live="polite">Loading reporters…</div>

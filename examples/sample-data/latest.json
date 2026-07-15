@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0",
-  "generated_at": "2026-01-01T00:00:00Z",
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:28:31Z",
   "provider": "wits",
   "partners": [
     "USA",
@@ -9,17 +9,32 @@
   "rows": [
     {
       "iso3": "DEU",
+      "iso2": "DE",
+      "name": "Germany",
+      "region": "Europe \u0026 Central Asia",
+      "income_group": "High income",
+      "groups": [
+        "EU"
+      ],
+      "population": {
+        "value": 84480000,
+        "year": "2023"
+      },
+      "gdp": {
+        "value": 4530000000000,
+        "year": "2023"
+      },
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 150000000000,
-        "import": 80000000000,
-        "trade": 230000000000,
+        "export": 133980000000.00002,
+        "import": 97020000000.00002,
+        "trade": 231000000000.00003,
         "growth": {
-          "export": 0.05,
-          "import": 0.02,
-          "trade": 0.039
+          "export": 0.023255813953488608,
+          "import": 0.02325581395348853,
+          "trade": 0.023255813953488507
         },
         "growth_basis": "yoy"
       },
@@ -27,32 +42,46 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 100000000000,
-        "import": 120000000000,
-        "trade": 220000000000,
+        "export": 130790000000.00002,
+        "import": 94710000000.00002,
+        "trade": 225500000000.00003,
         "growth": {
-          "export": -0.03,
-          "import": 0.01,
-          "trade": -0.008
+          "export": 0.023255813953488615,
+          "import": 0.02325581395348854,
+          "trade": 0.02325581395348851
         },
         "growth_basis": "yoy"
       },
-      "total": 450000000000,
-      "share_cn": 0.4888888888888889
+      "total": 456500000000.00006,
+      "share_cn": 0.4939759036144578,
+      "same_period": true,
+      "comparison_period": "2023"
     },
     {
       "iso3": "JPN",
+      "iso2": "JP",
+      "name": "Japan",
+      "region": "East Asia \u0026 Pacific",
+      "income_group": "High income",
+      "population": {
+        "value": 124520000,
+        "year": "2023"
+      },
+      "gdp": {
+        "value": 4210000000000,
+        "year": "2023"
+      },
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 140000000000,
-        "import": 70000000000,
-        "trade": 210000000000,
+        "export": 124410000000.00002,
+        "import": 90090000000.00002,
+        "trade": 214500000000.00003,
         "growth": {
-          "export": 0.04,
-          "import": -0.01,
-          "trade": 0.023
+          "export": 0.023255813953488625,
+          "import": 0.023255813953488545,
+          "trade": 0.023255813953488517
         },
         "growth_basis": "yoy"
       },
@@ -60,32 +89,46 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 120000000000,
-        "import": 160000000000,
-        "trade": 280000000000,
+        "export": 165880000000,
+        "import": 120120000000,
+        "trade": 286000000000,
         "growth": {
-          "export": -0.02,
-          "import": 0.03,
-          "trade": 0.008
+          "export": 0.023255813953488372,
+          "import": 0.023255813953488372,
+          "trade": 0.023255813953488372
         },
         "growth_basis": "yoy"
       },
-      "total": 490000000000,
-      "share_cn": 0.5714285714285714
+      "total": 500500000000,
+      "share_cn": 0.5714285714285714,
+      "same_period": true,
+      "comparison_period": "2023"
     },
     {
       "iso3": "KOR",
+      "iso2": "KR",
+      "name": "Korea, Rep.",
+      "region": "East Asia \u0026 Pacific",
+      "income_group": "High income",
+      "population": {
+        "value": 51710000,
+        "year": "2023"
+      },
+      "gdp": {
+        "value": 1710000000000,
+        "year": "2023"
+      },
       "usa": {
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 115000000000,
-        "import": 65000000000,
-        "trade": 180000000000,
+        "export": 105270000000,
+        "import": 76230000000,
+        "trade": 181500000000,
         "growth": {
-          "export": 0.06,
-          "import": 0.01,
-          "trade": 0.041
+          "export": 0.023255813953488372,
+          "import": 0.023255813953488372,
+          "trade": 0.023255813953488372
         },
         "growth_basis": "yoy"
       },
@@ -93,18 +136,20 @@
         "period": "2023",
         "period_type": "Y",
         "prev_period": "2022",
-        "export": 125000000000,
-        "import": 135000000000,
-        "trade": 260000000000,
+        "export": 156310000000,
+        "import": 113190000000.00002,
+        "trade": 269500000000,
         "growth": {
-          "export": -0.04,
-          "import": -0.02,
-          "trade": -0.03
+          "export": 0.023255813953488372,
+          "import": 0.02325581395348851,
+          "trade": 0.023255813953488372
         },
         "growth_basis": "yoy"
       },
-      "total": 440000000000,
-      "share_cn": 0.5909090909090909
+      "total": 451000000000,
+      "share_cn": 0.5975609756097561,
+      "same_period": true,
+      "comparison_period": "2023"
     }
   ]
 }

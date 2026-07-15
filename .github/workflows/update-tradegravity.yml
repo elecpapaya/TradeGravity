@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v7
         with:
@@ -30,13 +30,33 @@ jobs:
           go test ./...
           go vet ./...
 
-      - name: Run collector
+      - name: Build country context
+        run: go run ./cmd/context -out site/data/context.json
+
+      - name: Collect headline history
         env:
           WITS_BASE_URL: https://wits.worldbank.org/API/V1/
-        run: go run ./cmd/collector run -provider wits -db tradegravity.db
+        run: go run ./cmd/collector run -provider wits -history-years 9 -db tradegravity.db
+
+      - name: Collect HS2 product chapters
+        env:
+          COMTRADE_RATE_LIMIT_PER_SEC: "1"
+          COMTRADE_MAX_RETRIES: "6"
+          COMTRADE_TIMEOUT_SECONDS: "60"
+        run: go run ./cmd/collector products -provider comtrade -primary-provider wits -year auto -product-level 2 -concurrency 2 -db tradegravity.db
 
       - name: Run publisher
-        run: go run ./cmd/publisher build -db tradegravity.db -out site/data
+        run: go run ./cmd/publisher build -db tradegravity.db -out site/data -context site/data/context.json -series-years 10 -product-provider comtrade -product-level 2
+
+      - name: Build evidence-grounded explanations
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-5.6-luna
+        shell: bash
+        run: |
+          args=()
+          if [[ -n "$OPENAI_API_KEY" ]]; then args+=("-ai"); fi
+          go run ./cmd/explainer -dir site/data -max-ai-reporters 10 "${args[@]}"
 
       - name: Validate published dataset
         run: go run ./cmd/validator -dir site/data -min-reporters 40

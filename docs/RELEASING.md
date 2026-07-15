@@ -22,7 +22,8 @@ go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
 node --check site/app.js
 node --check site/security.js
 node --check site/data-tools.js
-node --test site/security.test.cjs site/data-tools.test.cjs site/structure.test.cjs
+node --check site/explorer-tools.js
+node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/structure.test.cjs
 python -m pip install --disable-pip-version-check cffconvert==2.0.0
 cffconvert --validate
 go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
@@ -32,12 +33,15 @@ go run ./cmd/validator -dir examples/sample-data -min-reporters 3
 Confirm that all required pull-request checks pass. Then run the collector, publisher, and validator against the intended provider or verify the latest successful scheduled run:
 
 ```bash
-go run ./cmd/collector run
-go run ./cmd/publisher build -db tradegravity.db -out site/data
+go run ./cmd/context
+go run ./cmd/collector run -history-years 9
+go run ./cmd/collector products -provider comtrade -primary-provider wits -year auto
+go run ./cmd/publisher build -db tradegravity.db -out site/data -series-years 10
+go run ./cmd/explainer -dir site/data
 go run ./cmd/validator -dir site/data -min-reporters 40
 ```
 
-Preview the site locally and confirm that the treemaps, accessible table, reporter filter, CSV export, source links, periods, and coverage summary work.
+Preview the site locally and confirm same-period/all modes, exact-period selection, regional/group filters, normalizations, share URL restoration, both exports, trends, HS2 products, quality signals, explanations, accessible table, and small-screen layout.
 
 ## 3. Tag and publish
 

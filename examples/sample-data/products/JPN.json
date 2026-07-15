@@ -1,0 +1,73 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T12:28:31Z",
+  "provider": "comtrade",
+  "classification": "H6",
+  "level": 2,
+  "reporter_iso3": "JPN",
+  "periods": [
+    "2023"
+  ],
+  "rows": [
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "85",
+      "name": "Electrical machinery equipment and parts",
+      "usa": {
+        "available": true,
+        "export": 18480000000,
+        "import": 12320000000.000002,
+        "trade": 30800000000
+      },
+      "chn": {
+        "available": true,
+        "export": 21252000000,
+        "import": 14168000000,
+        "trade": 35420000000
+      },
+      "total": 66220000000,
+      "share_cn": 0.5348837209302325
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "87",
+      "name": "Vehicles other than railway or tramway rolling stock",
+      "usa": {
+        "available": true,
+        "export": 11220000000,
+        "import": 7480000000,
+        "trade": 18700000000
+      },
+      "chn": {
+        "available": true,
+        "export": 12903000000,
+        "import": 8602000000,
+        "trade": 21505000000
+      },
+      "total": 40205000000,
+      "share_cn": 0.5348837209302325
+    },
+    {
+      "period_type": "Y",
+      "period": "2023",
+      "code": "90",
+      "name": "Optical photographic medical and precision instruments",
+      "usa": {
+        "available": true,
+        "export": 5940000000,
+        "import": 3960000000,
+        "trade": 9900000000
+      },
+      "chn": {
+        "available": true,
+        "export": 6831000000,
+        "import": 4554000000,
+        "trade": 11385000000
+      },
+      "total": 21285000000,
+      "share_cn": 0.5348837209302325
+    }
+  ]
+}

@@ -21,6 +21,7 @@ import (
 const (
 	defaultBaseURL           = "https://comtradeapi.un.org/"
 	defaultDataPath          = "data/v1/get/{type}/{freq}/{cl}"
+	defaultPreviewDataPath   = "public/v1/preview/{type}/{freq}/{cl}"
 	defaultReportersURL      = "https://comtradeapi.un.org/files/v1/app/reference/Reporters.json"
 	defaultPartnersURL       = "https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json"
 	defaultAPIKeyParam       = "subscription-key"
@@ -48,6 +49,7 @@ var ErrQuotaExceeded = errors.New("comtrade: quota exceeded")
 type Config struct {
 	BaseURL           string
 	DataPath          string
+	PreviewDataPath   string
 	Dataset           string
 	ReportersURL      string
 	PartnersURL       string
@@ -92,6 +94,7 @@ type referenceEntry struct {
 	IsPartner   bool
 	HasPartner  bool
 	IsGroup     bool
+	ExpiredAt   string
 }
 
 func New() (*Provider, error) {
@@ -108,6 +111,9 @@ func NewWithConfig(cfg Config) (*Provider, error) {
 	}
 	if strings.TrimSpace(cfg.DataPath) == "" {
 		cfg.DataPath = defaultDataPath
+	}
+	if strings.TrimSpace(cfg.PreviewDataPath) == "" {
+		cfg.PreviewDataPath = defaultPreviewDataPath
 	}
 	if strings.TrimSpace(cfg.ReportersURL) == "" {
 		cfg.ReportersURL = defaultReportersURL
@@ -177,6 +183,7 @@ func ConfigFromEnv() (Config, error) {
 	cfg := Config{
 		BaseURL:           getenv("COMTRADE_BASE_URL", defaultBaseURL),
 		DataPath:          getenv("COMTRADE_DATA_PATH", defaultDataPath),
+		PreviewDataPath:   getenv("COMTRADE_PREVIEW_DATA_PATH", defaultPreviewDataPath),
 		Dataset:           strings.TrimSpace(os.Getenv("COMTRADE_DATASET")),
 		ReportersURL:      getenv("COMTRADE_REPORTERS_URL", defaultReportersURL),
 		PartnersURL:       getenv("COMTRADE_PARTNERS_URL", defaultPartnersURL),
@@ -266,7 +273,7 @@ func (p *Provider) FetchSeries(ctx context.Context, reporterISO3, partnerISO3 st
 	flowCode := p.flowCode(flow)
 	observations := make([]model.Observation, 0)
 	for _, year := range years {
-		rows, err := p.fetchYear(ctx, reporterISO3, partnerISO3, reporterCode, partnerCode, flow, flowCode, year)
+		rows, err := p.fetchYear(ctx, reporterISO3, partnerISO3, reporterCode, partnerCode, flow, flowCode, year, p.config.Commodity)
 		if err != nil {
 			if errors.Is(err, ErrNoRecords) {
 				continue
@@ -280,6 +287,51 @@ func (p *Provider) FetchSeries(ctx context.Context, reporterISO3, partnerISO3 st
 		return nil, ErrNoRecords
 	}
 	return observations, nil
+}
+
+// FetchProducts returns a pre-aggregated HS commodity breakdown. UN Comtrade's
+// AG2 query produces chapter-level rows while keeping the source
+// classification visible on every observation.
+func (p *Provider) FetchProducts(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow, year string, level int) ([]model.Observation, error) {
+	if level != 2 {
+		return nil, fmt.Errorf("comtrade: unsupported product level %d (only HS2 is supported)", level)
+	}
+	yearValue, ok := parseYear(year)
+	if !ok {
+		return nil, fmt.Errorf("comtrade: invalid product year %q", year)
+	}
+	refsErr := p.ensureReferences(ctx)
+	reporterISO3 = strings.ToUpper(strings.TrimSpace(reporterISO3))
+	partnerISO3 = strings.ToUpper(strings.TrimSpace(partnerISO3))
+	reporterCode, partnerCode := reporterISO3, partnerISO3
+	if refsErr == nil {
+		var err error
+		reporterCode, err = p.resolveReporterCode(reporterISO3)
+		if err != nil {
+			return nil, err
+		}
+		partnerCode, err = p.resolvePartnerCode(partnerISO3)
+		if err != nil {
+			return nil, err
+		}
+	} else if !p.config.AllowISO3Fallback {
+		return nil, refsErr
+	}
+
+	observations, err := p.fetchYear(ctx, reporterISO3, partnerISO3, reporterCode, partnerCode, flow, p.flowCode(flow), yearValue, "AG2")
+	if err != nil {
+		return nil, err
+	}
+	filtered := make([]model.Observation, 0, len(observations))
+	for _, observation := range observations {
+		if observation.ProductLevel == level && len(observation.ProductCode) == level {
+			filtered = append(filtered, observation)
+		}
+	}
+	if len(filtered) == 0 {
+		return nil, ErrNoRecords
+	}
+	return filtered, nil
 }
 
 func (p *Provider) ensureReferences(ctx context.Context) error {
@@ -333,6 +385,9 @@ func (p *Provider) fetchReferences(ctx context.Context, endpoint string, filterR
 		if entry.IsGroup {
 			continue
 		}
+		if strings.TrimSpace(entry.ExpiredAt) != "" {
+			continue
+		}
 		if filterReporter && entry.HasReporter && !entry.IsReporter {
 			continue
 		}
@@ -341,7 +396,9 @@ func (p *Provider) fetchReferences(ctx context.Context, endpoint string, filterR
 		if code == "" {
 			code = iso3
 		}
-		codes[iso3] = code
+		if existing, exists := codes[iso3]; !exists || existing == "" || preferredReferenceCode(iso3, code) {
+			codes[iso3] = code
+		}
 
 		if filterReporter {
 			reporters = append(reporters, model.Reporter{
@@ -382,13 +439,16 @@ func (p *Provider) resolveCode(kind, iso3 string, codes map[string]string) (stri
 	return "", fmt.Errorf("comtrade: missing %s code for %s", kind, iso3)
 }
 
-func (p *Provider) fetchYear(ctx context.Context, reporterISO3, partnerISO3, reporterCode, partnerCode string, flow model.Flow, flowCode string, year int) ([]model.Observation, error) {
+func (p *Provider) fetchYear(ctx context.Context, reporterISO3, partnerISO3, reporterCode, partnerCode string, flow model.Flow, flowCode string, year int, commodity string) ([]model.Observation, error) {
 	params := url.Values{}
 	params.Set("reportercode", reporterCode)
 	params.Set("flowCode", flowCode)
 	params.Set("period", strconv.Itoa(year))
-	params.Set("cmdCode", p.config.Commodity)
+	params.Set("cmdCode", commodity)
 	params.Set("partnerCode", partnerCode)
+	params.Set("partner2Code", "0")
+	params.Set("customsCode", "C00")
+	params.Set("motCode", "0")
 	params.Set("format", p.config.Format)
 	if p.config.MaxRecords > 0 {
 		params.Set("maxRecords", strconv.Itoa(p.config.MaxRecords))
@@ -413,7 +473,15 @@ func (p *Provider) fetchYear(ctx context.Context, reporterISO3, partnerISO3, rep
 }
 
 func (p *Provider) dataURL() string {
-	path := strings.TrimLeft(p.config.DataPath, "/")
+	return p.dataURLForPath(p.config.DataPath)
+}
+
+func (p *Provider) previewDataURL() string {
+	return p.dataURLForPath(p.config.PreviewDataPath)
+}
+
+func (p *Provider) dataURLForPath(pathTemplate string) string {
+	path := strings.TrimLeft(pathTemplate, "/")
 	path = strings.ReplaceAll(path, "{type}", url.PathEscape(p.config.Type))
 	path = strings.ReplaceAll(path, "{freq}", url.PathEscape(p.config.Frequency))
 	path = strings.ReplaceAll(path, "{cl}", url.PathEscape(p.config.Classification))
@@ -445,7 +513,10 @@ func (p *Provider) doRequest(ctx context.Context, endpoint string, params url.Va
 		keys = append(keys, p.config.APIKeySecondary)
 	}
 	if len(keys) == 0 {
-		return nil, errors.New("comtrade: api key is required (COMTRADE_PRIMARY_KEY)")
+		keys = append(keys, "")
+		if !strings.Contains(endpoint, "/files/") {
+			endpoint = p.previewDataURL()
+		}
 	}
 
 	var lastErr error
@@ -510,7 +581,7 @@ func (p *Provider) doRequestWithKey(ctx context.Context, endpoint string, params
 
 	resp, err := p.client.Do(req)
 	if err != nil {
-		return nil, 0, 0, err
+		return nil, 0, 0, safeTransportError("comtrade: request failed", err)
 	}
 	defer resp.Body.Close()
 
@@ -521,13 +592,31 @@ func (p *Provider) doRequestWithKey(ctx context.Context, endpoint string, params
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
 		retryAfter := parseRetryAfter(resp, body)
-		if resp.StatusCode == http.StatusForbidden && isQuotaExceeded(body) {
-			return nil, resp.StatusCode, retryAfter, fmt.Errorf("%w: %s", ErrQuotaExceeded, strings.TrimSpace(string(body)))
+		safeBody := strings.TrimSpace(string(body))
+		if strings.TrimSpace(apiKey) != "" {
+			safeBody = strings.ReplaceAll(safeBody, apiKey, "[REDACTED]")
 		}
-		return nil, resp.StatusCode, retryAfter, fmt.Errorf("comtrade: request failed (%s): %s", resp.Status, strings.TrimSpace(string(body)))
+		if resp.StatusCode == http.StatusForbidden && isQuotaExceeded(body) {
+			return nil, resp.StatusCode, retryAfter, fmt.Errorf("%w: %s", ErrQuotaExceeded, safeBody)
+		}
+		return nil, resp.StatusCode, retryAfter, fmt.Errorf("comtrade: request failed (%s): %s", resp.Status, safeBody)
 	}
 
 	return body, resp.StatusCode, 0, nil
+}
+
+func safeTransportError(prefix string, err error) error {
+	var urlError *url.Error
+	if errors.As(err, &urlError) && urlError.Err != nil {
+		return fmt.Errorf("%s: %w", prefix, urlError.Err)
+	}
+	if errors.Is(err, context.Canceled) {
+		return fmt.Errorf("%s: %w", prefix, context.Canceled)
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return fmt.Errorf("%s: %w", prefix, context.DeadlineExceeded)
+	}
+	return errors.New(prefix)
 }
 
 func (p *Provider) buildURL(endpoint string, params url.Values, apiKey string) (string, error) {
@@ -614,6 +703,7 @@ func parseReferenceEntries(body []byte) ([]referenceEntry, error) {
 			ISO3: strings.TrimSpace(iso3),
 			Name: strings.TrimSpace(name),
 		}
+		entry.ExpiredAt, _ = getString(row, "entryExpiredDate", "expiredDate", "endDate")
 
 		if value, ok := getValue(row, "isReporter", "isreporter", "reporter"); ok {
 			entry.IsReporter = parseBool(value)
@@ -631,6 +721,14 @@ func parseReferenceEntries(body []byte) ([]referenceEntry, error) {
 	}
 
 	return entries, nil
+}
+
+func preferredReferenceCode(iso3, code string) bool {
+	preferred := map[string]string{
+		"USA": "842",
+		"CHN": "156",
+	}
+	return preferred[strings.ToUpper(strings.TrimSpace(iso3))] == strings.TrimSpace(code)
 }
 
 func parseObservations(body []byte, fallbackFlow model.Flow, reporterISO3, partnerISO3 string, multiplier float64) ([]model.Observation, error) {
@@ -675,14 +773,27 @@ func rowToObservation(row map[string]any, reporterISO3, partnerISO3 string, flow
 	if value, ok := getString(row, "pt3ISO", "PartnerISO3", "partnerISO3", "Partner", "partner"); ok {
 		partner = value
 	}
+	classification, _ := getString(row, "classificationSearchCode", "classificationCode", "clCode")
+	productCode, _ := getString(row, "cmdCode", "commodityCode", "productCode")
+	productCode = strings.ToUpper(strings.TrimSpace(productCode))
+	productLevel := 0
+	if productCode != "" && productCode != "TOTAL" && isDigits(productCode) {
+		productLevel = len(productCode)
+	}
+	if productCode == "" {
+		productCode = "TOTAL"
+	}
 
 	return model.Observation{
-		ReporterISO3: strings.ToUpper(strings.TrimSpace(reporter)),
-		PartnerISO3:  strings.ToUpper(strings.TrimSpace(partner)),
-		Flow:         flow,
-		PeriodType:   periodType,
-		Period:       period,
-		ValueUSD:     value,
+		Classification: strings.ToUpper(strings.TrimSpace(classification)),
+		ProductCode:    productCode,
+		ProductLevel:   productLevel,
+		ReporterISO3:   strings.ToUpper(strings.TrimSpace(reporter)),
+		PartnerISO3:    strings.ToUpper(strings.TrimSpace(partner)),
+		Flow:           flow,
+		PeriodType:     periodType,
+		Period:         period,
+		ValueUSD:       value,
 	}, nil
 }
 
@@ -1157,3 +1268,4 @@ func getenvBool(key string, fallback bool) bool {
 }
 
 var _ providers.Provider = (*Provider)(nil)
+var _ providers.ProductProvider = (*Provider)(nil)
