@@ -16,9 +16,14 @@ TradeGravity is an open-source pipeline and tabbed static intelligence dashboard
 - **Project roadmap:** [ROADMAP.md](ROADMAP.md)
 - **How to cite:** [CITATION.cff](CITATION.cff)
 
-## Try it in 30 seconds
+## Dashboard screenshots
 
-[![TradeGravity Intelligence view showing Viet Nam's reported partner network and transparent USA/China exposure signals](docs/assets/tradegravity-dashboard.png)](https://elecpapaya.github.io/TradeGravity/?period=Y%3A2023&group=ASEAN&country=VNM&tab=intelligence)
+| Overview | Intelligence |
+| --- | --- |
+| [![TradeGravity Overview with linked USA and China treemaps and the selected Korea evidence panel](docs/assets/tradegravity-overview.png)](https://elecpapaya.github.io/TradeGravity/?country=KOR) | [![TradeGravity Intelligence with transparent exposure scope and the observed USA-China anchor network](docs/assets/tradegravity-intelligence.png)](https://elecpapaya.github.io/TradeGravity/?tab=intelligence) |
+| Compare same-period country scale, growth, and selected-country evidence. | Inspect descriptive exposure signals and reported partner networks without treating links as physical shipment routes. |
+
+## Try it in 30 seconds
 
 1. Open the [ready-made ASEAN · Viet Nam · 2023 view](https://elecpapaya.github.io/TradeGravity/?period=Y%3A2023&group=ASEAN&country=VNM&tab=intelligence). The URL restores the period, group, country, and tab.
 2. Read **Selected-country signals**, then inspect the partner network. Its links are reported bilateral trade totals—not ports, firms, shipment paths, or proof of rerouting.
