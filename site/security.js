@@ -39,7 +39,23 @@
     return /^[A-Z]{3}$/.test(normalized) ? normalized : "";
   }
 
+  function escapeCSVCell(value) {
+    let text = String(value ?? "");
+    if (typeof value !== "number" && /^[=+\-@\t\r]/.test(text)) {
+      text = "'" + text;
+    }
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  function encodeCSV(rows) {
+    if (!Array.isArray(rows)) return "";
+    return rows
+      .map(row => (Array.isArray(row) ? row : [row]).map(escapeCSVCell).join(","))
+      .join("\r\n");
+  }
+
   return {
+    encodeCSV,
     escapeHTML,
     normalizeISO2,
     normalizeISO3,

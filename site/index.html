@@ -6,12 +6,14 @@
   <meta name="description" content="Explore reproducible public trade data comparing reporter countries' trade with the United States and China." />
   <meta name="referrer" content="no-referrer" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagcdn.com; connect-src 'self' https://api.worldbank.org https://api.gdeltproject.org; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
-  <title>TradeGravity – US/CN Trade Treemap</title>
+  <title>TradeGravity – US/CN Trade Data Explorer</title>
   <link rel="stylesheet" href="./styles.css" />
   <script src="./security.js"></script>
+  <script src="./data-tools.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 </head>
 <body>
+  <a class="skipLink" href="#dataTableTitle">Skip to accessible data table</a>
   <header class="topbar">
     <div class="brand">
       <div class="title">TradeGravity</div>
@@ -56,7 +58,7 @@
     </div>
   </header>
 
-  <main class="layout">
+  <main class="layout" aria-label="Trade visualization and country details">
     <section class="canvas">
       <div class="grid">
         <div class="card" id="card-usa">
@@ -94,6 +96,38 @@
       </div>
     </aside>
   </main>
+
+  <section class="dataTableCard" aria-labelledby="dataTableTitle" aria-describedby="dataTableHelp">
+    <div class="tableHeader">
+      <div>
+        <h2 id="dataTableTitle">Accessible trade data table</h2>
+        <p id="dataTableHelp">Filter all reporters, open country details, or download the normalized dataset as CSV. Values are nominal US dollars.</p>
+      </div>
+      <div class="tableActions">
+        <label class="tableSearchLabel" for="tableSearch">Filter reporters</label>
+        <input id="tableSearch" type="search" autocomplete="off" placeholder="Country or ISO3" />
+        <button id="downloadCSV" class="btn" type="button">Download CSV</button>
+      </div>
+    </div>
+    <div id="tableSummary" class="tableSummary" aria-live="polite">Loading reporters…</div>
+    <div class="tableScroll" tabindex="0" aria-label="Scrollable trade data table">
+      <table class="tradeTable">
+        <caption class="srOnly">Reporter countries and their trade with the United States and China for the selected metric.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Reporter</th>
+            <th scope="col">USA period</th>
+            <th id="usaMetricHeader" class="numeric" scope="col">USA trade</th>
+            <th scope="col">CHN period</th>
+            <th id="chnMetricHeader" class="numeric" scope="col">CHN trade</th>
+            <th id="combinedMetricHeader" class="numeric" scope="col" aria-sort="descending">Combined trade</th>
+            <th class="numeric" scope="col">China share</th>
+          </tr>
+        </thead>
+        <tbody id="tradeTableBody"></tbody>
+      </table>
+    </div>
+  </section>
 
   <div id="tooltip" class="tooltip" role="status" aria-live="polite" style="display:none;"></div>
   <script src="./app.js"></script>

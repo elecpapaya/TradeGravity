@@ -90,6 +90,12 @@ Values are nominal US dollars as supplied and normalized by the selected provide
 
 Additive fields may be introduced within a schema version. Removing fields, changing meanings, or changing required types requires a schema-version change and release note. Consumers should ignore unknown fields but should not assume that every reporter has both partner blocks.
 
+## CSV export
+
+The viewer can export the currently filtered reporters as CSV. This is a client-generated convenience representation, not a third canonical endpoint. It repeats schema, provider, and generation metadata on every row and flattens USA and CHN partner blocks into explicit columns.
+
+All CSV cells are quoted, embedded quotes are doubled, and values beginning with spreadsheet formula characters are prefixed with an apostrophe to reduce CSV formula-injection risk. Automated consumers should prefer `latest.json`, which preserves types and nesting.
+
 ## Validation
 
 The deployment workflow runs:

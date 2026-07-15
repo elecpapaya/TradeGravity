@@ -2,6 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 
 const {
+  encodeCSV,
   escapeHTML,
   normalizeISO2,
   normalizeISO3,
@@ -28,4 +29,16 @@ test("ISO normalizers accept only exact alphabetic country codes", () => {
   assert.equal(normalizeISO2("K1"), "");
   assert.equal(normalizeISO3(" kor "), "KOR");
   assert.equal(normalizeISO3("KOR<script>"), "");
+});
+
+test("encodeCSV quotes fields and neutralizes spreadsheet formulas", () => {
+  assert.equal(
+    encodeCSV([
+      ["country", "note"],
+      ["=HYPERLINK(\"https://example.com\")", 'A "quoted", value'],
+      ["+SUM(1,2)", null],
+      [-0.5, "-1+2"],
+    ]),
+    '"country","note"\r\n"\'=HYPERLINK(""https://example.com"")","A ""quoted"", value"\r\n"\'+SUM(1,2)",""\r\n"-0.5","\'-1+2"',
+  );
 });

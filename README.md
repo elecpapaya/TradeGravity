@@ -11,6 +11,7 @@ TradeGravity is an open-source pipeline and static web viewer for comparing how 
 - **System design:** [DESIGN.md](DESIGN.md)
 - **Published data schema:** [docs/DATA_SCHEMA.md](docs/DATA_SCHEMA.md)
 - **Project roadmap:** [ROADMAP.md](ROADMAP.md)
+- **How to cite:** [CITATION.cff](CITATION.cff)
 
 ## Why this project exists
 
@@ -33,6 +34,7 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 - SQLite persistence for repeatable collection and publishing runs.
 - Static JSON output for a low-cost, serverless web viewer.
 - Linked US/China treemaps with hover highlighting and flag overlays.
+- Searchable accessible data table and safe CSV export.
 - Year-over-year growth coloring when prior-period data is available.
 - Optional World Bank indicator and GDELT headline panels.
 - Reporter allowlist for controlled coverage.
@@ -68,6 +70,17 @@ Exports and imports are reported from each reporter country's perspective, with 
 
 Source availability, revisions, and classification choices can affect results. TradeGravity does not modify or guarantee the accuracy of upstream data.
 
+## Reusing and citing the data
+
+The public deployment exposes stable machine-readable endpoints:
+
+- `https://elecpapaya.github.io/TradeGravity/data/meta.json`
+- `https://elecpapaya.github.io/TradeGravity/data/latest.json`
+
+`latest.json` is the canonical published dataset. The viewer's **Download CSV** button creates a spreadsheet-safe convenience export of the currently filtered reporters, including schema version, provider, pipeline timestamp, observation periods, flows, growth values, totals, and China share. See [docs/DATA_SCHEMA.md](docs/DATA_SCHEMA.md) before comparing reporters with different periods.
+
+When citing a result, record the repository URL, commit or release when applicable, provider, `generated_at` timestamp, and the observation period shown for each value. GitHub can generate citation formats from [CITATION.cff](CITATION.cff).
+
 ## Requirements
 
 - Go 1.25.12+ (includes standard-library security fixes required by CI)
@@ -90,7 +103,7 @@ To run the automated checks:
 ```bash
 go test ./...
 go vet ./...
-node --test site/security.test.cjs
+node --test site/security.test.cjs site/data-tools.test.cjs site/structure.test.cjs
 ```
 
 ## Collector configuration
@@ -161,6 +174,8 @@ Before deployment, `cmd/validator` checks schema agreement, reporter uniqueness,
 TradeGravity is created and primarily maintained by [@elecpapaya](https://github.com/elecpapaya). Maintenance includes monitoring scheduled collection runs, reviewing source/API changes, keeping dependencies current, improving tests and documentation, and planning releases.
 
 Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow and [ROADMAP.md](ROADMAP.md) for planned work. Please do not include API keys or other secrets in issues, logs, or commits.
+
+Support routes are documented in [SUPPORT.md](SUPPORT.md), and the release procedure is documented in [docs/RELEASING.md](docs/RELEASING.md).
 
 Security vulnerabilities should be reported privately according to [SECURITY.md](SECURITY.md). Notable changes are recorded in [CHANGELOG.md](CHANGELOG.md).
 

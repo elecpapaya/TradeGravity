@@ -11,7 +11,12 @@ const security = globalThis.TradeGravitySecurity;
 if (!security) {
   throw new Error("TradeGravity security helpers failed to load.");
 }
-const { escapeHTML, normalizeISO2, normalizeISO3, safeHTTPSURL } = security;
+const dataTools = globalThis.TradeGravityDataTools;
+if (!dataTools) {
+  throw new Error("TradeGravity data helpers failed to load.");
+}
+const { encodeCSV, escapeHTML, normalizeISO2, normalizeISO3, safeHTTPSURL } = security;
+const { buildCSVMatrix: createCSVMatrix, filterAndSortRows } = dataTools;
 
 const els = {
   svgUSA: document.getElementById("svg-usa"),
@@ -26,6 +31,13 @@ const els = {
   growthLegend: document.getElementById("growthLegend"),
   dataStatus: document.getElementById("dataStatus"),
   sourceLink: document.getElementById("sourceLink"),
+  tableSearch: document.getElementById("tableSearch"),
+  downloadCSV: document.getElementById("downloadCSV"),
+  tableSummary: document.getElementById("tableSummary"),
+  tableBody: document.getElementById("tradeTableBody"),
+  usaMetricHeader: document.getElementById("usaMetricHeader"),
+  chnMetricHeader: document.getElementById("chnMetricHeader"),
+  combinedMetricHeader: document.getElementById("combinedMetricHeader"),
 };
 
 let state = {
@@ -36,6 +48,10 @@ let state = {
   selectedRow: null,
   topN: 25,
   meta: null,
+  tableQuery: "",
+  schemaVersion: "",
+  generatedAt: "",
+  provider: "",
 };
 
 // Minimal ISO3->ISO2 fallback map (overridden by iso3_to_iso2.json if present).
@@ -185,6 +201,12 @@ function toNullableNumber(value){
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function toFiniteNumber(value, fallback = 0){
+  if (value == null || value === "") return fallback;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 function normalizeGrowth(value){
   if (!value || typeof value !== "object") return null;
   return {
@@ -218,29 +240,142 @@ function getMetricValue(row, side){
   return +v || 0;
 }
 
+function normalizePartnerBlock(value){
+  const block = value && typeof value === "object" ? value : {};
+  const exportValue = toFiniteNumber(block.export);
+  const importValue = toFiniteNumber(block.import);
+  const tradeValue = toFiniteNumber(block.trade, exportValue + importValue);
+  return {
+    period: String(block.period || "").trim().slice(0, 16),
+    period_type: String(block.period_type || "").trim().slice(0, 1),
+    prev_period: String(block.prev_period || "").trim().slice(0, 16),
+    export: exportValue,
+    import: importValue,
+    trade: tradeValue,
+    growth: normalizeGrowth(block.growth),
+    growth_basis: String(block.growth_basis || "").trim().slice(0, 16),
+  };
+}
+
 function normalizeRows(rows){
   return (rows || []).map(r => {
     const iso3 = normalizeISO3(r.iso3 || r.ISO3);
     if (!iso3) return null;
-    const usa = r.usa || {};
-    const chn = r.chn || {};
-    const usaGrowth = normalizeGrowth(usa.growth);
-    const chnGrowth = normalizeGrowth(chn.growth);
-    const trade_us = +(usa.trade ?? (+(usa.export||0) + +(usa.import||0))) || 0;
-    const trade_cn = +(chn.trade ?? (+(chn.export||0) + +(chn.import||0))) || 0;
-    const total = +(r.total ?? (trade_us + trade_cn)) || 0;
-    const share_cn = +(r.share_cn ?? (total ? trade_cn/total : 0)) || 0;
+    const usa = normalizePartnerBlock(r.usa);
+    const chn = normalizePartnerBlock(r.chn);
+    const total = toFiniteNumber(r.total, usa.trade + chn.trade);
+    const share_cn = toFiniteNumber(r.share_cn, total ? chn.trade/total : 0);
     const iso2 = iso2FromRow(r);
     return {
       iso3,
       name: String(r.name || displayCountryName(iso2, iso3)).trim().slice(0, 100),
       iso2,
-      usa: { ...usa, trade: trade_us, growth: usaGrowth },
-      chn: { ...chn, trade: trade_cn, growth: chnGrowth },
+      usa,
+      chn,
       total,
       share_cn
     };
   }).filter(Boolean);
+}
+
+const exactNumberFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
+
+function metricLabel(){
+  return {
+    trade: "total trade",
+    export: "exports",
+    import: "imports",
+  }[state.metric] || state.metric;
+}
+
+function filteredTableRows(){
+  return filterAndSortRows(state.rows, state.tableQuery, state.metric);
+}
+
+function appendTableCell(tableRow, value, className = "", title = ""){
+  const cell = document.createElement("td");
+  cell.textContent = String(value ?? "");
+  if (className) cell.className = className;
+  if (title) cell.title = title;
+  tableRow.appendChild(cell);
+  return cell;
+}
+
+function selectCountry(row){
+  if (!row || row.iso3 === "OTH") return;
+  state.selectedRow = row;
+  state.highlightKey = row.iso3;
+  applyHighlight(row.iso3);
+  setSelection(row);
+  setIndicators(row);
+  renderDataTable();
+}
+
+function renderDataTable(){
+  if (!els.tableBody) return;
+  const label = metricLabel();
+  if (els.usaMetricHeader) els.usaMetricHeader.textContent = `USA ${label}`;
+  if (els.chnMetricHeader) els.chnMetricHeader.textContent = `CHN ${label}`;
+  if (els.combinedMetricHeader) els.combinedMetricHeader.textContent = `Combined ${label}`;
+
+  const rows = filteredTableRows();
+  const fragment = document.createDocumentFragment();
+  for (const row of rows) {
+    const tableRow = document.createElement("tr");
+    if (state.selectedRow?.iso3 === row.iso3) tableRow.classList.add("is-selected");
+
+    const reporterCell = document.createElement("td");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "tableCountryButton";
+    button.title = `Open details for ${row.name}`;
+    button.addEventListener("click", () => selectCountry(row));
+    const name = document.createElement("span");
+    name.textContent = row.name;
+    const iso = document.createElement("span");
+    iso.className = "iso";
+    iso.textContent = row.iso3;
+    button.append(name, iso);
+    reporterCell.appendChild(button);
+    tableRow.appendChild(reporterCell);
+
+    appendTableCell(tableRow, row.usa.period || "—", "", row.usa.period_type || "");
+    const usaValue = getMetricValue(row, "usa");
+    appendTableCell(tableRow, exactNumberFormatter.format(usaValue), "numeric", String(usaValue));
+    appendTableCell(tableRow, row.chn.period || "—", "", row.chn.period_type || "");
+    const chnValue = getMetricValue(row, "chn");
+    appendTableCell(tableRow, exactNumberFormatter.format(chnValue), "numeric", String(chnValue));
+    const combined = usaValue + chnValue;
+    appendTableCell(tableRow, exactNumberFormatter.format(combined), "numeric", String(combined));
+    appendTableCell(tableRow, combined > 0 ? `${(chnValue / combined * 100).toFixed(1)}%` : "—", "numeric");
+    fragment.appendChild(tableRow);
+  }
+  els.tableBody.replaceChildren(fragment);
+  if (els.tableSummary) {
+    els.tableSummary.textContent = `${rows.length} of ${state.rows.length} reporters · sorted by combined ${label}`;
+  }
+}
+
+function downloadTableCSV(){
+  const rows = filteredTableRows();
+  const matrix = createCSVMatrix(rows, {
+    schemaVersion: state.schemaVersion,
+    generatedAt: state.generatedAt,
+    provider: state.provider,
+  });
+  const csv = encodeCSV(matrix);
+  const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+  const objectURL = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const date = String(state.generatedAt || "").match(/^\d{4}-\d{2}-\d{2}/)?.[0] || "latest";
+  link.href = objectURL;
+  link.download = `tradegravity-${date}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(objectURL), 0);
 }
 
 function setSelection(row){
@@ -269,8 +404,8 @@ function setSelection(row){
     <div class="kv"><span>CHN prev period</span><b>${escapeHTML(cn.prev_period || "-")}</b></div>
     <div class="kv"><span>CHN growth (${escapeHTML(growthBasisLabel(cn))})</span><b>${fmtPct(getGrowthValue(row, "chn"))}</b></div>
     <div style="height:10px"></div>
-    <div class="kv"><span>share_cn</span><b>${(row.share_cn*100).toFixed(1)}%</b></div>
-    <div class="kv"><span>total(trade_us+trade_cn)</span><b>${fmt(row.total)}</b></div>
+    <div class="kv"><span>China share of total trade</span><b>${(row.share_cn*100).toFixed(1)}%</b></div>
+    <div class="kv"><span>USA + CHN total trade</span><b>${fmt(row.total)}</b></div>
   `;
   els.selection.innerHTML = html;
 }
@@ -293,7 +428,7 @@ function showTooltip(ev, row, side){
       <div class="kv"><span>${sideLabel} ${metric}</span><b>${fmt(o[state.metric] ?? 0)}</b></div>
       <div class="kv"><span>${sideLabel} prev</span><b>${escapeHTML(o.prev_period || "-")}</b></div>
       <div class="kv"><span>${sideLabel} growth (${escapeHTML(growthBasisLabel(o))})</span><b>${fmtPct(getGrowthValue(row, side))}</b></div>
-      <div class="kv"><span>share_cn</span><b>${(row.share_cn*100).toFixed(1)}%</b></div>
+      <div class="kv"><span>China share of total trade</span><b>${(row.share_cn*100).toFixed(1)}%</b></div>
     </div>
   `;
   const pad = 12;
@@ -468,12 +603,7 @@ function buildTreemap(svgEl, side, rows){
       applyHighlight(state.highlightKey);
     })
     .on("click", (ev, d) => {
-      const row = d.data.row;
-      state.selectedRow = row;
-      state.highlightKey = row.iso3;
-      applyHighlight(state.highlightKey);
-      setSelection(row);
-      setIndicators(row);
+      selectCountry(d.data.row);
     })
     .on("focus", (ev, d) => {
       applyHighlight(d.data.row.iso3);
@@ -481,12 +611,7 @@ function buildTreemap(svgEl, side, rows){
     .on("keydown", (ev, d) => {
       if (ev.key !== "Enter" && ev.key !== " ") return;
       ev.preventDefault();
-      const row = d.data.row;
-      state.selectedRow = row;
-      state.highlightKey = row.iso3;
-      applyHighlight(state.highlightKey);
-      setSelection(row);
-      setIndicators(row);
+      selectCountry(d.data.row);
     });
 }
 
@@ -501,6 +626,7 @@ function renderAll(){
   } else {
     setSelection(null);
   }
+  renderDataTable();
 }
 
 async function setIndicators(row){
@@ -686,6 +812,8 @@ async function main(){
   }
 
   state.generatedAt = data.generated_at || data.generatedAt || "-";
+  state.schemaVersion = String(metadata?.schema_version || data.schema_version || "");
+  state.provider = String(metadata?.provider || data.provider || "").trim().toLowerCase();
   state.rows = normalizeRows(data.rows || []);
   state.meta = metadata;
   renderDatasetStatus(data, metadata);
@@ -733,6 +861,15 @@ async function main(){
     const initV = parseInt(els.topN.value, 10);
     if (Number.isFinite(initV)) state.topN = initV;
   }
+  if (els.tableSearch) {
+    els.tableSearch.addEventListener("input", () => {
+      state.tableQuery = els.tableSearch.value;
+      renderDataTable();
+    });
+  }
+  if (els.downloadCSV) {
+    els.downloadCSV.addEventListener("click", downloadTableCSV);
+  }
 
   window.addEventListener("resize", () => {
     clearTimeout(window.__tmResize);
@@ -775,5 +912,8 @@ main().catch(err => {
   console.error(err);
   if (els.indicators) {
     els.indicators.textContent = "Failed to load data: " + String(err);
+  }
+  if (els.tableSummary) {
+    els.tableSummary.textContent = "Failed to load the trade dataset.";
   }
 });

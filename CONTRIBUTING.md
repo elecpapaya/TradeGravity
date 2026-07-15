@@ -26,9 +26,12 @@ go test ./...
 go vet ./...
 node --check site/app.js
 node --check site/security.js
-node --test site/security.test.cjs
+node --check site/data-tools.js
+node --test site/security.test.cjs site/data-tools.test.cjs site/structure.test.cjs
 go run ./cmd/validator -dir cmd/validator/testdata/valid -min-reporters 1
 ```
+
+When changing `CITATION.cff`, install `cffconvert==2.0.0` and run `cffconvert --validate`; CI performs the same schema check.
 
 For a local end-to-end run:
 
@@ -48,6 +51,7 @@ Generated files under `site/data/` and `tradegravity.db` should not be committed
 - Update README or design documentation when commands, output, or data semantics change.
 - Preserve provider attribution and never silently combine observations from different sources.
 - Escape third-party text before HTML rendering and allowlist protocols for external URLs.
+- Keep table rendering text-only and route CSV changes through the tested formula-injection-safe encoder.
 - Confirm that `go test ./...` and `go vet ./...` pass.
 
 Small pull requests are easier to review. Maintainers may ask to split unrelated changes.

@@ -13,6 +13,8 @@ All notable changes to TradeGravity will be documented in this file. The project
 - Go 1.25.12 as the minimum toolchain to include required standard-library security fixes.
 - Contributor guidance, roadmap, security policy, and structured issue templates.
 - Keyboard-accessible treemap tiles and visible data freshness information.
+- Searchable accessible data table and spreadsheet-safe filtered CSV export.
+- Citation metadata, support routes, and a repeatable release checklist.
 
 ### Security
 
