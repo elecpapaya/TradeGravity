@@ -18,14 +18,18 @@ const series = [{ iso3: "KOR", points: [
 ]}];
 
 test("view state round-trips supported filters and rejects unsafe values", () => {
-  const parsed = parseViewState("?metric=export&period=Y%3A2023&mode=all&group=asean&top=40&country=kor");
+  const parsed = parseViewState("?metric=export&period=Y%3A2023&mode=all&group=asean&top=40&country=kor&tab=intelligence&sector=semiconductors");
   assert.equal(parsed.metric, "export");
   assert.equal(parsed.period, "Y:2023");
   assert.equal(parsed.group, "ASEAN");
   assert.equal(parsed.country, "KOR");
+  assert.equal(parsed.tab, "intelligence");
+  assert.equal(parsed.sector, "semiconductors");
   assert.match(serializeViewState(parsed), /period=Y%3A2023/);
   assert.equal(parseViewState("?metric=bogus&period=javascript:alert(1)").metric, "trade");
   assert.equal(parseViewState("?metric=bogus&period=javascript:alert(1)").period, "latest");
+  assert.equal(parseViewState("?tab=javascript:alert(1)").tab, "overview");
+  assert.equal(parseViewState("?sector=../../secret").sector, "all");
 });
 
 test("period derivation calculates comparable rows and previous-period growth", () => {

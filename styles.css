@@ -455,3 +455,137 @@ select option{background:#fff;color:#111}
   opacity: .9;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
 }
+
+/* Dashboard information architecture */
+.tabBar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  padding:0 24px;
+  border-bottom:1px solid var(--border);
+  background:rgba(11,13,18,.92);
+  backdrop-filter:blur(14px);
+}
+.tabList{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin}
+.tabButton{
+  appearance:none;
+  min-width:max-content;
+  padding:13px 15px 11px;
+  border:0;
+  border-bottom:2px solid transparent;
+  background:transparent;
+  color:var(--muted);
+  font:700 12px/1.2 inherit;
+  cursor:pointer;
+}
+.tabButton:hover{color:var(--text);background:rgba(255,255,255,.025)}
+.tabButton.is-active{color:var(--text);border-bottom-color:var(--hi)}
+.tabButton:focus-visible{outline:2px solid var(--hi);outline-offset:-3px}
+.tabPanel{min-width:0}
+.tabPanel[hidden]{display:none!important}
+.sectionIntro{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:24px;
+  margin:18px 24px 0;
+  padding:24px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:linear-gradient(120deg,rgba(90,162,255,.08),rgba(255,107,87,.035));
+}
+.sectionIntro h1{margin:5px 0 8px;font-size:24px;line-height:1.15}
+.sectionIntro p{max-width:820px;margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+.eyebrow{color:var(--hi);font:700 10px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.scopeBadge{
+  flex:none;
+  padding:7px 10px;
+  border:1px solid rgba(134,231,176,.28);
+  border-radius:999px;
+  color:var(--growth-pos);
+  background:rgba(134,231,176,.06);
+  font:700 10px/1 var(--mono);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.warningBadge{border-color:rgba(231,211,124,.3);color:var(--hi);background:rgba(231,211,124,.06)}
+
+.intelligenceGrid{
+  display:grid;
+  grid-template-columns:minmax(300px,.8fr) minmax(480px,1.2fr);
+  gap:12px;
+  padding:12px 24px 24px;
+}
+.rankingCard{grid-column:1/-1}
+.networkChart{display:block;width:100%;height:330px}
+.networkLink{stroke:rgba(255,255,255,.16);fill:none}
+.networkNode circle{stroke:rgba(255,255,255,.35);stroke-width:1}
+.networkNode text{fill:var(--muted);font:10px var(--mono);pointer-events:none}
+.networkNode.anchor circle{fill:var(--hi)}
+.networkNode.reporter circle{fill:var(--accent)}
+.networkNode.partner circle{fill:var(--hi)}
+.networkNode.is-selected circle{stroke:var(--growth-pos);stroke-width:3}
+.signalMetrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.signalMetric{padding:11px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.025)}
+.signalMetric span{display:block;color:var(--muted2);font-size:10px}
+.signalMetric b{display:block;margin-top:5px;font:700 17px var(--mono)}
+.signalList{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.signalItem{padding:8px 10px;border-left:3px solid var(--muted2);background:rgba(255,255,255,.025);font-size:11px;line-height:1.4}
+.signalItem.attention{border-left-color:var(--hi)}
+.signalItem.warning{border-left-color:var(--growth-neg)}
+.compactTableScroll{max-height:440px}
+.compactTable{min-width:820px}
+.compactTable .tableCountryButton{padding:0}
+
+.productLayout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;padding:12px 24px 24px}
+.productMain{display:flex;min-width:0;flex-direction:column;gap:12px}
+.inlineFilter{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:10px;white-space:nowrap}
+.inlineFilter select{min-width:180px;height:34px}
+.sectorTag{display:inline-block;padding:3px 6px;border-radius:999px;background:rgba(90,162,255,.09);color:var(--accent);font:9px var(--mono);text-transform:uppercase}
+.capabilityRail{display:flex;flex-direction:column;gap:10px}
+.capabilityCard{padding:16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--panel)}
+.capabilityCard h2{margin:12px 0 6px;font-size:14px}
+.capabilityCard p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+.statusPill.planned{color:var(--muted);border-style:dashed}
+.singleTop{grid-template-columns:repeat(2,minmax(0,1fr));padding-top:12px}
+.catalogList{display:flex;flex-direction:column;gap:8px}
+.catalogItem{display:grid;grid-template-columns:minmax(140px,1fr) minmax(160px,1.3fr) auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.02)}
+.catalogItem b{font-size:11px}
+.catalogItem span{color:var(--muted);font-size:10px;line-height:1.35}
+.catalogItem code{color:var(--muted2);font:10px var(--mono)}
+
+.labGrid{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(380px,1.2fr);gap:12px;padding:12px 24px 24px}
+.roadmapCard{grid-column:1/-1}
+.scenarioForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:16px}
+.scenarioForm label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:11px}
+.scenarioForm label:first-child{grid-column:1/-1}
+.scenarioForm input,.scenarioForm select{width:100%;min-width:0}
+.scenarioSource{grid-column:1/-1;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.02);font-size:10px;line-height:1.5}
+.primaryBtn{align-self:end;border-color:rgba(231,211,124,.35);color:var(--hi)}
+.scenarioResults{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.scenarioResultMetric{padding:12px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.025)}
+.scenarioResultMetric span{display:block;color:var(--muted2);font-size:10px}
+.scenarioResultMetric b{display:block;margin-top:5px;font:700 17px var(--mono)}
+.modelRoadmap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0;padding:16px;list-style:none;counter-reset:modelstep}
+.modelRoadmap li{counter-increment:modelstep;padding:14px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.02)}
+.modelRoadmap li::before{content:"0" counter(modelstep);display:block;margin-bottom:10px;color:var(--hi);font:700 11px var(--mono)}
+.modelRoadmap b,.modelRoadmap span{display:block}
+.modelRoadmap b{font-size:12px}
+.modelRoadmap span{margin-top:5px;color:var(--muted);font-size:10px;line-height:1.45}
+
+@media (max-width: 1000px){
+  .intelligenceGrid,.productLayout,.labGrid,.singleTop{grid-template-columns:1fr}
+  .rankingCard,.roadmapCard{grid-column:auto}
+  .capabilityRail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .modelRoadmap{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width: 650px){
+  .tabBar{padding:0 10px}
+  .sectionIntro{margin:10px 10px 0;padding:17px;flex-direction:column}
+  .sectionIntro h1{font-size:20px}
+  .intelligenceGrid,.productLayout,.labGrid{padding:10px}
+  .capabilityRail,.modelRoadmap,.scenarioForm{grid-template-columns:1fr}
+  .scenarioForm label:first-child{grid-column:auto}
+  .scenarioSource{grid-column:auto}
+  .catalogItem{grid-template-columns:1fr}
+}

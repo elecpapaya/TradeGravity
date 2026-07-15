@@ -9,6 +9,7 @@
   const COLORS = new Set(["value", "growth"]);
   const MODES = new Set(["comparable", "all"]);
   const NORMALIZATIONS = new Set(["raw", "per_capita", "gdp_share"]);
+  const TABS = new Set(["overview", "intelligence", "products", "quality", "lab"]);
 
   function clean(value, max = 100) {
     return String(value || "").trim().slice(0, max);
@@ -18,7 +19,7 @@
     return {
       metric: "trade", color: "value", top: 25, mode: "comparable",
       period: "latest", region: "", income: "", group: "",
-      normalization: "raw", country: "", query: "",
+      normalization: "raw", country: "", query: "", tab: "overview", sector: "all",
     };
   }
 
@@ -43,6 +44,8 @@
       normalization: NORMALIZATIONS.has(normalization) ? normalization : defaults.normalization,
       country: clean(params.get("country"), 3).toUpperCase(),
       query: clean(params.get("q")),
+      tab: TABS.has(clean(params.get("tab"))) ? clean(params.get("tab")) : defaults.tab,
+      sector: /^(all|[a-z0-9_-]{1,40})$/.test(clean(params.get("sector"))) ? clean(params.get("sector")) : defaults.sector,
     };
   }
 
@@ -61,6 +64,8 @@
     if (values.normalization !== defaults.normalization) params.set("normalize", values.normalization);
     if (values.country) params.set("country", clean(values.country, 3).toUpperCase());
     if (values.query) params.set("q", clean(values.query));
+    if (values.tab !== defaults.tab && TABS.has(values.tab)) params.set("tab", values.tab);
+    if (values.sector !== defaults.sector && /^(all|[a-z0-9_-]{1,40})$/.test(values.sector)) params.set("sector", values.sector);
     return params.toString();
   }
 

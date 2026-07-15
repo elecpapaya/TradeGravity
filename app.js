@@ -10,6 +10,10 @@ const META_URL = "./data/meta.json";
 const SERIES_URL = "./data/series.json";
 const QUALITY_URL = "./data/quality.json";
 const PRODUCTS_INDEX_URL = "./data/products/index.json";
+const STRATEGIC_INDEX_URL = "./data/strategic-hs6/index.json";
+const TARIFF_INDEX_URL = "./data/tariffs/index.json";
+const MATRIX_INDEX_URL = "./data/bilateral-matrix/index.json";
+const CATALOG_URL = "./data/catalog.json";
 const security = globalThis.TradeGravitySecurity;
 if (!security) {
   throw new Error("TradeGravity security helpers failed to load.");
@@ -22,6 +26,10 @@ const explorerTools = globalThis.TradeGravityExplorerTools;
 if (!explorerTools) {
   throw new Error("TradeGravity explorer helpers failed to load.");
 }
+const intelligenceTools = globalThis.TradeGravityIntelligenceTools;
+if (!intelligenceTools) {
+  throw new Error("TradeGravity intelligence helpers failed to load.");
+}
 const { encodeCSV, escapeHTML, normalizeISO2, normalizeISO3, safeHTTPSURL } = security;
 const { buildCSVMatrix: createCSVMatrix } = dataTools;
 const {
@@ -33,6 +41,14 @@ const {
   parseViewState,
   serializeViewState,
 } = explorerTools;
+const {
+  buildAnchorNetwork,
+	buildPartnerNetwork,
+  buildIntelligenceProfile,
+  estimateTariffScenario,
+  rankExposureRows,
+  selectPreferredTariffs,
+} = intelligenceTools;
 
 const els = {
   svgUSA: document.getElementById("svg-usa"),
@@ -66,6 +82,31 @@ const els = {
   products: document.getElementById("products"),
   qualityDashboard: document.getElementById("qualityDashboard"),
   explanation: document.getElementById("explanation"),
+  dashboardTabs: document.getElementById("dashboardTabs"),
+  intelligenceSummary: document.getElementById("intelligenceSummary"),
+  networkChart: document.getElementById("networkChart"),
+	networkTitle: document.getElementById("networkTitle"),
+	networkDescription: document.getElementById("networkDescription"),
+	networkNote: document.getElementById("networkNote"),
+	intelligenceScopeBadge: document.getElementById("intelligenceScopeBadge"),
+  exposureRankingBody: document.getElementById("exposureRankingBody"),
+  productAvailability: document.getElementById("productAvailability"),
+  strategicSectorFilter: document.getElementById("strategicSectorFilter"),
+  strategicProducts: document.getElementById("strategicProducts"),
+  strategicCapabilityStatus: document.getElementById("strategicCapabilityStatus"),
+  strategicCapabilityText: document.getElementById("strategicCapabilityText"),
+  tariffCapabilityStatus: document.getElementById("tariffCapabilityStatus"),
+  tariffCapabilityText: document.getElementById("tariffCapabilityText"),
+  dataCatalog: document.getElementById("dataCatalog"),
+  scenarioForm: document.getElementById("scenarioForm"),
+  scenarioPartner: document.getElementById("scenarioPartner"),
+  scenarioProduct: document.getElementById("scenarioProduct"),
+  scenarioTariffBase: document.getElementById("scenarioTariffBase"),
+  scenarioTariffChange: document.getElementById("scenarioTariffChange"),
+  scenarioElasticity: document.getElementById("scenarioElasticity"),
+  scenarioPassThrough: document.getElementById("scenarioPassThrough"),
+  scenarioTariffSource: document.getElementById("scenarioTariffSource"),
+  scenarioResult: document.getElementById("scenarioResult"),
 };
 
 let state = {
@@ -73,8 +114,16 @@ let state = {
   rows: [],
   seriesRows: [],
   quality: null,
+  catalog: null,
   productIndex: null,
+  strategicIndex: null,
+  tariffIndex: null,
+	matrixIndex: null,
   productCache: {},
+  strategicCache: {},
+  tariffCache: {},
+	matrixCache: {},
+	matrixPromises: {},
   explanationCache: {},
   metric: "trade",
   colorMode: "value",
@@ -92,6 +141,8 @@ let state = {
   income: "",
   group: "",
   normalization: "raw",
+  tab: "overview",
+  strategicSector: "all",
 };
 
 // Minimal ISO3->ISO2 fallback map (overridden by iso3_to_iso2.json if present).
@@ -373,8 +424,17 @@ function selectCountry(row){
   setIndicators(row);
   renderTimeSeries();
   renderProducts();
+  renderStrategicProducts();
   renderExplanation();
   renderDataTable();
+  renderIntelligence();
+  renderScenarioBaseline();
+}
+
+function formatNominalUSD(value){
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "—";
+  return `${number < 0 ? "−" : ""}$${fmt(Math.abs(number))}`;
 }
 
 function renderDataTable(){
@@ -719,6 +779,8 @@ function currentViewState(){
     normalization: state.normalization,
     country: state.selectedRow?.iso3 || "",
     query: state.tableQuery,
+    tab: state.tab,
+    sector: state.strategicSector,
   };
 }
 
@@ -790,6 +852,49 @@ function populateExplorerControls(){
   fillSelect(els.regionFilter, regions, "All regions");
   fillSelect(els.incomeFilter, incomes, "All income groups");
   fillSelect(els.groupFilter, groups, "All groups");
+}
+
+function populateStrategicControls(){
+  if (!els.strategicSectorFilter) return;
+  const sectors = Array.isArray(state.strategicIndex?.sectors) ? state.strategicIndex.sectors : [];
+  const fragment = document.createDocumentFragment();
+  const all = document.createElement("option");
+  all.value = "all";
+  all.textContent = "All strategic sectors";
+  fragment.appendChild(all);
+  for (const sector of sectors) {
+    const option = document.createElement("option");
+    option.value = sector;
+    option.textContent = sector.replaceAll("_", " ").replace(/\b\w/g, char => char.toUpperCase());
+    fragment.appendChild(option);
+  }
+  els.strategicSectorFilter.replaceChildren(fragment);
+  if (state.strategicSector !== "all" && !sectors.includes(state.strategicSector)) {
+    state.strategicSector = "all";
+  }
+  els.strategicSectorFilter.value = state.strategicSector;
+
+  if (els.scenarioProduct) {
+    const products = Array.isArray(state.tariffIndex?.products) && state.tariffIndex.products.length > 0
+      ? state.tariffIndex.products
+      : (Array.isArray(state.strategicIndex?.products) ? state.strategicIndex.products : []);
+    const selectedCode = els.scenarioProduct.value;
+    const productFragment = document.createDocumentFragment();
+    const aggregate = document.createElement("option");
+    aggregate.value = "";
+    aggregate.textContent = "Aggregate imports (manual tariff)";
+    productFragment.appendChild(aggregate);
+    for (const product of products) {
+      if (!/^\d{6}$/.test(String(product.code || ""))) continue;
+      const option = document.createElement("option");
+      option.value = product.code;
+      option.textContent = `${product.code} · ${product.label}`;
+      productFragment.appendChild(option);
+    }
+    els.scenarioProduct.replaceChildren(productFragment);
+    const codes = products.map(product => product.code);
+    els.scenarioProduct.value = codes.includes(selectedCode) ? selectedCode : (codes.includes("854231") ? "854231" : "");
+  }
 }
 
 function syncExplorerControls(){
@@ -900,6 +1005,109 @@ async function renderProducts(){
   }
 }
 
+function strategicRegistryTable(products){
+  const rows = products.map(product => `<tr><td><span class="sectorTag">${escapeHTML(product.sector.replaceAll("_", " "))}</span></td><td><span class="evidenceTag">HS ${escapeHTML(product.code)}</span><br>${escapeHTML(product.label)}</td><td>${escapeHTML(product.revision_note)}</td></tr>`).join("");
+  return `<table class="miniTable"><thead><tr><th>Sector</th><th>Product</th><th>Revision scope</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function requestedAnnualPeriod(){
+  if (state.period === "latest") return "";
+  const period = state.period.split(":").slice(1).join(":");
+  return /^\d{4}$/.test(period) ? period : "";
+}
+
+async function loadStrategicPartition(iso3){
+  if (!/^[A-Z]{3}$/.test(String(iso3 || ""))) return null;
+  const partitions = (state.strategicIndex?.partitions || [])
+    .filter(partition => partition.reporter_iso3 === iso3 && /^\d{4}$/.test(String(partition.period || "")))
+    .sort((a, b) => String(b.period).localeCompare(String(a.period)));
+  if (partitions.length === 0) return null;
+  const requested = requestedAnnualPeriod();
+  const partition = partitions.find(item => item.period === requested) || partitions[0];
+  const cacheKey = `${iso3}/${partition.period}`;
+  if (!state.strategicCache[cacheKey]) {
+    state.strategicCache[cacheKey] = fetch(`./data/strategic-hs6/${iso3}/${partition.period}.json`, { cache: "no-store" }).then(response => {
+      if (!response.ok) throw new Error(`strategic HS6 request failed (${response.status})`);
+      return response.json();
+    }).catch(error => {
+      delete state.strategicCache[cacheKey];
+      throw error;
+    });
+  }
+  return { partition, requested, file: await state.strategicCache[cacheKey] };
+}
+
+async function loadTariffPartition(iso3){
+  if (!/^[A-Z]{3}$/.test(String(iso3 || ""))) return null;
+  const partitions = (state.tariffIndex?.partitions || [])
+    .filter(partition => partition.importer_iso3 === iso3 && /^\d{4}$/.test(String(partition.year || "")))
+    .sort((a, b) => String(b.year).localeCompare(String(a.year)));
+  if (partitions.length === 0) return null;
+  const requested = requestedAnnualPeriod();
+  const partition = partitions.find(item => item.year === requested) || partitions[0];
+  const cacheKey = `${iso3}/${partition.year}`;
+  if (!state.tariffCache[cacheKey]) {
+    state.tariffCache[cacheKey] = fetch(`./data/tariffs/${iso3}/${partition.year}.json`, { cache: "no-store" }).then(response => {
+      if (!response.ok) throw new Error(`tariff request failed (${response.status})`);
+      return response.json();
+    }).catch(error => {
+      delete state.tariffCache[cacheKey];
+      throw error;
+    });
+  }
+  return { partition, requested, file: await state.tariffCache[cacheKey] };
+}
+
+function tariffRateLabel(row){
+  if (!row || !Number.isFinite(Number(row.rate_percent))) return "—";
+  const method = row.data_type === "ave_estimated" ? "incl. AVE" : "reported";
+  return `${Number(row.rate_percent).toFixed(2)}% · ${method}`;
+}
+
+async function renderStrategicProducts(){
+  if (!els.strategicProducts) return;
+  const index = state.strategicIndex;
+  if (!index || !Array.isArray(index.products)) {
+    els.strategicProducts.textContent = "No strategic HS6 registry is published.";
+    return;
+  }
+  const registryProducts = index.products.filter(product => state.strategicSector === "all" || product.sector === state.strategicSector);
+  const selected = state.selectedRow;
+  if (!selected) {
+    els.strategicProducts.innerHTML = `${strategicRegistryTable(registryProducts)}<div class="analysisNote">Registry ${Number(index.products.length)} products · ${Number(index.sectors?.length || 0)} sectors. Select a reporter to load available trade and tariff partitions.</div>`;
+    return;
+  }
+  els.strategicProducts.textContent = "Loading strategic HS6 trade and tariff partitions…";
+  try {
+    const [tradePartition, tariffPartition] = await Promise.all([
+      loadStrategicPartition(selected.iso3),
+      loadTariffPartition(selected.iso3),
+    ]);
+    if (state.selectedRow?.iso3 !== selected.iso3) return;
+    const tradeByCode = new Map((tradePartition?.file?.rows || []).map(row => [row.code, row]));
+    const tariffByCode = selectPreferredTariffs(tariffPartition?.file?.rows || []);
+    const rows = registryProducts.map(product => {
+      const trade = tradeByCode.get(product.code);
+      const usa = trade ? normalizedMetricValue({ ...selected, usa: trade.usa }, "usa", state.metric, state.normalization) : null;
+      const chn = trade ? normalizedMetricValue({ ...selected, chn: trade.chn }, "chn", state.metric, state.normalization) : null;
+      return { ...product, trade, tariff: tariffByCode.get(product.code), normalizedUSA: usa, normalizedCHN: chn, normalizedTotal: Number.isFinite(usa) || Number.isFinite(chn) ? (Number(usa) || 0) + (Number(chn) || 0) : null };
+    }).sort((a, b) => (Number(b.normalizedTotal) || 0) - (Number(a.normalizedTotal) || 0) || a.code.localeCompare(b.code));
+    if (rows.length === 0) {
+      els.strategicProducts.textContent = "No strategic products match this sector.";
+      return;
+    }
+    const body = rows.map(row => `<tr><td><span class="sectorTag">${escapeHTML(row.sector.replaceAll("_", " "))}</span></td><td><span class="evidenceTag">HS ${escapeHTML(row.code)}</span><br>${escapeHTML(row.label)}</td><td>${escapeHTML(row.trade?.classification || row.tariff?.classification || "—")}<br><span class="subtle">${escapeHTML(row.revision_note)}</span></td><td class="numeric">${formatMetricValue(row.normalizedUSA)}</td><td class="numeric">${formatMetricValue(row.normalizedCHN)}</td><td class="numeric">${formatMetricValue(row.normalizedTotal)}</td><td class="numeric" title="MFN simple average; trade remedies are not included">${escapeHTML(tariffRateLabel(row.tariff))}</td></tr>`).join("");
+    const tradeNote = tradePartition ? `${String(tradePartition.file.provider || "").toUpperCase()} trade ${tradePartition.partition.period}` : "trade partition unavailable";
+    const tariffNote = tariffPartition ? `${String(tariffPartition.file.provider || "").toUpperCase()} MFN ${tariffPartition.partition.year}` : "tariff partition unavailable";
+    const requested = requestedAnnualPeriod();
+    const fallbacks = [tradePartition && requested && requested !== tradePartition.partition.period ? `trade→${tradePartition.partition.period}` : "", tariffPartition && requested && requested !== tariffPartition.partition.year ? `tariff→${tariffPartition.partition.year}` : ""].filter(Boolean);
+    els.strategicProducts.innerHTML = `<table class="miniTable"><thead><tr><th>Sector</th><th>HS6 product</th><th>Source revision</th><th class="numeric">USA</th><th class="numeric">China</th><th class="numeric">Combined</th><th class="numeric">MFN avg.</th></tr></thead><tbody>${body}</tbody></table><div class="analysisNote">${escapeHTML(tradeNote)} · ${escapeHTML(tariffNote)}. Source classifications remain row-level; MFN values are not bilateral trade-remedy rates.${fallbacks.length ? ` Period fallback: ${escapeHTML(fallbacks.join(", "))}.` : ""}</div>`;
+  } catch (error) {
+    console.error(error);
+    els.strategicProducts.textContent = "Failed to load this reporter's strategic trade or tariff partition.";
+  }
+}
+
 function renderQualityDashboard(){
   if (!els.qualityDashboard) return;
   const quality = state.quality;
@@ -979,6 +1187,428 @@ async function renderExplanation(){
   }
 }
 
+function intelligenceRows(){
+  return state.rows.map(row => ({
+    ...row,
+    usa: {
+      ...row.usa,
+      trade: normalizedMetricValue(row, "usa", "trade", state.normalization) ?? 0,
+      export: normalizedMetricValue(row, "usa", "export", state.normalization) ?? 0,
+      import: normalizedMetricValue(row, "usa", "import", state.normalization) ?? 0,
+    },
+    chn: {
+      ...row.chn,
+      trade: normalizedMetricValue(row, "chn", "trade", state.normalization) ?? 0,
+      export: normalizedMetricValue(row, "chn", "export", state.normalization) ?? 0,
+      import: normalizedMetricValue(row, "chn", "import", state.normalization) ?? 0,
+    },
+  }));
+}
+
+function renderIntelligenceSummary(rows){
+  if (!els.intelligenceSummary) return;
+  const selected = rows.find(row => row.iso3 === state.selectedRow?.iso3);
+  if (!selected) {
+    els.intelligenceSummary.textContent = "Select a country in Overview or the exposure ranking.";
+    return;
+  }
+  const profile = buildIntelligenceProfile(selected, state.metric);
+  const divergence = profile.growthDivergence == null ? "—" : `${(profile.growthDivergence * 100).toFixed(1)}pp`;
+  const signals = profile.signals.map(signal => `<div class="signalItem ${escapeHTML(signal.level)}">${escapeHTML(signal.label)}</div>`).join("");
+  els.intelligenceSummary.innerHTML = `
+    <div class="signalMetrics">
+      <div class="signalMetric"><span>Observed ${escapeHTML(metricLabel())}</span><b>${formatMetricValue(profile.total)}</b></div>
+      <div class="signalMetric"><span>China share</span><b>${(profile.chinaShare * 100).toFixed(1)}%</b></div>
+      <div class="signalMetric"><span>Two-partner HHI</span><b>${profile.concentration.toFixed(3)}</b></div>
+      <div class="signalMetric"><span>Net balance</span><b>${formatMetricValue(profile.netBalance)}</b></div>
+      <div class="signalMetric"><span>Growth divergence</span><b>${escapeHTML(divergence)}</b></div>
+      <div class="signalMetric"><span>Observation scope</span><b>USA + CHN</b></div>
+    </div>
+    <div class="subSectionTitle">Threshold signals for ${escapeHTML(profile.name)}</div>
+    <div class="signalList">${signals}</div>
+    <div class="analysisNote">HHI and shares cover only the two published anchor partners. They are not whole-world concentration measures.</div>`;
+}
+
+function renderExposureRanking(rows){
+  if (!els.exposureRankingBody) return;
+  const profiles = rankExposureRows(rows, state.metric);
+  const fragment = document.createDocumentFragment();
+  for (const profile of profiles) {
+    const tr = document.createElement("tr");
+    if (state.selectedRow?.iso3 === profile.iso3) tr.classList.add("is-selected");
+    const nameCell = document.createElement("td");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "tableCountryButton";
+    button.textContent = profile.name;
+    const iso = document.createElement("span");
+    iso.className = "iso";
+    iso.textContent = profile.iso3;
+    button.appendChild(iso);
+    button.addEventListener("click", () => {
+      const selected = state.rows.find(row => row.iso3 === profile.iso3);
+      if (selected) selectCountry(selected);
+    });
+    nameCell.appendChild(button);
+    tr.appendChild(nameCell);
+    appendTableCell(tr, formatMetricValue(profile.total), "numeric");
+    appendTableCell(tr, `${(profile.chinaShare * 100).toFixed(1)}%`, "numeric");
+    appendTableCell(tr, profile.concentration.toFixed(3), "numeric");
+    appendTableCell(tr, formatMetricValue(profile.netBalance), "numeric");
+    appendTableCell(tr, profile.signals[0]?.label || "—");
+    fragment.appendChild(tr);
+  }
+  els.exposureRankingBody.replaceChildren(fragment);
+}
+
+function renderAnchorNetwork(rows){
+  if (!els.networkChart || state.tab !== "intelligence") return;
+	if (els.networkTitle) els.networkTitle.textContent = "Observed anchor network";
+	if (els.networkDescription) els.networkDescription.textContent = "Filtered reporters connected to USA and China; link width represents the selected metric.";
+	if (els.networkNote) els.networkNote.textContent = "Select a country to load its reported multi-partner matrix when available. This fallback is not an inferred physical supply-chain route.";
+  const width = Math.max(500, els.networkChart.getBoundingClientRect().width || 0);
+  const height = 330;
+  const graph = buildAnchorNetwork(rows, state.metric, Math.min(state.topN, 30));
+  const svg = d3.select(els.networkChart).attr("viewBox", `0 0 ${width} ${height}`);
+  svg.selectAll("*").remove();
+  const reporters = graph.nodes.filter(node => node.kind === "reporter");
+  const profiles = new Map(rankExposureRows(rows, state.metric).map(profile => [profile.iso3, profile]));
+  const positions = new Map([
+    ["USA", { x: 46, y: height / 2 }],
+    ["CHN", { x: width - 46, y: height / 2 }],
+  ]);
+  reporters.forEach((node, index) => {
+    const profile = profiles.get(node.id);
+    const step = reporters.length > 1 ? (height - 44) / (reporters.length - 1) : 0;
+    positions.set(node.id, {
+      x: 120 + (width - 240) * (profile?.chinaShare ?? 0.5),
+      y: reporters.length > 1 ? 22 + index * step : height / 2,
+    });
+  });
+  const maxLink = d3.max(graph.links, link => link.value) || 1;
+  const linkWidth = d3.scaleSqrt().domain([0, maxLink]).range([0.5, 7]);
+  svg.append("g").selectAll("line").data(graph.links).join("line")
+    .attr("class", "networkLink")
+    .attr("x1", link => positions.get(link.source)?.x)
+    .attr("y1", link => positions.get(link.source)?.y)
+    .attr("x2", link => positions.get(link.target)?.x)
+    .attr("y2", link => positions.get(link.target)?.y)
+    .attr("stroke-width", link => linkWidth(link.value));
+  const maxNode = d3.max(reporters, node => node.total) || 1;
+  const nodeRadius = d3.scaleSqrt().domain([0, maxNode]).range([3, 11]);
+  const groups = svg.append("g").selectAll("g").data(graph.nodes).join("g")
+    .attr("class", node => `networkNode ${node.kind}${state.selectedRow?.iso3 === node.id ? " is-selected" : ""}`)
+    .attr("transform", node => `translate(${positions.get(node.id)?.x || 0},${positions.get(node.id)?.y || 0})`)
+    .attr("tabindex", node => node.kind === "reporter" ? 0 : null)
+    .attr("role", node => node.kind === "reporter" ? "button" : null)
+    .on("click", (_, node) => {
+      if (node.kind !== "reporter") return;
+      const selected = state.rows.find(row => row.iso3 === node.id);
+      if (selected) selectCountry(selected);
+    })
+    .on("keydown", (event, node) => {
+      if (node.kind !== "reporter" || (event.key !== "Enter" && event.key !== " ")) return;
+      event.preventDefault();
+      const selected = state.rows.find(row => row.iso3 === node.id);
+      if (selected) selectCountry(selected);
+    });
+  groups.append("circle").attr("r", node => node.kind === "anchor" ? 14 : nodeRadius(node.total));
+  groups.append("text")
+    .attr("x", node => node.id === "USA" ? 20 : node.id === "CHN" ? -20 : 0)
+    .attr("y", node => node.kind === "anchor" ? 4 : -8)
+    .attr("text-anchor", node => node.id === "CHN" ? "end" : node.id === "USA" ? "start" : "middle")
+    .text(node => node.kind === "anchor" ? node.id : node.id);
+  groups.append("title").text(node => node.kind === "anchor" ? node.label : `${node.label}: ${formatMetricValue(node.total)}`);
+}
+
+function matrixPartitionFor(reporterISO3, preferredPeriod = ""){
+	const reporter = normalizeISO3(reporterISO3);
+	if (!reporter) return null;
+	const partitions = (Array.isArray(state.matrixIndex?.partitions) ? state.matrixIndex.partitions : [])
+	  .filter(partition => normalizeISO3(partition?.reporter_iso3) === reporter && /^\d{4}$/.test(String(partition?.period || "")))
+	  .sort((a, b) => String(b.period).localeCompare(String(a.period)));
+	return partitions.find(partition => String(partition.period) === String(preferredPeriod || "")) || partitions[0] || null;
+}
+
+async function loadMatrixPartition(partition){
+	const reporter = normalizeISO3(partition?.reporter_iso3);
+	const period = String(partition?.period || "");
+	if (!reporter || !/^\d{4}$/.test(period)) return null;
+	const key = `${reporter}/${period}`;
+	if (Object.prototype.hasOwnProperty.call(state.matrixCache, key)) return state.matrixCache[key];
+	if (!state.matrixPromises[key]) {
+	  state.matrixPromises[key] = fetch(`./data/bilateral-matrix/${reporter}/${period}.json`, { cache: "no-store" })
+		.then(response => response.ok ? response.json() : null)
+		.then(file => {
+		  const valid = normalizeISO3(file?.reporter_iso3) === reporter
+			&& String(file?.period || "") === period
+			&& Array.isArray(file?.rows);
+		  state.matrixCache[key] = valid ? file : null;
+		  return state.matrixCache[key];
+		})
+		.catch(() => {
+		  state.matrixCache[key] = null;
+		  return null;
+		})
+		.finally(() => { delete state.matrixPromises[key]; });
+	}
+	return state.matrixPromises[key];
+}
+
+function normalizeMatrixValue(value, selected){
+	const numeric = Math.max(0, Number(value) || 0);
+	if (state.normalization === "gdp_share") {
+	  const gdp = Number(selected?.gdp?.value);
+	  return gdp > 0 ? numeric / gdp : 0;
+	}
+	if (state.normalization === "per_capita") {
+	  const population = Number(selected?.population?.value);
+	  return population > 0 ? numeric / population : 0;
+	}
+	return numeric;
+}
+
+function renderPartnerNetwork(file, selected){
+	if (!els.networkChart || state.tab !== "intelligence") return;
+	const transformed = file.rows.map(row => ({
+	  ...row,
+	  export_usd: normalizeMatrixValue(row.export_usd, selected),
+	  import_usd: normalizeMatrixValue(row.import_usd, selected),
+	  trade_usd: normalizeMatrixValue(row.trade_usd, selected),
+	}));
+	const graph = buildPartnerNetwork(transformed, selected.iso3, state.metric, Math.min(state.topN, 30));
+	const width = Math.max(500, els.networkChart.getBoundingClientRect().width || 0);
+	const height = 330;
+	const svg = d3.select(els.networkChart).attr("viewBox", `0 0 ${width} ${height}`);
+	svg.selectAll("*").remove();
+	const center = { x: width / 2, y: height / 2 };
+	const partners = graph.nodes.filter(node => node.kind === "partner");
+	const radiusX = Math.max(150, width / 2 - 62);
+	const radiusY = height / 2 - 38;
+	const positions = new Map([[selected.iso3, center]]);
+	partners.forEach((node, index) => {
+	  const angle = -Math.PI / 2 + (index * Math.PI * 2 / Math.max(1, partners.length));
+	  positions.set(node.id, { x: center.x + Math.cos(angle) * radiusX, y: center.y + Math.sin(angle) * radiusY });
+	});
+	const maxLink = d3.max(graph.links, link => link.value) || 1;
+	const linkWidth = d3.scaleSqrt().domain([0, maxLink]).range([0.5, 8]);
+	svg.append("g").selectAll("line").data(graph.links).join("line")
+	  .attr("class", "networkLink")
+	  .attr("x1", link => positions.get(link.source)?.x)
+	  .attr("y1", link => positions.get(link.source)?.y)
+	  .attr("x2", link => positions.get(link.target)?.x)
+	  .attr("y2", link => positions.get(link.target)?.y)
+	  .attr("stroke-width", link => linkWidth(link.value));
+	const nodeRadius = d3.scaleSqrt().domain([0, maxLink]).range([3, 11]);
+	const groups = svg.append("g").selectAll("g").data(graph.nodes).join("g")
+	  .attr("class", node => `networkNode ${node.kind}`)
+	  .attr("transform", node => `translate(${positions.get(node.id)?.x || 0},${positions.get(node.id)?.y || 0})`);
+	groups.append("circle").attr("r", node => node.kind === "reporter" ? 16 : nodeRadius(node.total));
+	groups.append("text")
+	  .attr("y", node => node.kind === "reporter" ? 4 : -9)
+	  .attr("text-anchor", "middle")
+	  .text(node => node.id);
+	groups.append("title").text(node => node.kind === "reporter"
+	  ? `${selected.name || selected.iso3} (${selected.iso3})`
+	  : `${node.id}: ${formatMetricValue(node.total)}`);
+	if (els.networkTitle) els.networkTitle.textContent = `${selected.name || selected.iso3} partner network`;
+	if (els.networkDescription) els.networkDescription.textContent = `Top ${partners.length} reported partners for ${file.period}; link width represents ${metricLabel().toLowerCase()}.`;
+	if (els.networkNote) els.networkNote.textContent = `${graph.scope}. Partner totals describe reported bilateral trade, not ports, firms, intermediate-input paths, or physical rerouting.`;
+}
+
+async function renderTradeNetwork(rows){
+	const selected = rows.find(row => row.iso3 === state.selectedRow?.iso3);
+	const partition = matrixPartitionFor(selected?.iso3, selected?.comparison_period);
+	if (!selected || !partition) {
+	  renderAnchorNetwork(rows);
+	  return;
+	}
+	const selectedISO3 = selected.iso3;
+	if (els.networkNote) els.networkNote.textContent = `Loading ${selectedISO3} reported partner matrix…`;
+	const file = await loadMatrixPartition(partition);
+	if (state.tab !== "intelligence" || state.selectedRow?.iso3 !== selectedISO3) return;
+	if (!file) {
+	  renderAnchorNetwork(rows);
+	  return;
+	}
+	renderPartnerNetwork(file, selected);
+}
+
+function renderIntelligence(){
+  const rows = intelligenceRows();
+  renderIntelligenceSummary(rows);
+  renderExposureRanking(rows);
+	if (els.intelligenceScopeBadge) {
+	  els.intelligenceScopeBadge.textContent = Number(state.matrixIndex?.partitions?.length || 0) > 0 ? "Multi-partner on selection" : "Two-anchor scope";
+	}
+	renderTradeNetwork(rows);
+}
+
+function renderCatalog(){
+  if (els.productAvailability) {
+    const product = state.catalog?.resources?.find(resource => resource.id === "product_chapters");
+    const strategic = state.catalog?.resources?.find(resource => resource.id === "strategic_hs6");
+    const tariffs = state.catalog?.resources?.find(resource => resource.id === "tariff_schedules");
+    const hs2Label = product?.status === "ready" ? `HS${Number(product.product_level || 2)}` : "HS2 unknown";
+    const hs6Label = strategic?.status === "ready" ? "strategic HS6" : strategic?.status === "partial" ? "HS6 registry" : "HS6 planned";
+    const tariffLabel = tariffs?.status === "ready" ? "MFN tariffs" : "tariffs partial";
+    els.productAvailability.textContent = `${hs2Label} + ${hs6Label} + ${tariffLabel}`;
+  }
+  if (els.tariffCapabilityStatus) {
+    const partitions = Number(state.tariffIndex?.partitions?.length || 0);
+    const importers = Number(state.tariffIndex?.importers?.length || 0);
+    const observations = Number(state.tariffIndex?.observation_count || 0);
+    els.tariffCapabilityStatus.textContent = partitions > 0 ? "Available" : "Contract ready";
+    els.tariffCapabilityStatus.className = `statusPill ${partitions > 0 ? "success" : "warning"}`;
+    if (els.tariffCapabilityText) {
+      els.tariffCapabilityText.textContent = `${importers} importers · ${partitions} importer/year partitions · ${observations} revision-aware HS6 rates.`;
+    }
+  }
+  if (els.strategicCapabilityStatus) {
+    const partitions = Number(state.strategicIndex?.partitions?.length || 0);
+    const products = Number(state.strategicIndex?.products?.length || 0);
+    els.strategicCapabilityStatus.textContent = partitions > 0 ? "Available" : products > 0 ? "Registry ready" : "Unavailable";
+    els.strategicCapabilityStatus.className = `statusPill ${partitions > 0 ? "success" : "warning"}`;
+    if (els.strategicCapabilityText) {
+      els.strategicCapabilityText.textContent = `${products} curated codes · ${Number(state.strategicIndex?.sectors?.length || 0)} sectors · ${partitions} reporter/year partitions.`;
+    }
+  }
+  if (!els.dataCatalog) return;
+  const resources = state.catalog?.resources;
+  if (!Array.isArray(resources)) {
+    els.dataCatalog.textContent = "No machine-readable catalog is available for this publication.";
+    return;
+  }
+  const rows = resources.map(resource => {
+    const status = String(resource.status || "unknown");
+    const statusClass = status === "ready" ? "success" : status === "partial" ? "warning" : "planned";
+    return `<div class="catalogItem"><div><span class="statusPill ${statusClass}">${escapeHTML(status)}</span> <b>${escapeHTML(resource.title || resource.id)}</b></div><span>${escapeHTML(resource.grain || "unspecified grain")} · ${escapeHTML(resource.partitioning || "single file")}</span><code>${escapeHTML(resource.href || "not published")}</code></div>`;
+  }).join("");
+  els.dataCatalog.innerHTML = `<div class="catalogList">${rows}</div><div class="analysisNote">Catalog schema ${escapeHTML(state.catalog.schema_version || "unknown")} · generated ${escapeHTML(state.catalog.generated_at || "unknown")}. Planned resources are contracts, not data claims.</div>`;
+}
+
+async function buildScenarioContext(){
+  const selected = state.selectedRow;
+  const side = els.scenarioPartner?.value || "usa";
+  const productCode = /^\d{6}$/.test(String(els.scenarioProduct?.value || "")) ? els.scenarioProduct.value : "";
+  if (!selected) return null;
+  let tradePartition = null;
+  let tariffPartition = null;
+  if (productCode) {
+    [tradePartition, tariffPartition] = await Promise.all([
+      loadStrategicPartition(selected.iso3).catch(error => { console.warn(error); return null; }),
+      loadTariffPartition(selected.iso3).catch(error => { console.warn(error); return null; }),
+    ]);
+  }
+  const tradeRow = (tradePartition?.file?.rows || []).find(row => row.code === productCode);
+  const tariffRow = selectPreferredTariffs(tariffPartition?.file?.rows || []).get(productCode);
+  const product = (state.tariffIndex?.products || state.strategicIndex?.products || []).find(item => item.code === productCode);
+  const productBaseline = tradeRow && Number.isFinite(Number(tradeRow?.[side]?.import)) ? Number(tradeRow[side].import) : null;
+  const aggregateBaseline = Number(selected?.[side]?.import) || 0;
+  return {
+    selected, side, productCode, product, tradePartition, tariffPartition, tradeRow, tariffRow,
+    baseline: productBaseline ?? aggregateBaseline,
+    baselineKind: productBaseline == null ? "aggregate" : "hs6",
+  };
+}
+
+async function renderScenarioBaseline(){
+  if (!els.scenarioResult) return;
+  const selected = state.selectedRow;
+  if (!selected) {
+    els.scenarioResult.textContent = "Select a country in Overview or Intelligence, then run a scenario.";
+    if (els.scenarioTariffSource) els.scenarioTariffSource.textContent = "Select a reporter and product to look up a published MFN rate.";
+    return;
+  }
+  const requestedISO3 = selected.iso3;
+  const context = await buildScenarioContext();
+  if (!context || state.selectedRow?.iso3 !== requestedISO3) return;
+  const partnerName = context.side === "chn" ? "China" : "the United States";
+  const productName = context.productCode ? `${context.productCode} ${context.product?.label || "strategic product"}` : "all products";
+  if (context.productCode && els.scenarioTariffBase) {
+    els.scenarioTariffBase.value = context.tariffRow ? String(Number(context.tariffRow.rate_percent).toFixed(2)) : "0";
+  }
+  if (els.scenarioTariffSource) {
+    if (context.tariffRow) {
+      els.scenarioTariffSource.textContent = `Default: ${tariffRateLabel(context.tariffRow)} · ${context.tariffRow.classification}/${context.tariffRow.nomenclature} · ${context.tariffPartition.partition.year} · ${String(context.tariffPartition.file.provider || "").toUpperCase()} · WLD/MFN schedule.`;
+    } else if (context.productCode) {
+      els.scenarioTariffSource.textContent = `No published MFN rate for ${context.selected.iso3}/${context.productCode}; enter the existing rate manually.`;
+    } else {
+      els.scenarioTariffSource.textContent = "Aggregate mode has no defensible single HS6 tariff. Enter the existing rate manually.";
+    }
+  }
+  const baselineNote = context.baselineKind === "hs6"
+    ? `HS6 import baseline from ${context.tradePartition.partition.period}.`
+    : `HS6 imports are unavailable, so this preview uses aggregate partner imports; do not interpret it as a product forecast.`;
+  els.scenarioResult.innerHTML = `<div class="signalMetric"><span>${escapeHTML(context.selected.name)} imports of ${escapeHTML(productName)} from ${escapeHTML(partnerName)}</span><b>${formatNominalUSD(context.baseline)}</b></div><div class="analysisNote">${escapeHTML(baselineNote)} Ready to run with the visible assumptions.</div>`;
+}
+
+async function runScenario(){
+  if (!els.scenarioResult || !state.selectedRow) {
+    await renderScenarioBaseline();
+    return;
+  }
+  const context = await buildScenarioContext();
+  if (!context) return;
+  const result = estimateTariffScenario({
+    baselineImport: context.baseline,
+    existingTariffPct: els.scenarioTariffBase?.value,
+    tariffChangePct: els.scenarioTariffChange?.value,
+    elasticity: els.scenarioElasticity?.value,
+    passThrough: els.scenarioPassThrough?.value,
+  });
+  els.scenarioResult.innerHTML = `
+    <div class="scenarioResults">
+      <div class="scenarioResultMetric"><span>Baseline imports</span><b>${formatNominalUSD(result.baselineImport)}</b></div>
+      <div class="scenarioResultMetric"><span>Illustrative imports</span><b>${formatNominalUSD(result.projectedImport)}</b></div>
+      <div class="scenarioResultMetric"><span>Import response</span><b>${fmtPct(result.responseRatio)}</b></div>
+      <div class="scenarioResultMetric"><span>Illustrative change</span><b>${formatNominalUSD(result.importChange)}</b></div>
+      <div class="scenarioResultMetric"><span>Tariff rate</span><b>${result.existingTariffPct.toFixed(1)}% → ${result.projectedTariffRate.toFixed(1)}%</b></div>
+      <div class="scenarioResultMetric"><span>Revenue change</span><b>${formatNominalUSD(result.revenueChange)}</b></div>
+    </div>
+    <div class="analysisNote">${escapeHTML(result.warning)} ${context.baselineKind === "hs6" ? `HS6 baseline ${escapeHTML(context.tradePartition.partition.period)}.` : "Aggregate baseline fallback; product interpretation is not valid."} ${context.tariffRow ? `MFN source ${escapeHTML(context.tariffPartition.partition.year)} ${escapeHTML(context.tariffRow.classification)}.` : "Tariff entered manually."} Elasticity ${result.elasticity.toFixed(2)} · pass-through ${result.passThrough.toFixed(2)} · response capped at −95%.</div>`;
+}
+
+function setActiveTab(tab, options = {}){
+  const allowed = new Set(["overview", "intelligence", "products", "quality", "lab"]);
+  state.tab = allowed.has(tab) ? tab : "overview";
+  const buttons = els.dashboardTabs?.querySelectorAll("[role='tab']") || [];
+  buttons.forEach(button => {
+    const active = button.dataset.tab === state.tab;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", String(active));
+    button.tabIndex = active ? 0 : -1;
+    if (active && options.focus) button.focus();
+  });
+  document.querySelectorAll("[data-tab-panel]").forEach(panel => {
+    panel.hidden = panel.dataset.tabPanel !== state.tab;
+  });
+  if (options.syncURL !== false) syncURL();
+  if (state.tab === "intelligence") renderIntelligence();
+  if (state.tab === "lab") renderScenarioBaseline();
+}
+
+function initializeTabs(){
+  if (!els.dashboardTabs) return;
+  els.dashboardTabs.addEventListener("click", event => {
+    const button = event.target.closest("[role='tab']");
+    if (button?.dataset.tab) setActiveTab(button.dataset.tab);
+  });
+  els.dashboardTabs.addEventListener("keydown", event => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    const buttons = Array.from(els.dashboardTabs.querySelectorAll("[role='tab']"));
+    const index = buttons.indexOf(document.activeElement);
+    if (index < 0) return;
+    event.preventDefault();
+    let next = index;
+    if (event.key === "ArrowLeft") next = (index - 1 + buttons.length) % buttons.length;
+    if (event.key === "ArrowRight") next = (index + 1) % buttons.length;
+    if (event.key === "Home") next = 0;
+    if (event.key === "End") next = buttons.length - 1;
+    setActiveTab(buttons[next].dataset.tab, { focus: true });
+  });
+}
+
 function renderAll(){
   const rows = state.rows;
   buildTreemap(els.svgUSA, "usa", rows);
@@ -993,8 +1623,12 @@ function renderAll(){
   renderDataTable();
   renderTimeSeries();
   renderProducts();
+  renderStrategicProducts();
   renderQualityDashboard();
   renderExplanation();
+  renderIntelligence();
+  renderCatalog();
+  if (state.tab === "lab") renderScenarioBaseline();
 }
 
 async function setIndicators(row){
@@ -1168,12 +1802,16 @@ async function main(){
     console.warn("[TradeGravity] iso3_to_iso2.json not loaded, using fallback map.", err);
   }
 
-  const [res, metaRes, seriesRes, qualityRes, productIndexRes] = await Promise.all([
+  const [res, metaRes, seriesRes, qualityRes, productIndexRes, strategicIndexRes, tariffIndexRes, matrixIndexRes, catalogRes] = await Promise.all([
     fetch(DATA_URL, { cache: "no-store" }),
     fetch(META_URL, { cache: "no-store" }).catch(() => null),
     fetch(SERIES_URL, { cache: "no-store" }).catch(() => null),
     fetch(QUALITY_URL, { cache: "no-store" }).catch(() => null),
     fetch(PRODUCTS_INDEX_URL, { cache: "no-store" }).catch(() => null),
+    fetch(STRATEGIC_INDEX_URL, { cache: "no-store" }).catch(() => null),
+    fetch(TARIFF_INDEX_URL, { cache: "no-store" }).catch(() => null),
+	  fetch(MATRIX_INDEX_URL, { cache: "no-store" }).catch(() => null),
+    fetch(CATALOG_URL, { cache: "no-store" }).catch(() => null),
   ]);
   if (!res.ok) throw new Error(`Dataset request failed (${res.status})`);
   const data = await res.json();
@@ -1184,6 +1822,10 @@ async function main(){
   const series = seriesRes?.ok ? await seriesRes.json().catch(() => null) : null;
   const quality = qualityRes?.ok ? await qualityRes.json().catch(() => null) : null;
   const productIndex = productIndexRes?.ok ? await productIndexRes.json().catch(() => null) : null;
+  const strategicIndex = strategicIndexRes?.ok ? await strategicIndexRes.json().catch(() => null) : null;
+  const tariffIndex = tariffIndexRes?.ok ? await tariffIndexRes.json().catch(() => null) : null;
+	const matrixIndex = matrixIndexRes?.ok ? await matrixIndexRes.json().catch(() => null) : null;
+  const catalog = catalogRes?.ok ? await catalogRes.json().catch(() => null) : null;
 
   state.generatedAt = data.generated_at || data.generatedAt || "-";
   state.schemaVersion = String(metadata?.schema_version || data.schema_version || "");
@@ -1192,6 +1834,10 @@ async function main(){
   state.seriesRows = Array.isArray(series?.rows) ? series.rows : [];
   state.quality = quality;
   state.productIndex = productIndex;
+  state.strategicIndex = strategicIndex;
+  state.tariffIndex = tariffIndex;
+	state.matrixIndex = matrixIndex;
+  state.catalog = catalog;
   state.meta = metadata;
   const initialView = parseViewState(window.location.search);
   state.metric = initialView.metric;
@@ -1204,6 +1850,11 @@ async function main(){
   state.group = initialView.group;
   state.normalization = initialView.normalization;
   state.tableQuery = initialView.query;
+  state.tab = initialView.tab;
+  state.strategicSector = initialView.sector;
+  populateStrategicControls();
+  initializeTabs();
+  setActiveTab(state.tab, { syncURL: false });
   populateExplorerControls();
   syncExplorerControls();
   refreshRows({ syncURL: false });
@@ -1298,6 +1949,25 @@ async function main(){
       setTimeout(() => { els.copyShareURL.textContent = "Copy view URL"; }, 1500);
     });
   }
+  if (els.scenarioPartner) {
+    els.scenarioPartner.addEventListener("change", renderScenarioBaseline);
+  }
+  if (els.scenarioProduct) {
+    els.scenarioProduct.addEventListener("change", renderScenarioBaseline);
+  }
+  if (els.scenarioForm) {
+    els.scenarioForm.addEventListener("submit", event => {
+      event.preventDefault();
+      runScenario();
+    });
+  }
+  if (els.strategicSectorFilter) {
+    els.strategicSectorFilter.addEventListener("change", () => {
+      state.strategicSector = els.strategicSectorFilter.value;
+      syncURL();
+      renderStrategicProducts();
+    });
+  }
   window.addEventListener("popstate", () => {
     const view = parseViewState(window.location.search);
     state.metric = view.metric;
@@ -1310,10 +1980,14 @@ async function main(){
     state.group = view.group;
     state.normalization = view.normalization;
     state.tableQuery = view.query;
+    state.tab = view.tab;
+    state.strategicSector = view.sector;
     state.selectedRow = null;
     state.highlightKey = null;
     syncExplorerControls();
+    populateStrategicControls();
     refreshRows({ syncURL: false });
+    setActiveTab(view.tab, { syncURL: false });
     const selected = state.rows.find(row => row.iso3 === view.country);
     if (selected) selectCountry(selected);
   });
@@ -1327,7 +2001,8 @@ async function main(){
   syncColorButtons();
   renderAll();
   syncColorLegend();
-  setIndicators(null);
+	if (state.selectedRow) selectCountry(state.selectedRow);
+	else setIndicators(null);
 }
 
 function syncMetricButtons(){

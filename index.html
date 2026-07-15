@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Explore reproducible public trade data comparing reporter countries' trade with the United States and China." />
+  <meta name="description" content="Explore reproducible trade, supply-chain exposure, product, quality, and scenario intelligence." />
   <meta name="referrer" content="no-referrer" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://flagcdn.com; connect-src 'self' https://api.worldbank.org https://api.gdeltproject.org; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
   <title>TradeGravity – US/CN Trade Data Explorer</title>
@@ -11,14 +11,15 @@
   <script src="./security.js"></script>
   <script src="./data-tools.js"></script>
   <script src="./explorer-tools.js"></script>
+  <script src="./intelligence-tools.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 </head>
 <body>
-  <a class="skipLink" href="#dataTableTitle">Skip to accessible data table</a>
+  <a class="skipLink" href="#mainContent">Skip to dashboard content</a>
   <header class="topbar">
     <div class="brand">
       <div class="title">TradeGravity</div>
-      <div class="subtitle">Compare each country's trade with the United States and China. Tiles scale by trade/export/import, with flags and linked highlights on hover. Exports/imports are from each country's perspective; USA/CHN are the partner side.</div>
+      <div class="subtitle">From reproducible trade observations to supply-chain exposure signals. Every analytical view keeps its source scope, assumptions, and availability visible.</div>
       <div class="datasetMeta">
         <span id="dataStatus">Loading dataset metadata…</span>
         <a id="sourceLink" href="https://wits.worldbank.org/" target="_blank" rel="noopener noreferrer">Data source</a>
@@ -100,6 +101,18 @@
     </div>
   </header>
 
+  <nav class="tabBar" aria-label="Dashboard sections">
+    <div id="dashboardTabs" class="tabList" role="tablist" aria-label="TradeGravity dashboard">
+      <button id="tabButton-overview" class="tabButton is-active" type="button" role="tab" aria-selected="true" aria-controls="tab-overview" data-tab="overview">Overview</button>
+      <button id="tabButton-intelligence" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-intelligence" data-tab="intelligence" tabindex="-1">Intelligence</button>
+      <button id="tabButton-products" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-products" data-tab="products" tabindex="-1">Products</button>
+      <button id="tabButton-quality" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-quality" data-tab="quality" tabindex="-1">Data &amp; Quality</button>
+      <button id="tabButton-lab" class="tabButton" type="button" role="tab" aria-selected="false" aria-controls="tab-lab" data-tab="lab" tabindex="-1">Scenario Lab</button>
+    </div>
+  </nav>
+
+  <div id="mainContent" tabindex="-1">
+  <section id="tab-overview" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-overview" data-tab-panel="overview">
   <main class="layout" aria-label="Trade visualization and country details">
     <section class="canvas">
       <div class="grid">
@@ -139,7 +152,7 @@
     </aside>
   </main>
 
-  <section class="analysisGrid" aria-label="Selected-country analysis and data quality">
+  <section class="analysisGrid" aria-label="Selected-country overview analysis">
     <article class="analysisCard" aria-labelledby="trendTitle">
       <div class="analysisHeader">
         <div>
@@ -148,27 +161,6 @@
         </div>
       </div>
       <div id="timeSeries" class="analysisBody subtle" aria-live="polite">Select a country to view its time series.</div>
-    </article>
-
-    <article class="analysisCard" aria-labelledby="productsTitle">
-      <div class="analysisHeader">
-        <div>
-          <h2 id="productsTitle">HS2 product mix</h2>
-          <p>Top traded product chapters from UN Comtrade, kept separate from headline totals.</p>
-        </div>
-      </div>
-      <div id="products" class="analysisBody subtle" aria-live="polite">Select a country to view product chapters.</div>
-    </article>
-
-    <article class="analysisCard" aria-labelledby="qualityTitle">
-      <div class="analysisHeader">
-        <div>
-          <h2 id="qualityTitle">Data quality</h2>
-          <p>Coverage, period comparability, collection runs, and provider differences.</p>
-        </div>
-        <a href="./data/quality.json" target="_blank" rel="noopener noreferrer">Quality JSON</a>
-      </div>
-      <div id="qualityDashboard" class="analysisBody subtle" aria-live="polite">Loading quality report…</div>
     </article>
 
     <article class="analysisCard" aria-labelledby="explanationTitle">
@@ -181,6 +173,85 @@
       <div id="explanation" class="analysisBody subtle" aria-live="polite">Select a country to view its explanation.</div>
     </article>
   </section>
+  </section>
+
+  <section id="tab-intelligence" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-intelligence" data-tab-panel="intelligence" hidden>
+    <div class="sectionIntro">
+      <div>
+        <span class="eyebrow">Decision support · descriptive</span>
+        <h1>Trade exposure intelligence</h1>
+        <p>Signals are derived only from the selected USA/China observations. They indicate exposure worth investigating, not shipment routes, causality, fraud, or investment advice.</p>
+      </div>
+	  <span id="intelligenceScopeBadge" class="scopeBadge">Two-anchor scope</span>
+    </div>
+    <div class="intelligenceGrid">
+      <article class="analysisCard intelligenceProfile" aria-labelledby="intelligenceTitle">
+        <div class="analysisHeader"><div><h2 id="intelligenceTitle">Selected-country signals</h2><p>Concentration, balance, and partner growth divergence with explicit thresholds.</p></div></div>
+        <div id="intelligenceSummary" class="analysisBody subtle" aria-live="polite">Select a country in Overview or the ranking below.</div>
+      </article>
+      <article class="analysisCard networkCard" aria-labelledby="networkTitle">
+		<div class="analysisHeader"><div><h2 id="networkTitle">Observed anchor network</h2><p id="networkDescription">Filtered reporters connected to USA and China; link width represents the selected metric.</p></div></div>
+        <div class="analysisBody">
+          <svg id="networkChart" class="networkChart" role="img" aria-label="Network of reporter trade observations connected to USA and China"></svg>
+		  <p id="networkNote" class="analysisNote">Select a country to load its reported multi-partner matrix when available. This is not an inferred physical supply-chain route.</p>
+        </div>
+      </article>
+      <article class="analysisCard rankingCard" aria-labelledby="rankingTitle">
+        <div class="analysisHeader"><div><h2 id="rankingTitle">Exposure ranking</h2><p>Compare scale, China share, concentration, balance, and current growth signals.</p></div></div>
+        <div class="tableScroll compactTableScroll" tabindex="0">
+          <table class="tradeTable compactTable">
+            <thead><tr><th>Reporter</th><th class="numeric">Observed value</th><th class="numeric">China share</th><th class="numeric">2-partner HHI</th><th class="numeric">Net balance</th><th>Signal</th></tr></thead>
+            <tbody id="exposureRankingBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="tab-products" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-products" data-tab-panel="products" hidden>
+    <div class="sectionIntro">
+      <div><span class="eyebrow">Product drill-down</span><h1>Strategic product explorer</h1><p>Compare reproducible HS2/HS6 trade with source-revision-aware MFN tariff schedules.</p></div>
+      <span id="productAvailability" class="scopeBadge">Checking catalog…</span>
+    </div>
+    <div class="productLayout">
+      <div class="productMain">
+        <article class="analysisCard" aria-labelledby="productsTitle">
+          <div class="analysisHeader"><div><h2 id="productsTitle">HS2 product mix</h2><p>Top traded product chapters from UN Comtrade, kept separate from headline totals.</p></div></div>
+          <div id="products" class="analysisBody subtle" aria-live="polite">Select a country to view product chapters.</div>
+        </article>
+        <article class="analysisCard" aria-labelledby="strategicProductsTitle">
+          <div class="analysisHeader">
+            <div><h2 id="strategicProductsTitle">Strategic HS6 trade &amp; tariffs</h2><p>Curated semiconductors, EV batteries, critical minerals, data infrastructure, and solar products.</p></div>
+            <label class="inlineFilter"><span>Sector</span><select id="strategicSectorFilter"><option value="all">All strategic sectors</option></select></label>
+          </div>
+          <div id="strategicProducts" class="analysisBody subtle" aria-live="polite">Loading strategic HS6 registry…</div>
+        </article>
+      </div>
+      <aside class="capabilityRail" aria-label="Product intelligence expansion status">
+        <article class="capabilityCard"><span class="statusPill success">Available</span><h2>HS2 chapters</h2><p>Reporter-partitioned files keep the initial page load small.</p></article>
+        <article class="capabilityCard"><span id="strategicCapabilityStatus" class="statusPill warning">Checking</span><h2>Curated HS6</h2><p id="strategicCapabilityText">Semiconductors, batteries, EVs, critical minerals, data infrastructure, and solar with revision-aware codes.</p></article>
+        <article class="capabilityCard"><span id="tariffCapabilityStatus" class="statusPill warning">Checking</span><h2>Tariff schedules</h2><p id="tariffCapabilityText">MFN and preferential rates remain separate from observed trade and retain their source HS revision.</p></article>
+      </aside>
+    </div>
+  </section>
+
+  <section id="tab-quality" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-quality" data-tab-panel="quality" hidden>
+    <div class="sectionIntro">
+      <div><span class="eyebrow">Provenance first</span><h1>Data catalog and quality</h1><p>Inspect coverage before interpretation, then export the exact filtered observations behind a view.</p></div>
+    </div>
+    <section class="analysisGrid singleTop" aria-label="Data quality overview">
+      <article class="analysisCard" aria-labelledby="qualityTitle">
+        <div class="analysisHeader">
+          <div><h2 id="qualityTitle">Data quality</h2><p>Coverage, period comparability, collection runs, and provider differences.</p></div>
+          <a href="./data/quality.json" target="_blank" rel="noopener noreferrer">Quality JSON</a>
+        </div>
+        <div id="qualityDashboard" class="analysisBody subtle" aria-live="polite">Loading quality report…</div>
+      </article>
+      <article class="analysisCard" aria-labelledby="catalogTitle">
+        <div class="analysisHeader"><div><h2 id="catalogTitle">Dataset catalog</h2><p>Machine-readable resource inventory, granularity, partitioning, and readiness.</p></div><a href="./data/catalog.json" target="_blank" rel="noopener noreferrer">Catalog JSON</a></div>
+        <div id="dataCatalog" class="analysisBody subtle" aria-live="polite">Loading dataset catalog…</div>
+      </article>
+    </section>
 
   <section class="dataTableCard" aria-labelledby="dataTableTitle" aria-describedby="dataTableHelp">
     <div class="tableHeader">
@@ -214,6 +285,43 @@
       </table>
     </div>
   </section>
+  </section>
+
+  <section id="tab-lab" class="tabPanel" role="tabpanel" aria-labelledby="tabButton-lab" data-tab-panel="lab" hidden>
+    <div class="sectionIntro">
+      <div><span class="eyebrow">Assumption-driven preview</span><h1>Tariff scenario lab</h1><p>Stress-test the selected reporter's observed imports with transparent elasticity assumptions. This does not estimate GDP, welfare, trade diversion, or causal effects.</p></div>
+      <span class="scopeBadge warningBadge">Illustrative model</span>
+    </div>
+    <div class="labGrid">
+      <article class="analysisCard scenarioFormCard" aria-labelledby="scenarioTitle">
+        <div class="analysisHeader"><div><h2 id="scenarioTitle">Scenario assumptions</h2><p>Baseline imports come from the active country, period, and partner selection.</p></div></div>
+        <form id="scenarioForm" class="scenarioForm">
+          <label><span>Partner</span><select id="scenarioPartner"><option value="usa">United States</option><option value="chn">China</option></select></label>
+          <label><span>Strategic HS6 product</span><select id="scenarioProduct"><option value="">Aggregate imports (manual tariff)</option></select></label>
+          <label><span>Existing tariff (%)</span><input id="scenarioTariffBase" type="number" min="0" max="300" step="0.1" value="0" /></label>
+          <label><span>Tariff change (percentage points)</span><input id="scenarioTariffChange" type="number" min="-100" max="300" step="0.1" value="10" /></label>
+          <label><span>Import-demand elasticity</span><input id="scenarioElasticity" type="number" min="-10" max="-0.05" step="0.05" value="-1.5" /></label>
+          <label><span>Price pass-through (0–1)</span><input id="scenarioPassThrough" type="number" min="0" max="1" step="0.05" value="1" /></label>
+          <div id="scenarioTariffSource" class="scenarioSource subtle" aria-live="polite">Select a reporter and product to look up a published MFN rate.</div>
+          <button class="btn primaryBtn" type="submit">Run illustration</button>
+        </form>
+      </article>
+      <article class="analysisCard" aria-labelledby="scenarioResultTitle">
+        <div class="analysisHeader"><div><h2 id="scenarioResultTitle">Illustrative result</h2><p>Constant-elasticity arithmetic with a lower bound; all assumptions remain visible.</p></div></div>
+        <div id="scenarioResult" class="analysisBody subtle" aria-live="polite">Select a country in Overview or Intelligence, then run a scenario.</div>
+      </article>
+      <article class="analysisCard roadmapCard" aria-labelledby="modelRoadmapTitle">
+        <div class="analysisHeader"><div><h2 id="modelRoadmapTitle">Path to a production model</h2><p>Required before results can be described as SMART-like.</p></div></div>
+        <ol class="modelRoadmap">
+          <li><b>Tariff schedules</b><span>Product-, partner-, regime-, and year-specific rates.</span></li>
+          <li><b>Elasticity registry</b><span>Source, product level, uncertainty, and version.</span></li>
+          <li><b>Substitution model</b><span>Trade creation/diversion and alternative suppliers.</span></li>
+          <li><b>Validation</b><span>Backtests, sensitivity intervals, and model cards.</span></li>
+        </ol>
+      </article>
+    </div>
+  </section>
+  </div>
 
   <div id="tooltip" class="tooltip" role="status" aria-live="polite" style="display:none;"></div>
   <script src="./app.js"></script>

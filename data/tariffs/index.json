@@ -1,0 +1,439 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-15T15:03:32Z",
+  "provider": "trains",
+  "level": 6,
+  "importers": [
+    "ARE",
+    "ARG",
+    "AUS",
+    "AUT",
+    "BGD",
+    "BRA",
+    "CAN",
+    "CHE",
+    "CHL",
+    "CHN",
+    "COL",
+    "CZE",
+    "EGY",
+    "FIN",
+    "HUN",
+    "IDN",
+    "IND",
+    "ISR",
+    "JPN",
+    "KAZ",
+    "KOR",
+    "MEX",
+    "MYS",
+    "NGA",
+    "NOR",
+    "NZL",
+    "PAK",
+    "PER",
+    "PHL",
+    "POL",
+    "RUS",
+    "SAU",
+    "SGP",
+    "SWE",
+    "THA",
+    "TUR",
+    "UKR",
+    "USA",
+    "VNM",
+    "ZAF"
+  ],
+  "exporters": [
+    "WLD"
+  ],
+  "years": [
+    "2021",
+    "2020",
+    "2019",
+    "2018",
+    "2003",
+    "2002",
+    "1990",
+    "1989"
+  ],
+  "data_types": [
+    "ave_estimated",
+    "reported"
+  ],
+  "rate_types": [
+    "mfn_applied"
+  ],
+  "products": [
+    {
+      "code": "260300",
+      "sector": "critical_minerals",
+      "label": "Copper ores and concentrates",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Upstream copper supply exposure"
+    },
+    {
+      "code": "282520",
+      "sector": "critical_minerals",
+      "label": "Lithium oxide and hydroxide",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Processed lithium compounds"
+    },
+    {
+      "code": "283691",
+      "sector": "critical_minerals",
+      "label": "Lithium carbonates",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Processed lithium compounds"
+    },
+    {
+      "code": "284690",
+      "sector": "critical_minerals",
+      "label": "Other rare-earth compounds",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Rare-earth compounds outside cerium compounds"
+    },
+    {
+      "code": "847150",
+      "sector": "data_infrastructure",
+      "label": "Processing units",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Broad processing-unit trade rather than AI chips alone"
+    },
+    {
+      "code": "851762",
+      "sector": "data_infrastructure",
+      "label": "Network transmission equipment",
+      "revision_note": "HS 2007 and later",
+      "notes": "Routing switching and data-transmission equipment"
+    },
+    {
+      "code": "850760",
+      "sector": "ev_batteries",
+      "label": "Lithium-ion accumulators",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Finished lithium-ion cells and batteries"
+    },
+    {
+      "code": "850790",
+      "sector": "ev_batteries",
+      "label": "Electric accumulator parts",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Broader accumulator parts exposure"
+    },
+    {
+      "code": "870380",
+      "sector": "ev_batteries",
+      "label": "Battery-electric passenger vehicles",
+      "revision_note": "HS 2017 and later",
+      "notes": "Passenger vehicles with only an electric motor for propulsion"
+    },
+    {
+      "code": "848620",
+      "sector": "semiconductors",
+      "label": "Semiconductor manufacturing machinery",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Wafer and semiconductor-device manufacturing equipment"
+    },
+    {
+      "code": "854231",
+      "sector": "semiconductors",
+      "label": "Processors and controllers",
+      "revision_note": "HS 2007 and later",
+      "notes": "Electronic integrated circuits"
+    },
+    {
+      "code": "854232",
+      "sector": "semiconductors",
+      "label": "Memories",
+      "revision_note": "HS 2007 and later",
+      "notes": "Electronic integrated circuits"
+    },
+    {
+      "code": "854233",
+      "sector": "semiconductors",
+      "label": "Amplifiers",
+      "revision_note": "HS 2007 and later",
+      "notes": "Electronic integrated circuits"
+    },
+    {
+      "code": "854239",
+      "sector": "semiconductors",
+      "label": "Other integrated circuits",
+      "revision_note": "HS 2007 and later",
+      "notes": "Electronic integrated circuits not covered by the selected functional codes"
+    },
+    {
+      "code": "854290",
+      "sector": "semiconductors",
+      "label": "Integrated-circuit parts",
+      "revision_note": "Compatible HS revisions",
+      "notes": "Parts of electronic integrated circuits"
+    },
+    {
+      "code": "854140",
+      "sector": "solar",
+      "label": "Photosensitive semiconductor devices legacy group",
+      "revision_note": "Through HS 2017",
+      "notes": "Includes photovoltaic cells before the HS 2022 split"
+    },
+    {
+      "code": "854142",
+      "sector": "solar",
+      "label": "Photovoltaic cells not assembled in modules",
+      "revision_note": "HS 2022 and later",
+      "notes": "Use only where the source classification supports HS 2022"
+    },
+    {
+      "code": "854143",
+      "sector": "solar",
+      "label": "Photovoltaic cells assembled in modules or panels",
+      "revision_note": "HS 2022 and later",
+      "notes": "Use only where the source classification supports HS 2022"
+    }
+  ],
+  "partitions": [
+    {
+      "importer_iso3": "ARE",
+      "year": "2021",
+      "href": "./ARE/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "ARG",
+      "year": "2021",
+      "href": "./ARG/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "AUS",
+      "year": "2021",
+      "href": "./AUS/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "AUT",
+      "year": "1990",
+      "href": "./AUT/1990.json",
+      "row_count": 7
+    },
+    {
+      "importer_iso3": "BGD",
+      "year": "2021",
+      "href": "./BGD/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "BRA",
+      "year": "2021",
+      "href": "./BRA/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "CAN",
+      "year": "2021",
+      "href": "./CAN/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "CHE",
+      "year": "2021",
+      "href": "./CHE/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "CHL",
+      "year": "2021",
+      "href": "./CHL/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "CHN",
+      "year": "2021",
+      "href": "./CHN/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "COL",
+      "year": "2021",
+      "href": "./COL/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "CZE",
+      "year": "2003",
+      "href": "./CZE/2003.json",
+      "row_count": 8
+    },
+    {
+      "importer_iso3": "EGY",
+      "year": "2019",
+      "href": "./EGY/2019.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "FIN",
+      "year": "1990",
+      "href": "./FIN/1990.json",
+      "row_count": 7
+    },
+    {
+      "importer_iso3": "HUN",
+      "year": "2002",
+      "href": "./HUN/2002.json",
+      "row_count": 8
+    },
+    {
+      "importer_iso3": "IDN",
+      "year": "2021",
+      "href": "./IDN/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "IND",
+      "year": "2021",
+      "href": "./IND/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "ISR",
+      "year": "2021",
+      "href": "./ISR/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "JPN",
+      "year": "2021",
+      "href": "./JPN/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "KAZ",
+      "year": "2021",
+      "href": "./KAZ/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "KOR",
+      "year": "2021",
+      "href": "./KOR/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "MEX",
+      "year": "2018",
+      "href": "./MEX/2018.json",
+      "row_count": 15
+    },
+    {
+      "importer_iso3": "MYS",
+      "year": "2021",
+      "href": "./MYS/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "NGA",
+      "year": "2021",
+      "href": "./NGA/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "NOR",
+      "year": "2021",
+      "href": "./NOR/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "NZL",
+      "year": "2021",
+      "href": "./NZL/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "PAK",
+      "year": "2021",
+      "href": "./PAK/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "PER",
+      "year": "2021",
+      "href": "./PER/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "PHL",
+      "year": "2021",
+      "href": "./PHL/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "POL",
+      "year": "2003",
+      "href": "./POL/2003.json",
+      "row_count": 8
+    },
+    {
+      "importer_iso3": "RUS",
+      "year": "2021",
+      "href": "./RUS/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "SAU",
+      "year": "2020",
+      "href": "./SAU/2020.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "SGP",
+      "year": "2021",
+      "href": "./SGP/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "SWE",
+      "year": "1989",
+      "href": "./SWE/1989.json",
+      "row_count": 7
+    },
+    {
+      "importer_iso3": "THA",
+      "year": "2021",
+      "href": "./THA/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "TUR",
+      "year": "2021",
+      "href": "./TUR/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "UKR",
+      "year": "2021",
+      "href": "./UKR/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "USA",
+      "year": "2021",
+      "href": "./USA/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "VNM",
+      "year": "2021",
+      "href": "./VNM/2021.json",
+      "row_count": 16
+    },
+    {
+      "importer_iso3": "ZAF",
+      "year": "2021",
+      "href": "./ZAF/2021.json",
+      "row_count": 16
+    }
+  ],
+  "observation_count": 588
+}
