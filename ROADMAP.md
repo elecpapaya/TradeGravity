@@ -4,7 +4,7 @@ TradeGravity is maintained as a small, inspectable public-data pipeline with an 
 
 ## Current maintenance commitments
 
-- Run the collection and GitHub Pages deployment workflow daily.
+- Run the staggered collection and GitHub Pages deployment workflows weekly, with manual refreshes available for urgent source updates.
 - Investigate failed scheduled runs and upstream schema changes.
 - Review dependencies, documentation, and security alerts at least monthly.
 - Keep source attribution, reporting periods, and transformation rules visible.

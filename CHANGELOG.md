@@ -21,7 +21,8 @@ All notable changes to TradeGravity will be documented in this file. The project
 
 ### Changed
 
-- The provider refresh is split into a core workflow and a quota-spaced semiconductor workflow; annual strategic HS6 collection is bounded to the declared connector allowlist instead of querying every headline reporter.
+- The provider refresh runs weekly and is split into a core workflow and a quota-spaced semiconductor workflow; annual strategic HS6 collection is bounded to the declared connector allowlist instead of querying every headline reporter.
+- WITS/TRAINS requests now declare annual frequency and split large strategic HS6 registries into server-safe 20-code batches.
 - The scheduled strategic HS6 collection now requests the selected year plus four prior annual periods and a focused 12-month panel; main-branch fast deploys preserve the latest observed coverage block while refreshing the versioned semiconductor reference.
 - Intelligence and semiconductor navigation now state the explicit US–China perspective while keeping reported observations, context, and illustrative estimates separate.
 - Recent headline panels now state their rolling window beside the selected historical trade periods and explicitly warn that the clocks are not aligned.

@@ -25,12 +25,13 @@ const (
 	defaultBaseURL          = "https://wits.worldbank.org/API/V1/"
 	defaultCountriesPath    = "wits/datasource/trn/country/ALL"
 	defaultAvailabilityPath = "wits/datasource/trn/dataavailability/country/{reporter}/year/all"
-	defaultDataPath         = "SDMX/V21/rest/data/DF_WITS_Tariff_TRAINS/.{reporter}.{partner}.{products}.{datatype}/"
+	defaultDataPath         = "SDMX/V21/rest/data/DF_WITS_Tariff_TRAINS/A.{reporter}.{partner}.{products}.{datatype}/"
 	defaultTimeout          = 45 * time.Second
 	defaultUserAgent        = "TradeGravity/0.1"
 	defaultRetries          = 2
 	defaultBackoff          = 500 * time.Millisecond
 	maxProductCodes         = 50
+	maxProductsPerRequest   = 20
 	sdmxJSONAccept          = "application/vnd.sdmx.data+json;version=1.0.0-wd"
 )
 
@@ -218,30 +219,38 @@ func (p *Provider) FetchTariffs(ctx context.Context, importerISO3, exporterISO3,
 		return nil, fmt.Errorf("%w for importer=%s year=%s", ErrAVEUnavailable, importerISO3, year)
 	}
 
-	path := p.config.DataPath
-	replacements := map[string]string{
-		"{reporter}": importer.Code,
-		"{partner}":  exporter.Code,
-		"{products}": strings.Join(normalizedCodes, "+"),
-		"{datatype}": dataTypePath,
-	}
-	for placeholder, value := range replacements {
-		path = strings.ReplaceAll(path, placeholder, value)
-	}
 	query := url.Values{"startperiod": {year}, "endperiod": {year}}
-	body, err := p.doRequest(ctx, path, query, sdmxJSONAccept)
-	if err != nil {
-		return nil, err
-	}
-	var payload sdmxResponse
-	decoder := json.NewDecoder(bytes.NewReader(body))
-	decoder.UseNumber()
-	if err := decoder.Decode(&payload); err != nil {
-		return nil, fmt.Errorf("trains: decode tariff response: %w", err)
-	}
-	observations, err := parseTariffs(payload, importerISO3, exporterISO3, exporter.Code, dataType, available.UpdatedAt)
-	if err != nil {
-		return nil, err
+	observations := make([]model.TariffObservation, 0)
+	for start := 0; start < len(normalizedCodes); start += maxProductsPerRequest {
+		end := min(start+maxProductsPerRequest, len(normalizedCodes))
+		path := p.config.DataPath
+		replacements := map[string]string{
+			"{reporter}": importer.Code,
+			"{partner}":  exporter.Code,
+			"{products}": strings.Join(normalizedCodes[start:end], "+"),
+			"{datatype}": dataTypePath,
+		}
+		for placeholder, value := range replacements {
+			path = strings.ReplaceAll(path, placeholder, value)
+		}
+		body, requestErr := p.doRequest(ctx, path, query, sdmxJSONAccept)
+		if errors.Is(requestErr, ErrNoRecords) {
+			continue
+		}
+		if requestErr != nil {
+			return nil, requestErr
+		}
+		var payload sdmxResponse
+		decoder := json.NewDecoder(bytes.NewReader(body))
+		decoder.UseNumber()
+		if err := decoder.Decode(&payload); err != nil {
+			return nil, fmt.Errorf("trains: decode tariff response: %w", err)
+		}
+		rows, parseErr := parseTariffs(payload, importerISO3, exporterISO3, exporter.Code, dataType, available.UpdatedAt)
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		observations = append(observations, rows...)
 	}
 	if len(observations) == 0 {
 		return nil, ErrNoRecords

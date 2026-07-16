@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -59,7 +60,7 @@ func TestFetchTariffsMapsCountriesAvailabilityAndSDMXAttributes(t *testing.T) {
 		case request.URL.Path == "/wits/datasource/trn/dataavailability/country/840/year/all":
 			writer.Header().Set("Content-Type", "application/xml")
 			_, _ = writer.Write([]byte(availabilityFixture))
-		case strings.Contains(request.URL.Path, "/DF_WITS_Tariff_TRAINS/.840.000.020110.aveestimated/"):
+		case strings.Contains(request.URL.Path, "/DF_WITS_Tariff_TRAINS/A.840.000.020110.aveestimated/"):
 			dataRequests.Add(1)
 			if request.URL.Query().Get("startperiod") != "2021" || request.URL.Query().Get("endperiod") != "2021" {
 				t.Fatalf("unexpected period query: %s", request.URL.RawQuery)
@@ -99,6 +100,51 @@ func TestFetchTariffsMapsCountriesAvailabilityAndSDMXAttributes(t *testing.T) {
 	}
 	if row.SourceUpdatedAt.Format("2006-01-02") != "2025-08-11" {
 		t.Fatalf("source updated = %v", row.SourceUpdatedAt)
+	}
+}
+
+func TestFetchTariffsBatchesProductCodesForWITSLimit(t *testing.T) {
+	var dataRequests atomic.Int32
+	paths := make(chan string, 2)
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		switch {
+		case request.URL.Path == "/wits/datasource/trn/country/ALL":
+			_, _ = writer.Write([]byte(countriesFixture))
+		case request.URL.Path == "/wits/datasource/trn/dataavailability/country/840/year/all":
+			_, _ = writer.Write([]byte(availabilityFixture))
+		case strings.Contains(request.URL.Path, "/DF_WITS_Tariff_TRAINS/A.840.000."):
+			dataRequests.Add(1)
+			paths <- request.URL.Path
+			writer.Header().Set("Content-Type", "application/json")
+			_, _ = writer.Write([]byte(tariffFixture))
+		default:
+			http.NotFound(writer, request)
+		}
+	}))
+	defer server.Close()
+
+	provider, err := NewWithConfig(Config{BaseURL: server.URL, Timeout: time.Second, Retries: 0, Backoff: time.Millisecond})
+	if err != nil {
+		t.Fatal(err)
+	}
+	codes := make([]string, 0, 21)
+	for code := 100000; code < 100021; code++ {
+		codes = append(codes, fmt.Sprintf("%06d", code))
+	}
+	rows, err := provider.FetchTariffs(context.Background(), "USA", "WLD", "2021", codes, model.TariffAVEEstimated)
+	if err != nil {
+		t.Fatal(err)
+	}
+	close(paths)
+	requestedPaths := make([]string, 0, 2)
+	for path := range paths {
+		requestedPaths = append(requestedPaths, path)
+	}
+	if dataRequests.Load() != 2 || len(rows) != 2 || len(requestedPaths) != 2 {
+		t.Fatalf("requests/rows/paths = %d/%d/%d, want 2/2/2", dataRequests.Load(), len(rows), len(requestedPaths))
+	}
+	if strings.Count(requestedPaths[0], "+") != 19 || strings.Contains(requestedPaths[1], "+") {
+		t.Fatalf("unexpected batch paths: %#v", requestedPaths)
 	}
 }
 
