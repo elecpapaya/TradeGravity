@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-16T08:51:09Z",
+  "provider": "comtrade",
+  "reporter_iso3": "CHE",
+  "period": "2023",
+  "scope": "Unadjusted bilateral mirror-reporting diagnostics; neither reporter is treated as ground truth",
+  "caveats": [
+    "Differences can reflect CIF/FOB valuation, timing, classification, partner attribution, re-exports, and revisions.",
+    "These diagnostics are not fraud, evasion, transshipment, or physical-route estimates."
+  ],
+  "rows": [
+    {
+      "anchor_iso3": "USA",
+      "reporter_export_available": true,
+      "anchor_import_available": false,
+      "reporter_export_usd": 62852531481.607,
+      "anchor_import_usd": 0,
+      "reporter_import_available": true,
+      "anchor_export_available": false,
+      "reporter_import_usd": 33040039793.519,
+      "anchor_export_usd": 0
+    },
+    {
+      "anchor_iso3": "CHN",
+      "reporter_export_available": true,
+      "anchor_import_available": false,
+      "reporter_export_usd": 45163448765.534,
+      "anchor_import_usd": 0,
+      "reporter_import_available": true,
+      "anchor_export_available": false,
+      "reporter_import_usd": 20478766240.603,
+      "anchor_export_usd": 0
+    }
+  ]
+}

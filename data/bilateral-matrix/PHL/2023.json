@@ -1,0 +1,1982 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-16T08:51:09Z",
+  "provider": "comtrade",
+  "product_code": "TOTAL",
+  "product_level": 0,
+  "reporter_iso3": "PHL",
+  "period": "2023",
+  "rows": [
+    {
+      "partner_iso3": "CHN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 10925417700,
+      "import_usd": 30942921448,
+      "trade_usd": 41868339148,
+      "balance_usd": -20017503748
+    },
+    {
+      "partner_iso3": "JPN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 10455788964,
+      "import_usd": 10950071163,
+      "trade_usd": 21405860127,
+      "balance_usd": -494282199
+    },
+    {
+      "partner_iso3": "USA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 11564939802,
+      "import_usd": 9116121567,
+      "trade_usd": 20681061369,
+      "balance_usd": 2448818235
+    },
+    {
+      "partner_iso3": "IDN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 748941349,
+      "import_usd": 12284549788,
+      "trade_usd": 13033491137,
+      "balance_usd": -11535608439
+    },
+    {
+      "partner_iso3": "KOR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3533831874,
+      "import_usd": 8890704004,
+      "trade_usd": 12424535878,
+      "balance_usd": -5356872130
+    },
+    {
+      "partner_iso3": "THA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2931640278,
+      "import_usd": 8188007145,
+      "trade_usd": 11119647423,
+      "balance_usd": -5256366867
+    },
+    {
+      "partner_iso3": "HKG",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 8843731591,
+      "import_usd": 2104897614,
+      "trade_usd": 10948629205,
+      "balance_usd": 6738833977
+    },
+    {
+      "partner_iso3": "SGP",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3528073982,
+      "import_usd": 7388068346,
+      "trade_usd": 10916142328,
+      "balance_usd": -3859994364
+    },
+    {
+      "partner_iso3": "MYS",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2183647959,
+      "import_usd": 6275923395,
+      "trade_usd": 8459571354,
+      "balance_usd": -4092275436
+    },
+    {
+      "partner_iso3": "VNM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1694890634,
+      "import_usd": 4974904973,
+      "trade_usd": 6669795607,
+      "balance_usd": -3280014339
+    },
+    {
+      "partner_iso3": "DEU",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2486640766,
+      "import_usd": 2274099184,
+      "trade_usd": 4760739950,
+      "balance_usd": 212541582
+    },
+    {
+      "partner_iso3": "AUS",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 561941531,
+      "import_usd": 3960173055,
+      "trade_usd": 4522114586,
+      "balance_usd": -3398231524
+    },
+    {
+      "partner_iso3": "NLD",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3088586285,
+      "import_usd": 598768670,
+      "trade_usd": 3687354955,
+      "balance_usd": 2489817615
+    },
+    {
+      "partner_iso3": "IND",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1103888271,
+      "import_usd": 2098609789,
+      "trade_usd": 3202498060,
+      "balance_usd": -994721518
+    },
+    {
+      "partner_iso3": "SAU",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 76320717,
+      "import_usd": 2396765732,
+      "trade_usd": 2473086449,
+      "balance_usd": -2320445015
+    },
+    {
+      "partner_iso3": "FRA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 680373833,
+      "import_usd": 1303491330,
+      "trade_usd": 1983865163,
+      "balance_usd": -623117497
+    },
+    {
+      "partner_iso3": "ARE",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 341966201,
+      "import_usd": 1599258606,
+      "trade_usd": 1941224807,
+      "balance_usd": -1257292405
+    },
+    {
+      "partner_iso3": "BRA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 207484925,
+      "import_usd": 1586373435,
+      "trade_usd": 1793858360,
+      "balance_usd": -1378888510
+    },
+    {
+      "partner_iso3": "CAN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 582996684,
+      "import_usd": 995749220,
+      "trade_usd": 1578745904,
+      "balance_usd": -412752536
+    },
+    {
+      "partner_iso3": "GBR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 512243065,
+      "import_usd": 836080215,
+      "trade_usd": 1348323280,
+      "balance_usd": -323837150
+    },
+    {
+      "partner_iso3": "MEX",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 906709604,
+      "import_usd": 387720747,
+      "trade_usd": 1294430351,
+      "balance_usd": 518988857
+    },
+    {
+      "partner_iso3": "ITA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 264125835,
+      "import_usd": 991540103,
+      "trade_usd": 1255665938,
+      "balance_usd": -727414268
+    },
+    {
+      "partner_iso3": "ESP",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 239018390,
+      "import_usd": 702339051,
+      "trade_usd": 941357441,
+      "balance_usd": -463320661
+    },
+    {
+      "partner_iso3": "BEL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 233894579,
+      "import_usd": 423282732,
+      "trade_usd": 657177311,
+      "balance_usd": -189388153
+    },
+    {
+      "partner_iso3": "IRL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 132446307,
+      "import_usd": 397997625,
+      "trade_usd": 530443932,
+      "balance_usd": -265551318
+    },
+    {
+      "partner_iso3": "NZL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 66811384,
+      "import_usd": 457564899,
+      "trade_usd": 524376283,
+      "balance_usd": -390753515
+    },
+    {
+      "partner_iso3": "ARG",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 86438489,
+      "import_usd": 436067796,
+      "trade_usd": 522506285,
+      "balance_usd": -349629307
+    },
+    {
+      "partner_iso3": "QAT",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 54716382,
+      "import_usd": 438346904,
+      "trade_usd": 493063286,
+      "balance_usd": -383630522
+    },
+    {
+      "partner_iso3": "ISR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 144006622,
+      "import_usd": 348315260,
+      "trade_usd": 492321882,
+      "balance_usd": -204308638
+    },
+    {
+      "partner_iso3": "KWT",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 24343311,
+      "import_usd": 386173496,
+      "trade_usd": 410516807,
+      "balance_usd": -361830185
+    },
+    {
+      "partner_iso3": "IRQ",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4145515,
+      "import_usd": 385405997,
+      "trade_usd": 389551512,
+      "balance_usd": -381260482
+    },
+    {
+      "partner_iso3": "CZE",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 216207975,
+      "import_usd": 162731578,
+      "trade_usd": 378939553,
+      "balance_usd": 53476397
+    },
+    {
+      "partner_iso3": "DNK",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 87245563,
+      "import_usd": 287675872,
+      "trade_usd": 374921435,
+      "balance_usd": -200430309
+    },
+    {
+      "partner_iso3": "POL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 225170453,
+      "import_usd": 143553777,
+      "trade_usd": 368724230,
+      "balance_usd": 81616676
+    },
+    {
+      "partner_iso3": "AUT",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 201349745,
+      "import_usd": 159950317,
+      "trade_usd": 361300062,
+      "balance_usd": 41399428
+    },
+    {
+      "partner_iso3": "BRN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 52581888,
+      "import_usd": 289339778,
+      "trade_usd": 341921666,
+      "balance_usd": -236757890
+    },
+    {
+      "partner_iso3": "PNG",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 18744206,
+      "import_usd": 253160480,
+      "trade_usd": 271904686,
+      "balance_usd": -234416274
+    },
+    {
+      "partner_iso3": "MMR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 61691911,
+      "import_usd": 186283102,
+      "trade_usd": 247975013,
+      "balance_usd": -124591191
+    },
+    {
+      "partner_iso3": "SWE",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 41845893,
+      "import_usd": 199932247,
+      "trade_usd": 241778140,
+      "balance_usd": -158086354
+    },
+    {
+      "partner_iso3": "LTU",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 9701314,
+      "import_usd": 223117096,
+      "trade_usd": 232818410,
+      "balance_usd": -213415782
+    },
+    {
+      "partner_iso3": "TUR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 69796043,
+      "import_usd": 156209003,
+      "trade_usd": 226005046,
+      "balance_usd": -86412960
+    },
+    {
+      "partner_iso3": "RUS",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 52790136,
+      "import_usd": 166720563,
+      "trade_usd": 219510699,
+      "balance_usd": -113930427
+    },
+    {
+      "partner_iso3": "ZAF",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 121653495,
+      "import_usd": 77436366,
+      "trade_usd": 199089861,
+      "balance_usd": 44217129
+    },
+    {
+      "partner_iso3": "HUN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 138168621,
+      "import_usd": 38398149,
+      "trade_usd": 176566770,
+      "balance_usd": 99770472
+    },
+    {
+      "partner_iso3": "PAK",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 22576810,
+      "import_usd": 153618257,
+      "trade_usd": 176195067,
+      "balance_usd": -131041447
+    },
+    {
+      "partner_iso3": "FIN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 15912890,
+      "import_usd": 141707510,
+      "trade_usd": 157620400,
+      "balance_usd": -125794620
+    },
+    {
+      "partner_iso3": "CHL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 37836412,
+      "import_usd": 118742846,
+      "trade_usd": 156579258,
+      "balance_usd": -80906434
+    },
+    {
+      "partner_iso3": "OMN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4469793,
+      "import_usd": 140708460,
+      "trade_usd": 145178253,
+      "balance_usd": -136238667
+    },
+    {
+      "partner_iso3": "BGR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 95743954,
+      "import_usd": 47821716,
+      "trade_usd": 143565670,
+      "balance_usd": 47922238
+    },
+    {
+      "partner_iso3": "MAC",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 10254022,
+      "import_usd": 127491077,
+      "trade_usd": 137745099,
+      "balance_usd": -117237055
+    },
+    {
+      "partner_iso3": "BGD",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 38297797,
+      "import_usd": 94809662,
+      "trade_usd": 133107459,
+      "balance_usd": -56511865
+    },
+    {
+      "partner_iso3": "KAZ",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3101015,
+      "import_usd": 113646650,
+      "trade_usd": 116747665,
+      "balance_usd": -110545635
+    },
+    {
+      "partner_iso3": "PER",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 31868971,
+      "import_usd": 76346724,
+      "trade_usd": 108215695,
+      "balance_usd": -44477753
+    },
+    {
+      "partner_iso3": "EGY",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 7560139,
+      "import_usd": 92925691,
+      "trade_usd": 100485830,
+      "balance_usd": -85365552
+    },
+    {
+      "partner_iso3": "ROU",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 54385564,
+      "import_usd": 45985220,
+      "trade_usd": 100370784,
+      "balance_usd": 8400344
+    },
+    {
+      "partner_iso3": "KHM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 17412410,
+      "import_usd": 66369266,
+      "trade_usd": 83781676,
+      "balance_usd": -48956856
+    },
+    {
+      "partner_iso3": "GRC",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 32099825,
+      "import_usd": 49922001,
+      "trade_usd": 82021826,
+      "balance_usd": -17822176
+    },
+    {
+      "partner_iso3": "DZA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2579418,
+      "import_usd": 78294519,
+      "trade_usd": 80873937,
+      "balance_usd": -75715101
+    },
+    {
+      "partner_iso3": "NOR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 7503520,
+      "import_usd": 69181513,
+      "trade_usd": 76685033,
+      "balance_usd": -61677993
+    },
+    {
+      "partner_iso3": "SRB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 8327049,
+      "import_usd": 67453360,
+      "trade_usd": 75780409,
+      "balance_usd": -59126311
+    },
+    {
+      "partner_iso3": "PRT",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 42859167,
+      "import_usd": 21757690,
+      "trade_usd": 64616857,
+      "balance_usd": 21101477
+    },
+    {
+      "partner_iso3": "CRI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 35413103,
+      "import_usd": 21209834,
+      "trade_usd": 56622937,
+      "balance_usd": 14203269
+    },
+    {
+      "partner_iso3": "NGA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 8146732,
+      "import_usd": 43639542,
+      "trade_usd": 51786274,
+      "balance_usd": -35492810
+    },
+    {
+      "partner_iso3": "MAR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 17176970,
+      "import_usd": 30097825,
+      "trade_usd": 47274795,
+      "balance_usd": -12920855
+    },
+    {
+      "partner_iso3": "SVN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2439741,
+      "import_usd": 39487623,
+      "trade_usd": 41927364,
+      "balance_usd": -37047882
+    },
+    {
+      "partner_iso3": "SVK",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 33557126,
+      "import_usd": 5800643,
+      "trade_usd": 39357769,
+      "balance_usd": 27756483
+    },
+    {
+      "partner_iso3": "MHL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3594788,
+      "import_usd": 35041042,
+      "trade_usd": 38635830,
+      "balance_usd": -31446254
+    },
+    {
+      "partner_iso3": "IRN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 37671831,
+      "import_usd": 383977,
+      "trade_usd": 38055808,
+      "balance_usd": 37287854
+    },
+    {
+      "partner_iso3": "COL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 24009130,
+      "import_usd": 13726234,
+      "trade_usd": 37735364,
+      "balance_usd": 10282896
+    },
+    {
+      "partner_iso3": "MLT",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 32736483,
+      "import_usd": 3347712,
+      "trade_usd": 36084195,
+      "balance_usd": 29388771
+    },
+    {
+      "partner_iso3": "DOM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 21466171,
+      "import_usd": 8597552,
+      "trade_usd": 30063723,
+      "balance_usd": 12868619
+    },
+    {
+      "partner_iso3": "LKA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 15871043,
+      "import_usd": 12961131,
+      "trade_usd": 28832174,
+      "balance_usd": 2909912
+    },
+    {
+      "partner_iso3": "FSM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 5331381,
+      "import_usd": 21481062,
+      "trade_usd": 26812443,
+      "balance_usd": -16149681
+    },
+    {
+      "partner_iso3": "URY",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 16054955,
+      "import_usd": 10321024,
+      "trade_usd": 26375979,
+      "balance_usd": 5733931
+    },
+    {
+      "partner_iso3": "TUN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 16729671,
+      "import_usd": 8511881,
+      "trade_usd": 25241552,
+      "balance_usd": 8217790
+    },
+    {
+      "partner_iso3": "GUM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 22727816,
+      "import_usd": 1469290,
+      "trade_usd": 24197106,
+      "balance_usd": 21258526
+    },
+    {
+      "partner_iso3": "ERI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 89238,
+      "import_usd": 23842614,
+      "trade_usd": 23931852,
+      "balance_usd": -23753376
+    },
+    {
+      "partner_iso3": "NRU",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 227741,
+      "import_usd": 22924246,
+      "trade_usd": 23151987,
+      "balance_usd": -22696505
+    },
+    {
+      "partner_iso3": "CYP",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4494439,
+      "import_usd": 17461909,
+      "trade_usd": 21956348,
+      "balance_usd": -12967470
+    },
+    {
+      "partner_iso3": "LAO",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1381044,
+      "import_usd": 19216760,
+      "trade_usd": 20597804,
+      "balance_usd": -17835716
+    },
+    {
+      "partner_iso3": "BHR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 8790270,
+      "import_usd": 11402127,
+      "trade_usd": 20192397,
+      "balance_usd": -2611857
+    },
+    {
+      "partner_iso3": "JOR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4230404,
+      "import_usd": 15006684,
+      "trade_usd": 19237088,
+      "balance_usd": -10776280
+    },
+    {
+      "partner_iso3": "MDV",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 16643628,
+      "import_usd": 1281967,
+      "trade_usd": 17925595,
+      "balance_usd": 15361661
+    },
+    {
+      "partner_iso3": "AGO",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1381391,
+      "import_usd": 15480282,
+      "trade_usd": 16861673,
+      "balance_usd": -14098891
+    },
+    {
+      "partner_iso3": "SYC",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2589587,
+      "import_usd": 10714561,
+      "trade_usd": 13304148,
+      "balance_usd": -8124974
+    },
+    {
+      "partner_iso3": "ECU",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4102053,
+      "import_usd": 8971300,
+      "trade_usd": 13073353,
+      "balance_usd": -4869247
+    },
+    {
+      "partner_iso3": "PAN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 7900343,
+      "import_usd": 4996323,
+      "trade_usd": 12896666,
+      "balance_usd": 2904020
+    },
+    {
+      "partner_iso3": "TGO",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 191725,
+      "import_usd": 11421900,
+      "trade_usd": 11613625,
+      "balance_usd": -11230175
+    },
+    {
+      "partner_iso3": "LUX",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 7339583,
+      "import_usd": 3857249,
+      "trade_usd": 11196832,
+      "balance_usd": 3482334
+    },
+    {
+      "partner_iso3": "UKR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1158993,
+      "import_usd": 10000582,
+      "trade_usd": 11159575,
+      "balance_usd": -8841589
+    },
+    {
+      "partner_iso3": "BLR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 97806,
+      "import_usd": 10829986,
+      "trade_usd": 10927792,
+      "balance_usd": -10732180
+    },
+    {
+      "partner_iso3": "UZB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4458751,
+      "import_usd": 6396313,
+      "trade_usd": 10855064,
+      "balance_usd": -1937562
+    },
+    {
+      "partner_iso3": "EST",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3486776,
+      "import_usd": 7027655,
+      "trade_usd": 10514431,
+      "balance_usd": -3540879
+    },
+    {
+      "partner_iso3": "MUS",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1658924,
+      "import_usd": 8266195,
+      "trade_usd": 9925119,
+      "balance_usd": -6607271
+    },
+    {
+      "partner_iso3": "MKD",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 9122304,
+      "import_usd": 597742,
+      "trade_usd": 9720046,
+      "balance_usd": 8524562
+    },
+    {
+      "partner_iso3": "LVA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 5365782,
+      "import_usd": 3291556,
+      "trade_usd": 8657338,
+      "balance_usd": 2074226
+    },
+    {
+      "partner_iso3": "GTM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2991025,
+      "import_usd": 5560870,
+      "trade_usd": 8551895,
+      "balance_usd": -2569845
+    },
+    {
+      "partner_iso3": "CUB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3809254,
+      "import_usd": 4291170,
+      "trade_usd": 8100424,
+      "balance_usd": -481916
+    },
+    {
+      "partner_iso3": "TZA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1512185,
+      "import_usd": 5904526,
+      "trade_usd": 7416711,
+      "balance_usd": -4392341
+    },
+    {
+      "partner_iso3": "KEN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3036599,
+      "import_usd": 4224152,
+      "trade_usd": 7260751,
+      "balance_usd": -1187553
+    },
+    {
+      "partner_iso3": "BIH",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 114725,
+      "import_usd": 7139039,
+      "trade_usd": 7253764,
+      "balance_usd": -7024314
+    },
+    {
+      "partner_iso3": "SLB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1495424,
+      "import_usd": 5341003,
+      "trade_usd": 6836427,
+      "balance_usd": -3845579
+    },
+    {
+      "partner_iso3": "HND",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2724806,
+      "import_usd": 3932941,
+      "trade_usd": 6657747,
+      "balance_usd": -1208135
+    },
+    {
+      "partner_iso3": "VUT",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1176114,
+      "import_usd": 5315096,
+      "trade_usd": 6491210,
+      "balance_usd": -4138982
+    },
+    {
+      "partner_iso3": "GAB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2703,
+      "import_usd": 6473742,
+      "trade_usd": 6476445,
+      "balance_usd": -6471039
+    },
+    {
+      "partner_iso3": "GEO",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2379096,
+      "import_usd": 3487037,
+      "trade_usd": 5866133,
+      "balance_usd": -1107941
+    },
+    {
+      "partner_iso3": "ETH",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3865841,
+      "import_usd": 1937074,
+      "trade_usd": 5802915,
+      "balance_usd": 1928767
+    },
+    {
+      "partner_iso3": "GHA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3641957,
+      "import_usd": 2089471,
+      "trade_usd": 5731428,
+      "balance_usd": 1552486
+    },
+    {
+      "partner_iso3": "NCL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 5337738,
+      "import_usd": 97358,
+      "trade_usd": 5435096,
+      "balance_usd": 5240380
+    },
+    {
+      "partner_iso3": "MWI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 79,
+      "import_usd": 4733175,
+      "trade_usd": 4733254,
+      "balance_usd": -4733096
+    },
+    {
+      "partner_iso3": "CMR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3732957,
+      "import_usd": 980227,
+      "trade_usd": 4713184,
+      "balance_usd": 2752730
+    },
+    {
+      "partner_iso3": "MNP",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4483109,
+      "import_usd": 4482,
+      "trade_usd": 4487591,
+      "balance_usd": 4478627
+    },
+    {
+      "partner_iso3": "HRV",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2634783,
+      "import_usd": 1636385,
+      "trade_usd": 4271168,
+      "balance_usd": 998398
+    },
+    {
+      "partner_iso3": "ZWE",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 42223,
+      "import_usd": 4173040,
+      "trade_usd": 4215263,
+      "balance_usd": -4130817
+    },
+    {
+      "partner_iso3": "GNQ",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 21655,
+      "import_usd": 4127711,
+      "trade_usd": 4149366,
+      "balance_usd": -4106056
+    },
+    {
+      "partner_iso3": "CUW",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4014946,
+      "import_usd": 103170,
+      "trade_usd": 4118116,
+      "balance_usd": 3911776
+    },
+    {
+      "partner_iso3": "PLW",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 4058072,
+      "import_usd": 20372,
+      "trade_usd": 4078444,
+      "balance_usd": 4037700
+    },
+    {
+      "partner_iso3": "LBN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3739984,
+      "import_usd": 181988,
+      "trade_usd": 3921972,
+      "balance_usd": 3557996
+    },
+    {
+      "partner_iso3": "VEN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 798863,
+      "import_usd": 2871530,
+      "trade_usd": 3670393,
+      "balance_usd": -2072667
+    },
+    {
+      "partner_iso3": "ASM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3470798,
+      "import_usd": 123578,
+      "trade_usd": 3594376,
+      "balance_usd": 3347220
+    },
+    {
+      "partner_iso3": "MNG",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3099235,
+      "import_usd": 254312,
+      "trade_usd": 3353547,
+      "balance_usd": 2844923
+    },
+    {
+      "partner_iso3": "KIR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 645597,
+      "import_usd": 2513483,
+      "trade_usd": 3159080,
+      "balance_usd": -1867886
+    },
+    {
+      "partner_iso3": "COG",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2885127,
+      "import_usd": 4818,
+      "trade_usd": 2889945,
+      "balance_usd": 2880309
+    },
+    {
+      "partner_iso3": "PRY",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2354630,
+      "import_usd": 506811,
+      "trade_usd": 2861441,
+      "balance_usd": 1847819
+    },
+    {
+      "partner_iso3": "WSM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2051066,
+      "import_usd": 738862,
+      "trade_usd": 2789928,
+      "balance_usd": 1312204
+    },
+    {
+      "partner_iso3": "NPL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2594226,
+      "import_usd": 145338,
+      "trade_usd": 2739564,
+      "balance_usd": 2448888
+    },
+    {
+      "partner_iso3": "YEM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2696322,
+      "import_usd": 84,
+      "trade_usd": 2696406,
+      "balance_usd": 2696238
+    },
+    {
+      "partner_iso3": "ISL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1799738,
+      "import_usd": 609739,
+      "trade_usd": 2409477,
+      "balance_usd": 1189999
+    },
+    {
+      "partner_iso3": "FJI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2242831,
+      "import_usd": 123661,
+      "trade_usd": 2366492,
+      "balance_usd": 2119170
+    },
+    {
+      "partner_iso3": "BOL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2145233,
+      "import_usd": 211670,
+      "trade_usd": 2356903,
+      "balance_usd": 1933563
+    },
+    {
+      "partner_iso3": "SLV",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1273568,
+      "import_usd": 983787,
+      "trade_usd": 2257355,
+      "balance_usd": 289781
+    },
+    {
+      "partner_iso3": "JAM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 425011,
+      "import_usd": 1695138,
+      "trade_usd": 2120149,
+      "balance_usd": -1270127
+    },
+    {
+      "partner_iso3": "CIV",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2039043,
+      "import_usd": 612,
+      "trade_usd": 2039655,
+      "balance_usd": 2038431
+    },
+    {
+      "partner_iso3": "FRO",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 1845208,
+      "trade_usd": 1845208,
+      "balance_usd": -1845208
+    },
+    {
+      "partner_iso3": "AFG",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1710775,
+      "import_usd": 19473,
+      "trade_usd": 1730248,
+      "balance_usd": 1691302
+    },
+    {
+      "partner_iso3": "MDG",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 146221,
+      "import_usd": 1473608,
+      "trade_usd": 1619829,
+      "balance_usd": -1327387
+    },
+    {
+      "partner_iso3": "MOZ",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 60101,
+      "import_usd": 1392309,
+      "trade_usd": 1452410,
+      "balance_usd": -1332208
+    },
+    {
+      "partner_iso3": "NIC",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1099187,
+      "import_usd": 313866,
+      "trade_usd": 1413053,
+      "balance_usd": 785321
+    },
+    {
+      "partner_iso3": "TUV",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 39109,
+      "import_usd": 1369232,
+      "trade_usd": 1408341,
+      "balance_usd": -1330123
+    },
+    {
+      "partner_iso3": "UGA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1124180,
+      "import_usd": 7561,
+      "trade_usd": 1131741,
+      "balance_usd": 1116619
+    },
+    {
+      "partner_iso3": "UMI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 931831,
+      "import_usd": 72855,
+      "trade_usd": 1004686,
+      "balance_usd": 858976
+    },
+    {
+      "partner_iso3": "MDA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 39554,
+      "import_usd": 770986,
+      "trade_usd": 810540,
+      "balance_usd": -731432
+    },
+    {
+      "partner_iso3": "TON",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 770582,
+      "import_usd": 422,
+      "trade_usd": 771004,
+      "balance_usd": 770160
+    },
+    {
+      "partner_iso3": "NFK",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 573802,
+      "import_usd": 145253,
+      "trade_usd": 719055,
+      "balance_usd": 428549
+    },
+    {
+      "partner_iso3": "ZMB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 211509,
+      "import_usd": 474256,
+      "trade_usd": 685765,
+      "balance_usd": -262747
+    },
+    {
+      "partner_iso3": "BLZ",
+      "export_available": true,
+      "import_available": false,
+      "export_usd": 673108,
+      "import_usd": 0,
+      "trade_usd": 673108,
+      "balance_usd": 673108
+    },
+    {
+      "partner_iso3": "ARM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 385732,
+      "import_usd": 247734,
+      "trade_usd": 633466,
+      "balance_usd": 137998
+    },
+    {
+      "partner_iso3": "TLS",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 623794,
+      "import_usd": 2075,
+      "trade_usd": 625869,
+      "balance_usd": 621719
+    },
+    {
+      "partner_iso3": "GIN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 617234,
+      "import_usd": 1930,
+      "trade_usd": 619164,
+      "balance_usd": 615304
+    },
+    {
+      "partner_iso3": "BHS",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 617213,
+      "import_usd": 1505,
+      "trade_usd": 618718,
+      "balance_usd": 615708
+    },
+    {
+      "partner_iso3": "SLE",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 379182,
+      "import_usd": 225053,
+      "trade_usd": 604235,
+      "balance_usd": 154129
+    },
+    {
+      "partner_iso3": "AND",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 186603,
+      "import_usd": 393378,
+      "trade_usd": 579981,
+      "balance_usd": -206775
+    },
+    {
+      "partner_iso3": "SEN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 517719,
+      "import_usd": 4044,
+      "trade_usd": 521763,
+      "balance_usd": 513675
+    },
+    {
+      "partner_iso3": "PYF",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 385240,
+      "import_usd": 121412,
+      "trade_usd": 506652,
+      "balance_usd": 263828
+    },
+    {
+      "partner_iso3": "AZE",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 421559,
+      "import_usd": 871,
+      "trade_usd": 422430,
+      "balance_usd": 420688
+    },
+    {
+      "partner_iso3": "KGZ",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 163860,
+      "import_usd": 257879,
+      "trade_usd": 421739,
+      "balance_usd": -94019
+    },
+    {
+      "partner_iso3": "DJI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 102273,
+      "import_usd": 210840,
+      "trade_usd": 313113,
+      "balance_usd": -108567
+    },
+    {
+      "partner_iso3": "TTO",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 285616,
+      "import_usd": 11382,
+      "trade_usd": 296998,
+      "balance_usd": 274234
+    },
+    {
+      "partner_iso3": "LBR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 284930,
+      "import_usd": 167,
+      "trade_usd": 285097,
+      "balance_usd": 284763
+    },
+    {
+      "partner_iso3": "CCK",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 217666,
+      "import_usd": 38814,
+      "trade_usd": 256480,
+      "balance_usd": 178852
+    },
+    {
+      "partner_iso3": "MNE",
+      "export_available": true,
+      "import_available": false,
+      "export_usd": 248389,
+      "import_usd": 0,
+      "trade_usd": 248389,
+      "balance_usd": 248389
+    },
+    {
+      "partner_iso3": "SDN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 205354,
+      "import_usd": 27817,
+      "trade_usd": 233171,
+      "balance_usd": 177537
+    },
+    {
+      "partner_iso3": "SMR",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 220184,
+      "trade_usd": 220184,
+      "balance_usd": -220184
+    },
+    {
+      "partner_iso3": "LBY",
+      "export_available": true,
+      "import_available": false,
+      "export_usd": 218823,
+      "import_usd": 0,
+      "trade_usd": 218823,
+      "balance_usd": 218823
+    },
+    {
+      "partner_iso3": "VGB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 77090,
+      "import_usd": 138196,
+      "trade_usd": 215286,
+      "balance_usd": -61106
+    },
+    {
+      "partner_iso3": "SYR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 194740,
+      "import_usd": 2953,
+      "trade_usd": 197693,
+      "balance_usd": 191787
+    },
+    {
+      "partner_iso3": "RWA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 195099,
+      "import_usd": 586,
+      "trade_usd": 195685,
+      "balance_usd": 194513
+    },
+    {
+      "partner_iso3": "NER",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 97200,
+      "import_usd": 85525,
+      "trade_usd": 182725,
+      "balance_usd": 11675
+    },
+    {
+      "partner_iso3": "ABW",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 176705,
+      "import_usd": 325,
+      "trade_usd": 177030,
+      "balance_usd": 176380
+    },
+    {
+      "partner_iso3": "MLI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 78611,
+      "import_usd": 93206,
+      "trade_usd": 171817,
+      "balance_usd": -14595
+    },
+    {
+      "partner_iso3": "TJK",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 147402,
+      "import_usd": 3511,
+      "trade_usd": 150913,
+      "balance_usd": 143891
+    },
+    {
+      "partner_iso3": "ALB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 50928,
+      "import_usd": 89999,
+      "trade_usd": 140927,
+      "balance_usd": -39071
+    },
+    {
+      "partner_iso3": "BTN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 137120,
+      "import_usd": 239,
+      "trade_usd": 137359,
+      "balance_usd": 136881
+    },
+    {
+      "partner_iso3": "NAM",
+      "export_available": true,
+      "import_available": false,
+      "export_usd": 124747,
+      "import_usd": 0,
+      "trade_usd": 124747,
+      "balance_usd": 124747
+    },
+    {
+      "partner_iso3": "BFA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 64564,
+      "import_usd": 51353,
+      "trade_usd": 115917,
+      "balance_usd": 13211
+    },
+    {
+      "partner_iso3": "BWA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 71675,
+      "import_usd": 13554,
+      "trade_usd": 85229,
+      "balance_usd": 58121
+    },
+    {
+      "partner_iso3": "SUR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 597,
+      "import_usd": 76615,
+      "trade_usd": 77212,
+      "balance_usd": -76018
+    },
+    {
+      "partner_iso3": "SWZ",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 19113,
+      "import_usd": 55034,
+      "trade_usd": 74147,
+      "balance_usd": -35921
+    },
+    {
+      "partner_iso3": "CYM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 70560,
+      "import_usd": 1635,
+      "trade_usd": 72195,
+      "balance_usd": 68925
+    },
+    {
+      "partner_iso3": "HTI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 200,
+      "import_usd": 52318,
+      "trade_usd": 52518,
+      "balance_usd": -52118
+    },
+    {
+      "partner_iso3": "TKL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 17404,
+      "import_usd": 31391,
+      "trade_usd": 48795,
+      "balance_usd": -13987
+    },
+    {
+      "partner_iso3": "GRD",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 26720,
+      "import_usd": 18578,
+      "trade_usd": 45298,
+      "balance_usd": 8142
+    },
+    {
+      "partner_iso3": "GMB",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 28271,
+      "import_usd": 3677,
+      "trade_usd": 31948,
+      "balance_usd": 24594
+    },
+    {
+      "partner_iso3": "GUY",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 28893,
+      "import_usd": 241,
+      "trade_usd": 29134,
+      "balance_usd": 28652
+    },
+    {
+      "partner_iso3": "BMU",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 26550,
+      "import_usd": 1169,
+      "trade_usd": 27719,
+      "balance_usd": 25381
+    },
+    {
+      "partner_iso3": "LCA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 24912,
+      "import_usd": 386,
+      "trade_usd": 25298,
+      "balance_usd": 24526
+    },
+    {
+      "partner_iso3": "LSO",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 20582,
+      "trade_usd": 20582,
+      "balance_usd": -20582
+    },
+    {
+      "partner_iso3": "TCA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 15175,
+      "import_usd": 3138,
+      "trade_usd": 18313,
+      "balance_usd": 12037
+    },
+    {
+      "partner_iso3": "MSR",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 17720,
+      "trade_usd": 17720,
+      "balance_usd": -17720
+    },
+    {
+      "partner_iso3": "SOM",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 6920,
+      "import_usd": 7613,
+      "trade_usd": 14533,
+      "balance_usd": -693
+    },
+    {
+      "partner_iso3": "GRL",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 218,
+      "import_usd": 14017,
+      "trade_usd": 14235,
+      "balance_usd": -13799
+    },
+    {
+      "partner_iso3": "STP",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 12728,
+      "trade_usd": 12728,
+      "balance_usd": -12728
+    },
+    {
+      "partner_iso3": "ATF",
+      "export_available": true,
+      "import_available": false,
+      "export_usd": 10511,
+      "import_usd": 0,
+      "trade_usd": 10511,
+      "balance_usd": 10511
+    },
+    {
+      "partner_iso3": "BVT",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 8713,
+      "trade_usd": 8713,
+      "balance_usd": -8713
+    },
+    {
+      "partner_iso3": "DMA",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 8695,
+      "trade_usd": 8695,
+      "balance_usd": -8695
+    },
+    {
+      "partner_iso3": "BEN",
+      "export_available": true,
+      "import_available": false,
+      "export_usd": 8273,
+      "import_usd": 0,
+      "trade_usd": 8273,
+      "balance_usd": 8273
+    },
+    {
+      "partner_iso3": "ATG",
+      "export_available": true,
+      "import_available": false,
+      "export_usd": 6766,
+      "import_usd": 0,
+      "trade_usd": 6766,
+      "balance_usd": 6766
+    },
+    {
+      "partner_iso3": "GNB",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 6503,
+      "trade_usd": 6503,
+      "balance_usd": -6503
+    },
+    {
+      "partner_iso3": "CXR",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 104,
+      "import_usd": 5983,
+      "trade_usd": 6087,
+      "balance_usd": -5879
+    },
+    {
+      "partner_iso3": "KNA",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 5860,
+      "trade_usd": 5860,
+      "balance_usd": -5860
+    },
+    {
+      "partner_iso3": "BDI",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 2400,
+      "import_usd": 2600,
+      "trade_usd": 5000,
+      "balance_usd": -200
+    },
+    {
+      "partner_iso3": "MRT",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 4041,
+      "trade_usd": 4041,
+      "balance_usd": -4041
+    },
+    {
+      "partner_iso3": "TCD",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 3457,
+      "import_usd": 411,
+      "trade_usd": 3868,
+      "balance_usd": 3046
+    },
+    {
+      "partner_iso3": "FLK",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 2524,
+      "trade_usd": 2524,
+      "balance_usd": -2524
+    },
+    {
+      "partner_iso3": "AIA",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 1400,
+      "import_usd": 482,
+      "trade_usd": 1882,
+      "balance_usd": 918
+    },
+    {
+      "partner_iso3": "GIB",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 1676,
+      "trade_usd": 1676,
+      "balance_usd": -1676
+    },
+    {
+      "partner_iso3": "PCN",
+      "export_available": true,
+      "import_available": true,
+      "export_usd": 858,
+      "import_usd": 350,
+      "trade_usd": 1208,
+      "balance_usd": 508
+    },
+    {
+      "partner_iso3": "CPV",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 882,
+      "trade_usd": 882,
+      "balance_usd": -882
+    },
+    {
+      "partner_iso3": "CAF",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 744,
+      "trade_usd": 744,
+      "balance_usd": -744
+    },
+    {
+      "partner_iso3": "SHN",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 657,
+      "trade_usd": 657,
+      "balance_usd": -657
+    },
+    {
+      "partner_iso3": "VAT",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 575,
+      "trade_usd": 575,
+      "balance_usd": -575
+    },
+    {
+      "partner_iso3": "IOT",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 540,
+      "trade_usd": 540,
+      "balance_usd": -540
+    },
+    {
+      "partner_iso3": "TKM",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 391,
+      "trade_usd": 391,
+      "balance_usd": -391
+    },
+    {
+      "partner_iso3": "BRB",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 379,
+      "trade_usd": 379,
+      "balance_usd": -379
+    },
+    {
+      "partner_iso3": "NIU",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 331,
+      "trade_usd": 331,
+      "balance_usd": -331
+    },
+    {
+      "partner_iso3": "ATA",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 205,
+      "trade_usd": 205,
+      "balance_usd": -205
+    },
+    {
+      "partner_iso3": "WLF",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 181,
+      "trade_usd": 181,
+      "balance_usd": -181
+    },
+    {
+      "partner_iso3": "ESH",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 140,
+      "trade_usd": 140,
+      "balance_usd": -140
+    },
+    {
+      "partner_iso3": "VCT",
+      "export_available": false,
+      "import_available": true,
+      "export_usd": 0,
+      "import_usd": 33,
+      "trade_usd": 33,
+      "balance_usd": -33
+    }
+  ]
+}

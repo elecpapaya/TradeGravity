@@ -1,0 +1,686 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-16T08:51:09Z",
+  "provider": "comtrade",
+  "level": 6,
+  "partners": [
+    "USA",
+    "CHN"
+  ],
+  "reporter_iso3": "VNM",
+  "period": "2021",
+  "rows": [
+    {
+      "classification": "HS",
+      "code": "284690",
+      "sector": "critical_minerals",
+      "label": "Other rare-earth compounds",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 0,
+        "import": 633.859,
+        "trade": 633.859
+      },
+      "chn": {
+        "available": true,
+        "export": 0,
+        "import": 1049538.337,
+        "trade": 1049538.337
+      },
+      "total": 1050172.196,
+      "share_cn": 0.9993964237461112
+    },
+    {
+      "classification": "HS",
+      "code": "282520",
+      "sector": "critical_minerals",
+      "label": "Lithium oxide and hydroxide",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": false,
+        "export": 0,
+        "import": 0,
+        "trade": 0
+      },
+      "chn": {
+        "available": true,
+        "export": 0,
+        "import": 278175,
+        "trade": 278175
+      },
+      "total": 278175,
+      "share_cn": 1
+    },
+    {
+      "classification": "HS",
+      "code": "283691",
+      "sector": "critical_minerals",
+      "label": "Lithium carbonates",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 0,
+        "import": 4500,
+        "trade": 4500
+      },
+      "chn": {
+        "available": true,
+        "export": 0,
+        "import": 22500,
+        "trade": 22500
+      },
+      "total": 27000,
+      "share_cn": 0.8333333333333334
+    },
+    {
+      "classification": "HS",
+      "code": "851762",
+      "sector": "data_infrastructure",
+      "label": "Network transmission equipment",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 8036902174.539,
+        "import": 43088462.856,
+        "trade": 8079990637.3949995
+      },
+      "chn": {
+        "available": true,
+        "export": 298340191.729,
+        "import": 489761164.765,
+        "trade": 788101356.494
+      },
+      "total": 8868091993.889,
+      "share_cn": 0.08886932578474382
+    },
+    {
+      "classification": "HS",
+      "code": "847150",
+      "sector": "data_infrastructure",
+      "label": "Processing units",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 7092268.456,
+        "import": 7785865.656,
+        "trade": 14878134.112
+      },
+      "chn": {
+        "available": true,
+        "export": 83712604.359,
+        "import": 53745130.646,
+        "trade": 137457735.005
+      },
+      "total": 152335869.11699998,
+      "share_cn": 0.9023333493402463
+    },
+    {
+      "classification": "HS",
+      "code": "850760",
+      "sector": "ev_batteries",
+      "label": "Lithium-ion accumulators",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 138061572.124,
+        "import": 422515.476,
+        "trade": 138484087.60000002
+      },
+      "chn": {
+        "available": true,
+        "export": 174577338.563,
+        "import": 2802617041.897,
+        "trade": 2977194380.46
+      },
+      "total": 3115678468.06,
+      "share_cn": 0.9555525099846943
+    },
+    {
+      "classification": "HS",
+      "code": "850790",
+      "sector": "ev_batteries",
+      "label": "Electric accumulator parts",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 573260.2,
+        "import": 29350.46,
+        "trade": 602610.6599999999
+      },
+      "chn": {
+        "available": true,
+        "export": 13621584.848,
+        "import": 63334106.584,
+        "trade": 76955691.432
+      },
+      "total": 77558302.092,
+      "share_cn": 0.9922302236672849
+    },
+    {
+      "classification": "HS",
+      "code": "870380",
+      "sector": "ev_batteries",
+      "label": "Battery-electric passenger vehicles",
+      "revision_note": "HS 2017 and later",
+      "usa": {
+        "available": true,
+        "export": 6245116,
+        "import": 124705.504,
+        "trade": 6369821.504
+      },
+      "chn": {
+        "available": true,
+        "export": 0,
+        "import": 42426,
+        "trade": 42426
+      },
+      "total": 6412247.504,
+      "share_cn": 0.006616400875595397
+    },
+    {
+      "classification": "HS",
+      "code": "854231",
+      "sector": "semiconductors",
+      "label": "Processors and controllers",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 494386510.223,
+        "import": 4460240397.206,
+        "trade": 4954626907.429
+      },
+      "chn": {
+        "available": true,
+        "export": 7013400482.43,
+        "import": 605840265.181,
+        "trade": 7619240747.611
+      },
+      "total": 12573867655.04,
+      "share_cn": 0.6059584017139682
+    },
+    {
+      "classification": "HS",
+      "code": "854239",
+      "sector": "semiconductors",
+      "label": "Other integrated circuits",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 21752332.715,
+        "import": 138529007.997,
+        "trade": 160281340.712
+      },
+      "chn": {
+        "available": true,
+        "export": 182089107.993,
+        "import": 6088519401.822,
+        "trade": 6270608509.815
+      },
+      "total": 6430889850.526999,
+      "share_cn": 0.9750763355558227
+    },
+    {
+      "classification": "HS",
+      "code": "853400",
+      "sector": "semiconductors",
+      "label": "Printed circuits",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 57320275.413,
+        "import": 6192548.947,
+        "trade": 63512824.36
+      },
+      "chn": {
+        "available": true,
+        "export": 366267590.298,
+        "import": 2128758855.882,
+        "trade": 2495026446.18
+      },
+      "total": 2558539270.54,
+      "share_cn": 0.9751761385524502
+    },
+    {
+      "classification": "HS",
+      "code": "381800",
+      "sector": "semiconductors",
+      "label": "Doped electronic wafers and chemical elements",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 0,
+        "import": 18115,
+        "trade": 18115
+      },
+      "chn": {
+        "available": true,
+        "export": 39211442.279,
+        "import": 677708186.77,
+        "trade": 716919629.049
+      },
+      "total": 716937744.049,
+      "share_cn": 0.9999747328130645
+    },
+    {
+      "classification": "HS",
+      "code": "854232",
+      "sector": "semiconductors",
+      "label": "Memories",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 317570.496,
+        "import": 2727176.934,
+        "trade": 3044747.4299999997
+      },
+      "chn": {
+        "available": true,
+        "export": 5074263.806,
+        "import": 446334988.696,
+        "trade": 451409252.502
+      },
+      "total": 454453999.932,
+      "share_cn": 0.9933002076547779
+    },
+    {
+      "classification": "HS",
+      "code": "854290",
+      "sector": "semiconductors",
+      "label": "Integrated-circuit parts",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 1267788.723,
+        "import": 15454573.327,
+        "trade": 16722362.049999999
+      },
+      "chn": {
+        "available": true,
+        "export": 112129879.188,
+        "import": 259256191.897,
+        "trade": 371386071.08500004
+      },
+      "total": 388108433.13500005,
+      "share_cn": 0.9569131700774374
+    },
+    {
+      "classification": "HS",
+      "code": "854233",
+      "sector": "semiconductors",
+      "label": "Amplifiers",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 76061.11,
+        "import": 10893719.443,
+        "trade": 10969780.553
+      },
+      "chn": {
+        "available": true,
+        "export": 5522336.266,
+        "import": 274230417.306,
+        "trade": 279752753.57199997
+      },
+      "total": 290722534.12499994,
+      "share_cn": 0.9622671817098176
+    },
+    {
+      "classification": "HS",
+      "code": "854110",
+      "sector": "semiconductors",
+      "label": "Diodes other than photosensitive or LED",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 228419.523,
+        "import": 759773.185,
+        "trade": 988192.7080000001
+      },
+      "chn": {
+        "available": true,
+        "export": 1571279.063,
+        "import": 241510862.783,
+        "trade": 243082141.846
+      },
+      "total": 244070334.554,
+      "share_cn": 0.9959511969785031
+    },
+    {
+      "classification": "HS",
+      "code": "854129",
+      "sector": "semiconductors",
+      "label": "Other transistors",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 534896.921,
+        "import": 15101616.736,
+        "trade": 15636513.657
+      },
+      "chn": {
+        "available": true,
+        "export": 1274784.725,
+        "import": 177549697.4,
+        "trade": 178824482.125
+      },
+      "total": 194460995.782,
+      "share_cn": 0.9195904886009671
+    },
+    {
+      "classification": "HS",
+      "code": "854190",
+      "sector": "semiconductors",
+      "label": "Parts of semiconductor devices",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 28288220.226,
+        "import": 7511780.688,
+        "trade": 35800000.914
+      },
+      "chn": {
+        "available": true,
+        "export": 1337999.148,
+        "import": 32031678.469,
+        "trade": 33369677.617
+      },
+      "total": 69169678.53099999,
+      "share_cn": 0.48243216284494667
+    },
+    {
+      "classification": "HS",
+      "code": "280461",
+      "sector": "semiconductors",
+      "label": "High-purity silicon",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 213510.01,
+        "import": 67766157.24,
+        "trade": 67979667.25
+      },
+      "chn": {
+        "available": true,
+        "export": 167472.04,
+        "import": 502882.508,
+        "trade": 670354.548
+      },
+      "total": 68650021.798,
+      "share_cn": 0.009764811873949465
+    },
+    {
+      "classification": "HS",
+      "code": "848620",
+      "sector": "semiconductors",
+      "label": "Semiconductor manufacturing machinery",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 287980.56,
+        "import": 6704104.76,
+        "trade": 6992085.319999999
+      },
+      "chn": {
+        "available": true,
+        "export": 812512.51,
+        "import": 56955407.784,
+        "trade": 57767920.294
+      },
+      "total": 64760005.614,
+      "share_cn": 0.8920308104715724
+    },
+    {
+      "classification": "HS",
+      "code": "854150",
+      "sector": "semiconductors",
+      "label": "Other semiconductor devices legacy group",
+      "revision_note": "Through HS 2017",
+      "usa": {
+        "available": true,
+        "export": 40272.616,
+        "import": 1680211.231,
+        "trade": 1720483.8469999998
+      },
+      "chn": {
+        "available": true,
+        "export": 482534.152,
+        "import": 61395921.121,
+        "trade": 61878455.273
+      },
+      "total": 63598939.120000005,
+      "share_cn": 0.9729479159431613
+    },
+    {
+      "classification": "HS",
+      "code": "854121",
+      "sector": "semiconductors",
+      "label": "Transistors with dissipation below one watt",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 34500.777,
+        "import": 166511.937,
+        "trade": 201012.714
+      },
+      "chn": {
+        "available": true,
+        "export": 2085142.461,
+        "import": 52562022.359,
+        "trade": 54647164.82
+      },
+      "total": 54848177.534,
+      "share_cn": 0.9963351067795208
+    },
+    {
+      "classification": "HS",
+      "code": "848640",
+      "sector": "semiconductors",
+      "label": "Specified semiconductor assembly machinery",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 100398.63,
+        "import": 4031180.473,
+        "trade": 4131579.103
+      },
+      "chn": {
+        "available": true,
+        "export": 34165376.92,
+        "import": 12246219.099,
+        "trade": 46411596.019
+      },
+      "total": 50543175.122,
+      "share_cn": 0.9182564393109992
+    },
+    {
+      "classification": "HS",
+      "code": "903090",
+      "sector": "semiconductors",
+      "label": "Parts of measuring and checking instruments",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 7397852.785,
+        "import": 19269554.9,
+        "trade": 26667407.685
+      },
+      "chn": {
+        "available": true,
+        "export": 6143152.77,
+        "import": 6609021.395,
+        "trade": 12752174.165
+      },
+      "total": 39419581.849999994,
+      "share_cn": 0.32349846361954754
+    },
+    {
+      "classification": "HS",
+      "code": "848690",
+      "sector": "semiconductors",
+      "label": "Semiconductor equipment parts and accessories",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 5678559.9,
+        "import": 13654778.662,
+        "trade": 19333338.562
+      },
+      "chn": {
+        "available": true,
+        "export": 2009639.87,
+        "import": 7124476.989,
+        "trade": 9134116.859000001
+      },
+      "total": 28467455.421,
+      "share_cn": 0.32086172521980677
+    },
+    {
+      "classification": "HS",
+      "code": "854130",
+      "sector": "semiconductors",
+      "label": "Thyristors diacs and triacs",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 0,
+        "import": 45928.262,
+        "trade": 45928.262
+      },
+      "chn": {
+        "available": true,
+        "export": 94007.605,
+        "import": 13865509.798,
+        "trade": 13959517.403
+      },
+      "total": 14005445.665000001,
+      "share_cn": 0.9967206854320405
+    },
+    {
+      "classification": "HS",
+      "code": "903082",
+      "sector": "semiconductors",
+      "label": "Semiconductor wafer and device measuring instruments",
+      "revision_note": "HS 2007 through HS 2017",
+      "usa": {
+        "available": true,
+        "export": 4964.92,
+        "import": 1503494.86,
+        "trade": 1508459.78
+      },
+      "chn": {
+        "available": true,
+        "export": 203804.258,
+        "import": 2423446.559,
+        "trade": 2627250.817
+      },
+      "total": 4135710.597,
+      "share_cn": 0.6352598315041142
+    },
+    {
+      "classification": "HS",
+      "code": "370790",
+      "sector": "semiconductors",
+      "label": "Other photographic chemicals",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 0,
+        "import": 2802835.35,
+        "trade": 2802835.35
+      },
+      "chn": {
+        "available": true,
+        "export": 0,
+        "import": 839748.352,
+        "trade": 839748.352
+      },
+      "total": 3642583.702,
+      "share_cn": 0.23053646002394593
+    },
+    {
+      "classification": "HS",
+      "code": "848610",
+      "sector": "semiconductors",
+      "label": "Wafer and boule manufacturing machinery",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 0,
+        "import": 1205,
+        "trade": 1205
+      },
+      "chn": {
+        "available": true,
+        "export": 0,
+        "import": 3227465.698,
+        "trade": 3227465.698
+      },
+      "total": 3228670.698,
+      "share_cn": 0.9996267813869198
+    },
+    {
+      "classification": "HS",
+      "code": "903141",
+      "sector": "semiconductors",
+      "label": "Optical semiconductor inspection instruments",
+      "revision_note": "HS 2022 and later",
+      "usa": {
+        "available": true,
+        "export": 0,
+        "import": 21813.33,
+        "trade": 21813.33
+      },
+      "chn": {
+        "available": true,
+        "export": 1569.77,
+        "import": 733305.63,
+        "trade": 734875.4
+      },
+      "total": 756688.73,
+      "share_cn": 0.9711726511375425
+    },
+    {
+      "classification": "HS",
+      "code": "370710",
+      "sector": "semiconductors",
+      "label": "Sensitising emulsions",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 0,
+        "import": 26113.66,
+        "trade": 26113.66
+      },
+      "chn": {
+        "available": true,
+        "export": 0,
+        "import": 633036.915,
+        "trade": 633036.915
+      },
+      "total": 659150.5750000001,
+      "share_cn": 0.9603828609267313
+    },
+    {
+      "classification": "HS",
+      "code": "854140",
+      "sector": "solar",
+      "label": "Photosensitive semiconductor devices legacy group",
+      "revision_note": "Through HS 2017",
+      "usa": {
+        "available": true,
+        "export": 3572022280.249,
+        "import": 2271998.28,
+        "trade": 3574294278.5290003
+      },
+      "chn": {
+        "available": true,
+        "export": 549626750.233,
+        "import": 817879999.846,
+        "trade": 1367506750.079
+      },
+      "total": 4941801028.608,
+      "share_cn": 0.27672234113889393
+    }
+  ]
+}

@@ -1,0 +1,346 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-16T08:51:09Z",
+  "provider": "comtrade",
+  "anchors": [
+    "USA",
+    "CHN"
+  ],
+  "reporters": [
+    "ARE",
+    "ARG",
+    "AUS",
+    "AUT",
+    "BEL",
+    "BRA",
+    "CAN",
+    "CHE",
+    "CHL",
+    "COL",
+    "CZE",
+    "DEU",
+    "DNK",
+    "EGY",
+    "ESP",
+    "FIN",
+    "FRA",
+    "GBR",
+    "GRC",
+    "HUN",
+    "IDN",
+    "IND",
+    "IRL",
+    "ISR",
+    "ITA",
+    "JPN",
+    "KAZ",
+    "KOR",
+    "MEX",
+    "MYS",
+    "NGA",
+    "NLD",
+    "NOR",
+    "NZL",
+    "PAK",
+    "PER",
+    "PHL",
+    "POL",
+    "PRT",
+    "SAU",
+    "SGP",
+    "SWE",
+    "THA",
+    "TUR",
+    "UKR",
+    "VNM",
+    "ZAF"
+  ],
+  "periods": [
+    "2023"
+  ],
+  "partitions": [
+    {
+      "reporter_iso3": "ARE",
+      "period": "2023",
+      "href": "./ARE/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "ARG",
+      "period": "2023",
+      "href": "./ARG/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "AUS",
+      "period": "2023",
+      "href": "./AUS/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "AUT",
+      "period": "2023",
+      "href": "./AUT/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "BEL",
+      "period": "2023",
+      "href": "./BEL/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "BRA",
+      "period": "2023",
+      "href": "./BRA/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "CAN",
+      "period": "2023",
+      "href": "./CAN/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "CHE",
+      "period": "2023",
+      "href": "./CHE/2023.json",
+      "comparison_count": 0
+    },
+    {
+      "reporter_iso3": "CHL",
+      "period": "2023",
+      "href": "./CHL/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "COL",
+      "period": "2023",
+      "href": "./COL/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "CZE",
+      "period": "2023",
+      "href": "./CZE/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "DEU",
+      "period": "2023",
+      "href": "./DEU/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "DNK",
+      "period": "2023",
+      "href": "./DNK/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "EGY",
+      "period": "2023",
+      "href": "./EGY/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "ESP",
+      "period": "2023",
+      "href": "./ESP/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "FIN",
+      "period": "2023",
+      "href": "./FIN/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "FRA",
+      "period": "2023",
+      "href": "./FRA/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "GBR",
+      "period": "2023",
+      "href": "./GBR/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "GRC",
+      "period": "2023",
+      "href": "./GRC/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "HUN",
+      "period": "2023",
+      "href": "./HUN/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "IDN",
+      "period": "2023",
+      "href": "./IDN/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "IND",
+      "period": "2023",
+      "href": "./IND/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "IRL",
+      "period": "2023",
+      "href": "./IRL/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "ISR",
+      "period": "2023",
+      "href": "./ISR/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "ITA",
+      "period": "2023",
+      "href": "./ITA/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "JPN",
+      "period": "2023",
+      "href": "./JPN/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "KAZ",
+      "period": "2023",
+      "href": "./KAZ/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "KOR",
+      "period": "2023",
+      "href": "./KOR/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "MEX",
+      "period": "2023",
+      "href": "./MEX/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "MYS",
+      "period": "2023",
+      "href": "./MYS/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "NGA",
+      "period": "2023",
+      "href": "./NGA/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "NLD",
+      "period": "2023",
+      "href": "./NLD/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "NOR",
+      "period": "2023",
+      "href": "./NOR/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "NZL",
+      "period": "2023",
+      "href": "./NZL/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "PAK",
+      "period": "2023",
+      "href": "./PAK/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "PER",
+      "period": "2023",
+      "href": "./PER/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "PHL",
+      "period": "2023",
+      "href": "./PHL/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "POL",
+      "period": "2023",
+      "href": "./POL/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "PRT",
+      "period": "2023",
+      "href": "./PRT/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "SAU",
+      "period": "2023",
+      "href": "./SAU/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "SGP",
+      "period": "2023",
+      "href": "./SGP/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "SWE",
+      "period": "2023",
+      "href": "./SWE/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "THA",
+      "period": "2023",
+      "href": "./THA/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "TUR",
+      "period": "2023",
+      "href": "./TUR/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "UKR",
+      "period": "2023",
+      "href": "./UKR/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "VNM",
+      "period": "2023",
+      "href": "./VNM/2023.json",
+      "comparison_count": 4
+    },
+    {
+      "reporter_iso3": "ZAF",
+      "period": "2023",
+      "href": "./ZAF/2023.json",
+      "comparison_count": 4
+    }
+  ],
+  "comparison_count": 184
+}

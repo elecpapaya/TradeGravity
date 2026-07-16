@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-15T15:03:32Z",
+  "generated_at": "2026-07-16T08:51:09Z",
   "resources": [
     {
       "id": "headline_totals",
@@ -23,7 +23,7 @@
     {
       "id": "country_context",
       "title": "Country economic context",
-      "status": "ready",
+      "status": "partial",
       "provider": "world_bank",
       "grain": "reporter × indicator × year",
       "partitioning": "single publication",
@@ -81,11 +81,35 @@
       "href": "./bilateral-matrix/index.json"
     },
     {
+      "id": "semiconductor_atlas",
+      "title": "Semiconductor value-chain atlas",
+      "status": "partial",
+      "provider": "tradegravity + cited official sources",
+      "classification": "stage-mapped source HS revision",
+      "product_level": 6,
+      "grain": "stage taxonomy + country role context + policy event + published HS6 coverage",
+      "partitioning": "reference publication + strategic HS6 reporter/year chunks",
+      "href": "./semiconductors/reference.json"
+    },
+    {
+      "id": "semiconductor_monthly",
+      "title": "Focused US-China semiconductor turning points",
+      "status": "ready",
+      "provider": "comtrade",
+      "classification": "source HS revision",
+      "product_level": 6,
+      "grain": "focused reporter × USA/CHN partner × flow × selected HS6 × month",
+      "partitioning": "index + one file per reporter",
+      "href": "./semiconductors/monthly/index.json"
+    },
+    {
       "id": "mirror_reconciliation",
-      "title": "Mirror and reconciled estimates",
-      "status": "planned",
-      "grain": "reporter pair × flow × product × period × estimate type",
-      "partitioning": "period/reporter chunks"
+      "title": "Unadjusted mirror-reporting diagnostics",
+      "status": "ready",
+      "provider": "comtrade",
+      "grain": "third-country reporter × USA/CHN anchor × mirrored flow × TOTAL × annual period",
+      "partitioning": "index + reporter/year chunks",
+      "href": "./mirror/index.json"
     },
     {
       "id": "value_added_network",

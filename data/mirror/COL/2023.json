@@ -1,0 +1,44 @@
+{
+  "schema_version": "2.0",
+  "generated_at": "2026-07-16T08:51:09Z",
+  "provider": "comtrade",
+  "reporter_iso3": "COL",
+  "period": "2023",
+  "scope": "Unadjusted bilateral mirror-reporting diagnostics; neither reporter is treated as ground truth",
+  "caveats": [
+    "Differences can reflect CIF/FOB valuation, timing, classification, partner attribution, re-exports, and revisions.",
+    "These diagnostics are not fraud, evasion, transshipment, or physical-route estimates."
+  ],
+  "rows": [
+    {
+      "anchor_iso3": "USA",
+      "reporter_export_available": true,
+      "anchor_import_available": true,
+      "reporter_export_usd": 14112815360.42,
+      "anchor_import_usd": 16957922661,
+      "export_gap_usd": -2845107300.58,
+      "export_symmetric_gap_ratio": -0.18313741364100192,
+      "reporter_import_available": true,
+      "anchor_export_available": true,
+      "reporter_import_usd": 16181689265.44,
+      "anchor_export_usd": 17552368192,
+      "import_gap_usd": -1370678926.5599995,
+      "import_symmetric_gap_ratio": -0.08126380458616893
+    },
+    {
+      "anchor_iso3": "CHN",
+      "reporter_export_available": true,
+      "anchor_import_available": true,
+      "reporter_export_usd": 2469306485.48,
+      "anchor_import_usd": 6428127166,
+      "export_gap_usd": -3958820680.52,
+      "export_symmetric_gap_ratio": -0.8898792248619892,
+      "reporter_import_available": true,
+      "anchor_export_available": true,
+      "reporter_import_usd": 13566844921.21,
+      "anchor_export_usd": 12371570749,
+      "import_gap_usd": 1195274172.209999,
+      "import_symmetric_gap_ratio": 0.09216246569621898
+    }
+  ]
+}

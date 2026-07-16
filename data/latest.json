@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-15T15:03:32Z",
+  "generated_at": "2026-07-16T08:51:09Z",
   "provider": "wits",
   "partners": [
     "USA",
@@ -11,8 +11,6 @@
       "iso3": "ARE",
       "iso2": "AE",
       "name": "United Arab Emirates",
-      "region": "Middle East, North Africa, Afghanistan \u0026 Pakistan",
-      "income_group": "High income",
       "population": {
         "value": 11513149,
         "year": "2025"
@@ -58,8 +56,6 @@
       "iso3": "ARG",
       "iso2": "AR",
       "name": "Argentina",
-      "region": "Latin America \u0026 Caribbean",
-      "income_group": "Upper middle income",
       "population": {
         "value": 45851378,
         "year": "2025"
@@ -105,8 +101,6 @@
       "iso3": "AUS",
       "iso2": "AU",
       "name": "Australia",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "High income",
       "population": {
         "value": 27614411,
         "year": "2025"
@@ -152,8 +146,6 @@
       "iso3": "AUT",
       "iso2": "AT",
       "name": "Austria",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -202,8 +194,6 @@
       "iso3": "BEL",
       "iso2": "BE",
       "name": "Belgium",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -252,8 +242,6 @@
       "iso3": "BGD",
       "iso2": "BD",
       "name": "Bangladesh",
-      "region": "South Asia",
-      "income_group": "Lower middle income",
       "population": {
         "value": 175686899,
         "year": "2025"
@@ -285,8 +273,6 @@
       "iso3": "BRA",
       "iso2": "BR",
       "name": "Brazil",
-      "region": "Latin America \u0026 Caribbean",
-      "income_group": "Upper middle income",
       "population": {
         "value": 212812405,
         "year": "2025"
@@ -332,8 +318,6 @@
       "iso3": "CAN",
       "iso2": "CA",
       "name": "Canada",
-      "region": "North America",
-      "income_group": "High income",
       "population": {
         "value": 41651653,
         "year": "2025"
@@ -379,8 +363,6 @@
       "iso3": "CHE",
       "iso2": "CH",
       "name": "Switzerland",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "population": {
         "value": 9092436,
         "year": "2025"
@@ -426,8 +408,6 @@
       "iso3": "CHL",
       "iso2": "CL",
       "name": "Chile",
-      "region": "Latin America \u0026 Caribbean",
-      "income_group": "High income",
       "population": {
         "value": 19859921,
         "year": "2025"
@@ -473,8 +453,6 @@
       "iso3": "CHN",
       "iso2": "CN",
       "name": "China",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "Upper middle income",
       "population": {
         "value": 1406585000,
         "year": "2025"
@@ -512,8 +490,6 @@
       "iso3": "COL",
       "iso2": "CO",
       "name": "Colombia",
-      "region": "Latin America \u0026 Caribbean",
-      "income_group": "Upper middle income",
       "population": {
         "value": 53425635,
         "year": "2025"
@@ -559,8 +535,6 @@
       "iso3": "CZE",
       "iso2": "CZ",
       "name": "Czechia",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -609,8 +583,6 @@
       "iso3": "DEU",
       "iso2": "DE",
       "name": "Germany",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -659,8 +631,6 @@
       "iso3": "DNK",
       "iso2": "DK",
       "name": "Denmark",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -708,9 +678,7 @@
     {
       "iso3": "EGY",
       "iso2": "EG",
-      "name": "Egypt, Arab Rep.",
-      "region": "Middle East, North Africa, Afghanistan \u0026 Pakistan",
-      "income_group": "Lower middle income",
+      "name": "Egypt",
       "population": {
         "value": 118365995,
         "year": "2025"
@@ -756,8 +724,6 @@
       "iso3": "ESP",
       "iso2": "ES",
       "name": "Spain",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -806,8 +772,6 @@
       "iso3": "FIN",
       "iso2": "FI",
       "name": "Finland",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -856,8 +820,6 @@
       "iso3": "FRA",
       "iso2": "FR",
       "name": "France",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -906,8 +868,6 @@
       "iso3": "GBR",
       "iso2": "GB",
       "name": "United Kingdom",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "population": {
         "value": 69487000,
         "year": "2025"
@@ -953,8 +913,6 @@
       "iso3": "GRC",
       "iso2": "GR",
       "name": "Greece",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -1003,8 +961,6 @@
       "iso3": "HUN",
       "iso2": "HU",
       "name": "Hungary",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -1053,8 +1009,6 @@
       "iso3": "IDN",
       "iso2": "ID",
       "name": "Indonesia",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "Upper middle income",
       "groups": [
         "ASEAN"
       ],
@@ -1103,8 +1057,6 @@
       "iso3": "IND",
       "iso2": "IN",
       "name": "India",
-      "region": "South Asia",
-      "income_group": "Lower middle income",
       "population": {
         "value": 1463865525,
         "year": "2025"
@@ -1150,8 +1102,6 @@
       "iso3": "IRL",
       "iso2": "IE",
       "name": "Ireland",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -1200,8 +1150,6 @@
       "iso3": "ISR",
       "iso2": "IL",
       "name": "Israel",
-      "region": "Middle East, North Africa, Afghanistan \u0026 Pakistan",
-      "income_group": "High income",
       "population": {
         "value": 10122800,
         "year": "2025"
@@ -1247,8 +1195,6 @@
       "iso3": "ITA",
       "iso2": "IT",
       "name": "Italy",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -1297,8 +1243,6 @@
       "iso3": "JPN",
       "iso2": "JP",
       "name": "Japan",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "High income",
       "population": {
         "value": 123366734,
         "year": "2025"
@@ -1344,8 +1288,6 @@
       "iso3": "KAZ",
       "iso2": "KZ",
       "name": "Kazakhstan",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "Upper middle income",
       "population": {
         "value": 20843754,
         "year": "2025"
@@ -1391,8 +1333,6 @@
       "iso3": "KOR",
       "iso2": "KR",
       "name": "Korea, Rep.",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "High income",
       "population": {
         "value": 51684564,
         "year": "2025"
@@ -1438,8 +1378,6 @@
       "iso3": "MEX",
       "iso2": "MX",
       "name": "Mexico",
-      "region": "Latin America \u0026 Caribbean",
-      "income_group": "Upper middle income",
       "population": {
         "value": 131946900,
         "year": "2025"
@@ -1485,8 +1423,6 @@
       "iso3": "MYS",
       "iso2": "MY",
       "name": "Malaysia",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "Upper middle income",
       "groups": [
         "ASEAN"
       ],
@@ -1535,8 +1471,6 @@
       "iso3": "NGA",
       "iso2": "NG",
       "name": "Nigeria",
-      "region": "Sub-Saharan Africa",
-      "income_group": "Lower middle income",
       "population": {
         "value": 237527782,
         "year": "2025"
@@ -1582,8 +1516,6 @@
       "iso3": "NLD",
       "iso2": "NL",
       "name": "Netherlands",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -1632,8 +1564,6 @@
       "iso3": "NOR",
       "iso2": "NO",
       "name": "Norway",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "population": {
         "value": 5610870,
         "year": "2025"
@@ -1679,8 +1609,6 @@
       "iso3": "NZL",
       "iso2": "NZ",
       "name": "New Zealand",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "High income",
       "population": {
         "value": 5324700,
         "year": "2025"
@@ -1726,8 +1654,6 @@
       "iso3": "PAK",
       "iso2": "PK",
       "name": "Pakistan",
-      "region": "Middle East, North Africa, Afghanistan \u0026 Pakistan",
-      "income_group": "Lower middle income",
       "population": {
         "value": 255219554,
         "year": "2025"
@@ -1773,8 +1699,6 @@
       "iso3": "PER",
       "iso2": "PE",
       "name": "Peru",
-      "region": "Latin America \u0026 Caribbean",
-      "income_group": "Upper middle income",
       "population": {
         "value": 34576665,
         "year": "2025"
@@ -1820,8 +1744,6 @@
       "iso3": "PHL",
       "iso2": "PH",
       "name": "Philippines",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "Upper middle income",
       "groups": [
         "ASEAN"
       ],
@@ -1870,8 +1792,6 @@
       "iso3": "POL",
       "iso2": "PL",
       "name": "Poland",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -1920,8 +1840,6 @@
       "iso3": "PRT",
       "iso2": "PT",
       "name": "Portugal",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -1970,8 +1888,6 @@
       "iso3": "RUS",
       "iso2": "RU",
       "name": "Russian Federation",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "population": {
         "value": 143513328,
         "year": "2025"
@@ -2017,8 +1933,6 @@
       "iso3": "SAU",
       "iso2": "SA",
       "name": "Saudi Arabia",
-      "region": "Middle East, North Africa, Afghanistan \u0026 Pakistan",
-      "income_group": "High income",
       "population": {
         "value": 36973555,
         "year": "2025"
@@ -2064,8 +1978,6 @@
       "iso3": "SGP",
       "iso2": "SG",
       "name": "Singapore",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "High income",
       "groups": [
         "ASEAN"
       ],
@@ -2114,8 +2026,6 @@
       "iso3": "SWE",
       "iso2": "SE",
       "name": "Sweden",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "High income",
       "groups": [
         "EU"
       ],
@@ -2164,8 +2074,6 @@
       "iso3": "THA",
       "iso2": "TH",
       "name": "Thailand",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "Upper middle income",
       "groups": [
         "ASEAN"
       ],
@@ -2213,9 +2121,7 @@
     {
       "iso3": "TUR",
       "iso2": "TR",
-      "name": "Turkiye",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "Upper middle income",
+      "name": "Türkiye",
       "population": {
         "value": 85878556,
         "year": "2025"
@@ -2243,17 +2149,17 @@
         "period_type": "Y",
         "prev_period": "2022",
         "export": 3306083517,
-        "import": 45047968463,
-        "trade": 48354051980,
+        "import": 0,
+        "trade": 3306083517,
         "growth": {
           "export": 0.007542132117519416,
-          "import": 0.08931075805064455,
-          "trade": 0.0832996706548372
+          "import": null,
+          "trade": null
         },
         "growth_basis": "yoy"
       },
-      "total": 79014076350,
-      "share_cn": 0.6119675659538353,
+      "total": 33966107887,
+      "share_cn": 0.09733477641885935,
       "same_period": true,
       "comparison_period": "2023"
     },
@@ -2261,8 +2167,6 @@
       "iso3": "UKR",
       "iso2": "UA",
       "name": "Ukraine",
-      "region": "Europe \u0026 Central Asia",
-      "income_group": "Upper middle income",
       "population": {
         "value": 38980376,
         "year": "2025"
@@ -2308,8 +2212,6 @@
       "iso3": "USA",
       "iso2": "US",
       "name": "United States",
-      "region": "North America",
-      "income_group": "High income",
       "population": {
         "value": 341784857,
         "year": "2025"
@@ -2347,8 +2249,6 @@
       "iso3": "VNM",
       "iso2": "VN",
       "name": "Viet Nam",
-      "region": "East Asia \u0026 Pacific",
-      "income_group": "Upper middle income",
       "groups": [
         "ASEAN"
       ],
@@ -2397,8 +2297,6 @@
       "iso3": "ZAF",
       "iso2": "ZA",
       "name": "South Africa",
-      "region": "Sub-Saharan Africa",
-      "income_group": "Upper middle income",
       "population": {
         "value": 64747319,
         "year": "2025"
