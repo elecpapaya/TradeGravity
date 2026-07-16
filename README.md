@@ -1,7 +1,8 @@
 # TradeGravity
 
 [![Quality checks](https://github.com/elecpapaya/TradeGravity/actions/workflows/quality.yml/badge.svg)](https://github.com/elecpapaya/TradeGravity/actions/workflows/quality.yml)
-[![Daily data update](https://github.com/elecpapaya/TradeGravity/actions/workflows/update-tradegravity.yml/badge.svg)](https://github.com/elecpapaya/TradeGravity/actions/workflows/update-tradegravity.yml)
+[![Core data update](https://github.com/elecpapaya/TradeGravity/actions/workflows/update-tradegravity.yml/badge.svg)](https://github.com/elecpapaya/TradeGravity/actions/workflows/update-tradegravity.yml)
+[![Semiconductor update](https://github.com/elecpapaya/TradeGravity/actions/workflows/update-semiconductor.yml/badge.svg)](https://github.com/elecpapaya/TradeGravity/actions/workflows/update-semiconductor.yml)
 [![CodeQL](https://github.com/elecpapaya/TradeGravity/actions/workflows/codeql.yml/badge.svg)](https://github.com/elecpapaya/TradeGravity/actions/workflows/codeql.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![User study recruiting](https://img.shields.io/badge/user%20study-recruiting-008672.svg)](https://github.com/elecpapaya/TradeGravity/issues/3)
@@ -40,7 +41,7 @@ The governing principle is **neutral reported observations, explicit US–China 
 
 ## Project status
 
-TradeGravity is an early-stage project under active maintenance. A scheduled GitHub Actions workflow currently refreshes and deploys the public dataset every day. The default allowlist tracks 52 reporter economies; a publication can contain fewer when a provider has no usable observation for an allowlisted reporter. Coverage can be changed through configuration.
+TradeGravity is an early-stage project under active maintenance. Two staggered GitHub Actions workflows refresh the public dataset every day: the core workflow collects and validates headline, HS2, matrix, and tariff data; the semiconductor workflow restores that state after the public Comtrade quota window, adds bounded annual and monthly chip observations, validates the complete publication, and deploys it. The default headline allowlist tracks 52 reporter economies; a publication can contain fewer when a provider has no usable observation for an allowlisted reporter. Coverage can be changed through configuration.
 
 **Help test v0.1.1:** we are recruiting three students, researchers, or developers for a 15-minute, task-based evaluation. No setup or trade-data expertise is required. Start with [the public study tracker](https://github.com/elecpapaya/TradeGravity/issues/3) or reuse the [recruitment invitation](docs/USER_RECRUITMENT.md), then submit only nonidentifying feedback through the linked form. Participation is voluntary, and public feedback is recorded only with consent.
 
@@ -274,9 +275,9 @@ This repository reads operating-system environment variables and does not load a
 - Local SQLite database: `tradegravity.db`
 - Published JSON: `meta.json`, `catalog.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, `strategic-hs6/`, `semiconductors/reference.json`, `semiconductors/monthly/`, `tariffs/`, `bilateral-matrix/`, `mirror/`, and `explanations/` under `site/data/`
 
-Generated data and the local database are intentionally not committed to the default branch. The scheduled or manually dispatched data workflow runs the collectors and publisher, validates the result, and deploys `site/` to the `gh-pages` branch. A `main` push uses the latest validated `data/` directory from `gh-pages` and redeploys the site without calling WITS, UN Comtrade, WITS/TRAINS, or World Bank APIs. This keeps code-only deployments fast while the daily refresh remains the source of new published observations.
+Generated data and the local database are intentionally not committed to the default branch. The scheduled or manually dispatched core workflow runs the broad collectors and saves its validated database as a three-day Actions artifact. The staggered semiconductor workflow restores that artifact, adds annual and monthly chip observations for [`configs/chip_connectors.csv`](configs/chip_connectors.csv), validates the complete publication, and deploys `site/` to the `gh-pages` branch. A `main` push uses the latest validated `data/` directory from `gh-pages` and redeploys the site without calling WITS, UN Comtrade, WITS/TRAINS, or World Bank APIs. This keeps code-only deployments fast while the daily refresh remains the source of new published observations.
 
-The fast deployment intentionally fails if `gh-pages` does not contain `data/latest.json` and `data/meta.json`. Bootstrap or repair the published dataset by manually running the **Update TradeGravity** workflow before retrying the site deployment.
+The fast deployment intentionally fails if `gh-pages` does not contain `data/latest.json` and `data/meta.json`. Bootstrap or repair the published dataset by manually running **Update TradeGravity core**, then **Update TradeGravity semiconductor**; the second workflow waits out any remaining quota window before it publishes.
 
 Before deployment, `cmd/validator` checks provenance across every artifact, reporter uniqueness, periods, non-negative finite values, totals and shares, matrix availability/count identities, tariff rate identities, product keys, context coverage, and explanation evidence references.
 

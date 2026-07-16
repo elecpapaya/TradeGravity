@@ -111,7 +111,7 @@ Filtering affects treemaps, the accessible table, and downloads. CSV is a raw fl
 
 ## Deployment sequence
 
-The scheduled workflow runs tests and vet, builds country context, collects ten-year WITS history, annual HS2/strategic HS6 data, a focused 12-month semiconductor panel, tariffs and bilateral matrices, publishes JSON, builds explanations, validates every artifact, and deploys `site/` to GitHub Pages. A main-branch code push reuses the last validated dataset instead of calling upstream APIs.
+The scheduled refresh is split to stay within the public Comtrade quota. At 01:00 UTC the core workflow runs tests and vet, builds country context, collects ten-year WITS history, annual HS2 data, tariffs and bilateral matrices, publishes and validates a core dataset, and stores the database plus context as a three-day Actions artifact. At 02:00 UTC the semiconductor workflow restores the latest successful core artifact, waits until at least 35 minutes after that run completed, collects five bounded annual periods and the focused 12-month semiconductor panel for the declared connector allowlist, republishes and validates the complete dataset, and deploys `site/` to GitHub Pages. A main-branch code push reuses the last validated dataset instead of calling upstream APIs.
 
 The first release uses schema 2.0. Breaking field or meaning changes require a schema-version change and release note. Additive fields may ship within 2.x.
 
@@ -120,7 +120,7 @@ The first release uses schema 2.0. Breaking field or meaning changes require a s
 - Upstream APIs can lag, revise data, throttle requests, or omit reporters.
 - Public Comtrade preview and authenticated endpoints can have different limits.
 - Current values are not inflation-adjusted.
-- HS2 collection publishes one selected year per scheduled run; the strategic HS6 collector publishes the selected year plus four prior years for semiconductor trend coverage.
+- HS2 collection publishes one selected year per core run; the staggered strategic HS6 collector publishes the selected year plus four prior years for the bounded semiconductor connector allowlist.
 - Focused monthly semiconductor collection covers a bounded 30-code/connector allowlist and at most 36 months; it is a turning-point signal, not a complete market.
 - Explanations summarize observed evidence and do not infer causes.
 - Intelligence concentration covers only the published USA/China partner universe and is not a whole-world concentration measure.
