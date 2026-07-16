@@ -17,6 +17,7 @@ const MIRROR_INDEX_URL = "./data/mirror/index.json";
 const CATALOG_URL = "./data/catalog.json";
 const SEMICONDUCTOR_REFERENCE_URL = "./data/semiconductors/reference.json";
 const SEMICONDUCTOR_MONTHLY_INDEX_URL = "./data/semiconductors/monthly/index.json";
+const PUBLICATION_CHANGES_URL = "./data/changes.json";
 const security = globalThis.TradeGravitySecurity;
 if (!security) {
   throw new Error("TradeGravity security helpers failed to load.");
@@ -72,6 +73,7 @@ const {
   sourceIndex: buildChipSourceIndex,
   summarizeStages: summarizeChipStages,
   summarizeMonthly: summarizeChipMonthly,
+	publicationPulse: buildPublicationPulse,
 } = semiconductorTools;
 const {
   buildSummaryReport,
@@ -132,6 +134,7 @@ const els = {
   chipStageFilter: document.getElementById("chipStageFilter"),
   chipCountryFilter: document.getElementById("chipCountryFilter"),
   chipDownloadCSV: document.getElementById("chipDownloadCSV"),
+	chipPublicationChanges: document.getElementById("chipPublicationChanges"),
   chipTrends: document.getElementById("chipTrends"),
   chipValueChain: document.getElementById("chipValueChain"),
   chipRoleLandscape: document.getElementById("chipRoleLandscape"),
@@ -200,6 +203,7 @@ let state = {
   mirrorIndex: null,
   semiconductorReference: null,
   semiconductorMonthlyIndex: null,
+	publicationChanges: null,
   semiconductorMonthlyFileCache: {},
   semiconductorMonthlyFile: null,
   semiconductorMonthlyLoading: false,
@@ -727,6 +731,59 @@ function reportModel(){
   const comparisonQuality = selected?.same_period
     ? `Same period (${selected.comparison_period || selected.usa?.period || selected.chn?.period || "unknown"})`
     : "Mixed or missing periods";
+	let semiconductor = null;
+	if (state.tab === "semiconductors") {
+	  const reference = chipReference();
+	  const annualSummary = chipSummary();
+	  const profile = buildChipCountryProfile(reference, annualSummary, state.chipCountry);
+	  const annualStage = state.chipStage === "all" ? null : profile.stages.find(stage => stage.id === state.chipStage && stage.observed) || null;
+	  const stageLabel = state.chipStage === "all" ? "All mapped chip codes" : (reference.stages || []).find(stage => stage.id === state.chipStage)?.label || state.chipStage;
+	  const monthlyFile = normalizeISO3(state.semiconductorMonthlyFile?.reporter_iso3) === state.chipCountry ? state.semiconductorMonthlyFile : null;
+	  const monthly = monthlyFile ? summarizeChipMonthly(reference, monthlyFile, state.metric, state.chipStage) : null;
+	  const pulse = buildPublicationPulse(state.publicationChanges, state.chipCountry);
+	  const signedPercent = value => value == null || !Number.isFinite(Number(value)) ? "—" : `${Number(value) >= 0 ? "+" : ""}${(Number(value) * 100).toFixed(1)}%`;
+	  const signedPoints = value => value == null || !Number.isFinite(Number(value)) ? "—" : `${Number(value) >= 0 ? "+" : ""}${(Number(value) * 100).toFixed(1)}pp`;
+	  semiconductor = {
+		country: state.chipCountry,
+		stage: stageLabel,
+		annual: annualStage ? {
+		  period: annualStage.period,
+		  usaValue: formatNominalUSD(annualStage.usaValue),
+		  chinaValue: formatNominalUSD(annualStage.chinaValue),
+		  position: annualStage.position,
+		  direction: annualStage.direction,
+		  balanceShift: signedPoints(annualStage.directionShift),
+		} : null,
+		monthly: monthly?.latest ? {
+		  period: monthly.latest.period,
+		  previousPeriod: monthly.previous?.period || "",
+		  usaValue: formatNominalUSD(monthly.latest.usaValue),
+		  chinaValue: formatNominalUSD(monthly.latest.chinaValue),
+		  combinedGrowth: signedPercent(monthly.latestGrowth),
+		  usaGrowth: signedPercent(monthly.latestUSAGrowth),
+		  chinaGrowth: signedPercent(monthly.latestChinaGrowth),
+		  balanceShift: signedPoints(monthly.latestBalanceShift),
+		  position: monthly.latest.position,
+		} : null,
+		publication: {
+		  status: pulse.status,
+		  previousGeneratedAt: pulse.previousGeneratedAt,
+		  newPeriods: pulse.newPeriods,
+		  newReporters: pulse.newReporters,
+		  removedReporters: pulse.removedReporters,
+		  observationDelta: pulse.summary.observationDelta,
+		  addedRows: pulse.summary.addedRows,
+		  removedRows: pulse.summary.removedRows,
+		  revisedRows: pulse.summary.revisedRows,
+		  selectedRevisions: pulse.revisions.slice(0, 5),
+		},
+		evidence: {
+		  reference: new URL(SEMICONDUCTOR_REFERENCE_URL, window.location.href).href,
+		  monthlyIndex: new URL(SEMICONDUCTOR_MONTHLY_INDEX_URL, window.location.href).href,
+		  changes: new URL(PUBLICATION_CHANGES_URL, window.location.href).href,
+		},
+	  };
+	}
   return {
     exportedAt: new Date().toISOString(),
     generatedAt: state.generatedAt,
@@ -763,6 +820,7 @@ function reportModel(){
     }),
     limit: tabLimitation(state.tab),
     viewURL: window.location.href,
+	semiconductor,
   };
 }
 
@@ -2432,6 +2490,27 @@ function renderChipCountry(summary){
   els.chipCountryProfile.innerHTML = `<div class="chipCountryHeading"><span class="countryFlag">${flag}</span><div><h3>${escapeHTML(displayRole.name)} <small>(${escapeHTML(profile.iso3)})</small></h3><p>${escapeHTML(displayRole.note)}</p></div></div><div class="chipRoleTags">${roleTags}</div><div class="tableScroll" tabindex="0"><table class="miniTable"><thead><tr><th>Stage</th><th class="numeric">USA</th><th class="numeric">China</th><th>Position</th><th>Direction</th><th class="numeric">Dual</th></tr></thead><tbody>${rows || `<tr><td colspan="6">No stage-mapped observation is published.</td></tr>`}</tbody></table></div><div class="analysisNote">${displayRole.evidence === "contextual" ? `<span class="evidenceTag">External context</span> Roles are curated and unranked. ` : ""}<span class="evidenceTag">Observed</span> Values use ${escapeHTML(summary.period || "no available period")} USA/China partner data and are not production capacity.</div>`;
 }
 
+function renderChipPublicationChanges(){
+	if (!els.chipPublicationChanges) return;
+	const pulse = buildPublicationPulse(state.publicationChanges, state.chipCountry);
+	if (pulse.status === "unavailable") {
+		els.chipPublicationChanges.innerHTML = `<div class="emptyState"><b>Publication comparison unavailable</b><span>The current trade data remains usable, but changes.json could not be loaded. This state is not interpreted as “no change.”</span></div>`;
+		return;
+	}
+	if (pulse.status === "baseline") {
+		els.chipPublicationChanges.innerHTML = `<div class="positionHeadline"><span class="statusPill planned">Baseline</span><strong>First comparable snapshot</strong><small>Future semiconductor releases will compare against this publication.</small></div><div class="analysisNote">Publish-to-publish revisions are separate from the month-to-month movement below. No previous publication is available, so TradeGravity does not claim that the data was unchanged.</div>`;
+		return;
+	}
+	const summary = pulse.summary;
+	const coverage = `Added ${pulse.newReporters.length ? pulse.newReporters.join(", ") : "none"} · removed ${pulse.removedReporters.length ? pulse.removedReporters.join(", ") : "none"}`;
+	const periods = `Added ${pulse.newPeriods.length ? pulse.newPeriods.join(", ") : "none"} · removed ${pulse.removedPeriods.length ? pulse.removedPeriods.join(", ") : "none"}`;
+	const revisionRows = pulse.revisions.map(item => `<tr><th>${escapeHTML(item.period)}</th><td>${escapeHTML(item.code)} · ${escapeHTML(item.label)}</td><td class="numeric">${escapeHTML(formatNominalUSD(item.previousTotal))}</td><td class="numeric">${escapeHTML(formatNominalUSD(item.currentTotal))}</td><td class="numeric">${item.delta >= 0 ? "+" : "−"}${escapeHTML(formatNominalUSD(Math.abs(item.delta)))}</td></tr>`).join("");
+	const revisionDetail = revisionRows
+		? `<div class="subSectionTitle">Largest published revisions for ${escapeHTML(state.chipCountry)}</div><div class="tableScroll" tabindex="0"><table class="miniTable"><thead><tr><th>Month</th><th>HS6</th><th class="numeric">Previous</th><th class="numeric">Current</th><th class="numeric">Delta</th></tr></thead><tbody>${revisionRows}</tbody></table></div>`
+		: `<div class="analysisNote">No bounded top revision in this release belongs to ${escapeHTML(state.chipCountry)}. Global counts above can still reflect other reporters or rows outside the top list.</div>`;
+	els.chipPublicationChanges.innerHTML = `<div class="positionHeadline"><span class="statusPill ${pulse.status === "changed" ? "warning" : "success"}">${escapeHTML(pulse.status)}</span><strong>${pulse.status === "changed" ? "The published observation set changed" : "No observed publication delta"}</strong><small>Compared with ${escapeHTML(pulse.previousGeneratedAt || "the previous release")}</small></div><div class="signalMetrics"><div class="signalMetric"><span>New / removed months</span><b>${escapeHTML(periods)}</b></div><div class="signalMetric"><span>Reporter coverage</span><b>${escapeHTML(coverage)}</b></div><div class="signalMetric"><span>Added / removed rows</span><b>${summary.addedRows} added · ${summary.removedRows} removed</b></div><div class="signalMetric"><span>Revised matching rows</span><b>${summary.revisedRows}</b></div><div class="signalMetric"><span>Source observation delta</span><b>${summary.observationDelta > 0 ? "+" : ""}${summary.observationDelta}</b></div></div>${revisionDetail}<div class="analysisNote">This compares generated publications at identical reporter–month–classification–HS6 keys. It does not describe economic month-to-month growth, causality, or a physical shipment route.</div>`;
+}
+
 function renderChipMonthly(){
   if (!els.chipMonthlySignals) return;
   const file = normalizeISO3(state.semiconductorMonthlyFile?.reporter_iso3) === state.chipCountry ? state.semiconductorMonthlyFile : null;
@@ -2454,8 +2533,12 @@ function renderChipMonthly(){
     return;
   }
   const shift = monthly.windowShift == null ? "—" : `${monthly.windowShift >= 0 ? "+" : ""}${(monthly.windowShift * 100).toFixed(1)}pp`;
+	const latestShift = monthly.latestBalanceShift == null ? "—" : `${monthly.latestBalanceShift >= 0 ? "+" : ""}${(monthly.latestBalanceShift * 100).toFixed(1)}pp`;
+	const latestGrowth = monthly.latestGrowth == null ? "—" : mirrorGapLabel(monthly.latestGrowth);
+	const usaGrowth = monthly.latestUSAGrowth == null ? "—" : mirrorGapLabel(monthly.latestUSAGrowth);
+	const chinaGrowth = monthly.latestChinaGrowth == null ? "—" : mirrorGapLabel(monthly.latestChinaGrowth);
   const rows = monthly.rows.map(row => `<tr><th>${escapeHTML(row.period)}</th><td class="numeric">${escapeHTML(formatNominalUSD(row.usaValue))}</td><td class="numeric">${escapeHTML(formatNominalUSD(row.chinaValue))}</td><td class="numeric">${row.exposureBalance >= 0 ? "+" : ""}${(row.exposureBalance * 100).toFixed(1)}pp</td></tr>`).join("");
-  els.chipMonthlySignals.innerHTML = `<div class="positionHeadline"><span class="statusPill warning">${escapeHTML(monthly.latest.position)}</span><strong>${escapeHTML(monthly.direction)}</strong><small>${escapeHTML(state.chipCountry)} · ${escapeHTML(state.chipStage === "all" ? "all mapped chip codes" : (chipReference().stages || []).find(stage => stage.id === state.chipStage)?.label || state.chipStage)}</small></div><div class="signalMetrics"><div class="signalMetric"><span>Latest USA value</span><b>${escapeHTML(formatNominalUSD(monthly.latest.usaValue))}</b></div><div class="signalMetric"><span>Latest China value</span><b>${escapeHTML(formatNominalUSD(monthly.latest.chinaValue))}</b></div><div class="signalMetric"><span>Window position shift</span><b>${escapeHTML(shift)}</b></div><div class="signalMetric"><span>Latest dual exposure</span><b>${(monthly.latest.dualDependency * 100).toFixed(1)}%</b></div></div><div class="tableScroll monthlyTableScroll" tabindex="0"><table class="miniTable"><thead><tr><th>Month</th><th class="numeric">USA</th><th class="numeric">China</th><th class="numeric">Balance</th></tr></thead><tbody>${rows}</tbody></table></div><div class="analysisNote">Selected monthly HS6 observations only. Positive balance/shift means toward USA; negative means toward China. Monthly customs values can be volatile and revised.</div>`;
+  els.chipMonthlySignals.innerHTML = `<div class="positionHeadline"><span class="statusPill warning">${escapeHTML(monthly.latest.position)}</span><strong>${escapeHTML(monthly.direction)}</strong><small>${escapeHTML(state.chipCountry)} · ${escapeHTML(state.chipStage === "all" ? "all mapped chip codes" : (chipReference().stages || []).find(stage => stage.id === state.chipStage)?.label || state.chipStage)}</small></div><div class="signalMetrics"><div class="signalMetric"><span>Latest combined growth</span><b>${escapeHTML(latestGrowth)}</b></div><div class="signalMetric"><span>USA growth</span><b>${escapeHTML(usaGrowth)}</b></div><div class="signalMetric"><span>China growth</span><b>${escapeHTML(chinaGrowth)}</b></div><div class="signalMetric"><span>Latest balance shift</span><b>${escapeHTML(latestShift)}</b></div><div class="signalMetric"><span>Window position shift</span><b>${escapeHTML(shift)}</b></div><div class="signalMetric"><span>Latest dual exposure</span><b>${(monthly.latest.dualDependency * 100).toFixed(1)}%</b></div></div><div class="tableScroll monthlyTableScroll" tabindex="0"><table class="miniTable"><thead><tr><th>Month</th><th class="numeric">USA</th><th class="numeric">China</th><th class="numeric">Balance</th></tr></thead><tbody>${rows}</tbody></table></div><div class="analysisNote">Latest change compares ${escapeHTML(monthly.latest.period)} with ${escapeHTML(monthly.previous?.period || "no prior month")}; window shift compares the first and last published months. Selected monthly HS6 observations only. Monthly customs values can be volatile and revised.</div>`;
 }
 
 async function loadSelectedChipMonthly(){
@@ -2591,6 +2674,7 @@ function renderSemiconductorAtlas(){
   renderChipRoleLandscape(reference);
   renderChipDistribution(summary);
   renderChipCountry(summary);
+	renderChipPublicationChanges();
   renderChipMonthly();
   renderChipTimeline(reference, sources);
   renderChipCapacitySignals(reference, sources);
@@ -2912,7 +2996,7 @@ async function main(){
     console.warn("[TradeGravity] iso3_to_iso2.json not loaded, using fallback map.", err);
   }
 
-  const [res, metaRes, seriesRes, qualityRes, productIndexRes, strategicIndexRes, tariffIndexRes, matrixIndexRes, mirrorIndexRes, catalogRes, semiconductorReferenceRes, semiconductorMonthlyIndexRes] = await Promise.all([
+  const [res, metaRes, seriesRes, qualityRes, productIndexRes, strategicIndexRes, tariffIndexRes, matrixIndexRes, mirrorIndexRes, catalogRes, semiconductorReferenceRes, semiconductorMonthlyIndexRes, publicationChangesRes] = await Promise.all([
     fetch(DATA_URL, { cache: "no-store" }),
     fetch(META_URL, { cache: "no-store" }).catch(() => null),
     fetch(SERIES_URL, { cache: "no-store" }).catch(() => null),
@@ -2925,6 +3009,7 @@ async function main(){
     fetch(CATALOG_URL, { cache: "no-store" }).catch(() => null),
     fetch(SEMICONDUCTOR_REFERENCE_URL, { cache: "no-store" }).catch(() => null),
     fetch(SEMICONDUCTOR_MONTHLY_INDEX_URL, { cache: "no-store" }).catch(() => null),
+	fetch(PUBLICATION_CHANGES_URL, { cache: "no-store" }).catch(() => null),
   ]);
   if (!res.ok) throw new Error(`Dataset request failed (${res.status})`);
   const data = await res.json();
@@ -2942,6 +3027,7 @@ async function main(){
   const catalog = catalogRes?.ok ? await catalogRes.json().catch(() => null) : null;
   const semiconductorReference = semiconductorReferenceRes?.ok ? await semiconductorReferenceRes.json().catch(() => null) : null;
   const semiconductorMonthlyIndex = semiconductorMonthlyIndexRes?.ok ? await semiconductorMonthlyIndexRes.json().catch(() => null) : null;
+	const publicationChanges = publicationChangesRes?.ok ? await publicationChangesRes.json().catch(() => null) : null;
 
   state.generatedAt = data.generated_at || data.generatedAt || "-";
   state.schemaVersion = String(metadata?.schema_version || data.schema_version || "");
@@ -2957,6 +3043,7 @@ async function main(){
   state.catalog = catalog;
   state.semiconductorReference = semiconductorReference;
   state.semiconductorMonthlyIndex = semiconductorMonthlyIndex;
+	state.publicationChanges = publicationChanges;
   state.meta = metadata;
   state.resourceStates = [
     { label: "metadata", ready: Boolean(metadata) },
@@ -2970,6 +3057,7 @@ async function main(){
     { label: "data catalog", ready: Boolean(catalog) },
     { label: "semiconductor atlas", ready: Boolean(semiconductorReference) },
     { label: "monthly semiconductor index", ready: Boolean(semiconductorMonthlyIndex) },
+	{ label: "publication change feed", ready: Boolean(publicationChanges) },
   ];
   const initialView = parseViewState(window.location.search);
   state.metric = initialView.metric;

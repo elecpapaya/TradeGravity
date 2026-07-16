@@ -12,6 +12,8 @@ All notable changes to TradeGravity will be documented in this file. The project
 - Five-year strategic HS6 collection support and a published `semiconductors/reference.json` artifact with cross-registry and source validation.
 - Explicit USA/China shares, exposure balance, position shift, dual exposure, and growth-divergence signals across the general and semiconductor lenses.
 - Focused 12-month semiconductor HS6 collection/publication for selected connector economies, with missing coverage left unestimated.
+- A validated `changes.json` feed and Chip Lens Pulse that distinguish latest month-to-month movement from publish-to-publish coverage, row, and value revisions.
+- Semiconductor-aware Markdown summary reports with annual position, latest monthly growth, publication deltas, and direct evidence endpoints.
 - Unadjusted USA/China mirror-reporting diagnostics that preserve both reports, symmetric gaps, and interpretation caveats.
 - A validated free/public-only semiconductor data policy and open-dataset register, including OECD ICIO as industry-level future context rather than fabricated HS6 evidence.
 - A first-visit 30-second onboarding guide with a ready-made Viet Nam view.
@@ -24,6 +26,7 @@ All notable changes to TradeGravity will be documented in this file. The project
 - The provider refresh runs weekly and is split into a core workflow and a quota-spaced semiconductor workflow; annual strategic HS6 collection is bounded to the declared connector allowlist instead of querying every headline reporter.
 - WITS/TRAINS requests now declare annual frequency and split large strategic HS6 registries into server-safe 20-code batches.
 - The scheduled strategic HS6 collection now requests the selected year plus four prior annual periods and a focused 12-month panel; main-branch fast deploys preserve the latest observed coverage block while refreshing the versioned semiconductor reference.
+- The semiconductor publisher now compares against the previous `gh-pages` monthly dataset; the first comparable release is marked as a baseline rather than “unchanged.”
 - Intelligence and semiconductor navigation now state the explicit US–China perspective while keeping reported observations, context, and illustrative estimates separate.
 - Recent headline panels now state their rolling window beside the selected historical trade periods and explicitly warn that the clocks are not aligned.
 - Share URLs now restore scenario partner, HS6 product, tariff, elasticity, and pass-through assumptions in addition to the existing filters and country selection.

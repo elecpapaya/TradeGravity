@@ -16,6 +16,7 @@ TradeGravity is an open-source pipeline and static intelligence dashboard for un
 - **Reuse examples:** [docs/USAGE.md](docs/USAGE.md)
 - **Data rights and attribution:** [docs/DATA_RIGHTS.md](docs/DATA_RIGHTS.md)
 - **Project roadmap:** [ROADMAP.md](ROADMAP.md)
+- **Iteration evidence and decisions:** [docs/ITERATION_LOG.md](docs/ITERATION_LOG.md)
 - **How to cite:** [CITATION.cff](CITATION.cff)
 
 ## Dashboard screenshots
@@ -68,6 +69,7 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 - Searchable accessible data table and selected-country 5–10 year trend.
 - HS2 product mix for the selected reporter, kept separate from WITS headline totals.
 - Shareable Overview, US–China Lens, Chip Lens, Products, Data & Quality, and Scenario Lab tabs with synchronized filters, country, semiconductor stage/context, product, tariff, and scenario-assumption state.
+- A semiconductor Pulse that separates latest month-to-month movement from publish-to-publish coverage and value revisions, with a machine-readable bounded change feed.
 - Two-anchor position metrics whose formulas are visible: USA share, China share, exposure balance, position shift, dual exposure, and anchor-growth divergence.
 - Unadjusted bilateral mirror-reporting diagnostics that compare both countries' reports without choosing either as ground truth or treating the difference as fraud, evasion, rerouting, or an adjusted estimate.
 - An illustrative HS6 tariff sensitivity lab that can load a published MFN rate and product import baseline while exposing elasticity, pass-through, fallback, and source assumptions.
@@ -138,6 +140,7 @@ The public deployment exposes stable machine-readable endpoints:
 - `https://elecpapaya.github.io/TradeGravity/data/strategic-hs6/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/semiconductors/reference.json`
 - `https://elecpapaya.github.io/TradeGravity/data/semiconductors/monthly/index.json`
+- `https://elecpapaya.github.io/TradeGravity/data/changes.json`
 - `https://elecpapaya.github.io/TradeGravity/data/tariffs/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/bilateral-matrix/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/mirror/index.json`
@@ -273,13 +276,13 @@ This repository reads operating-system environment variables and does not load a
 ## Generated files and deployment
 
 - Local SQLite database: `tradegravity.db`
-- Published JSON: `meta.json`, `catalog.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, `strategic-hs6/`, `semiconductors/reference.json`, `semiconductors/monthly/`, `tariffs/`, `bilateral-matrix/`, `mirror/`, and `explanations/` under `site/data/`
+- Published JSON: `meta.json`, `catalog.json`, `changes.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, `strategic-hs6/`, `semiconductors/reference.json`, `semiconductors/monthly/`, `tariffs/`, `bilateral-matrix/`, `mirror/`, and `explanations/` under `site/data/`
 
-Generated data and the local database are intentionally not committed to the default branch. The scheduled or manually dispatched core workflow runs the broad collectors and saves its validated database as a three-day Actions artifact. The staggered semiconductor workflow restores that artifact, adds annual and monthly chip observations for [`configs/chip_connectors.csv`](configs/chip_connectors.csv), validates the complete publication, and deploys `site/` to the `gh-pages` branch. A `main` push uses the latest validated `data/` directory from `gh-pages` and redeploys the site without calling WITS, UN Comtrade, WITS/TRAINS, or World Bank APIs. This keeps code-only deployments fast while the weekly refresh remains the source of new published observations.
+Generated data and the local database are intentionally not committed to the default branch. The scheduled or manually dispatched core workflow runs the broad collectors and saves its validated database as a three-day Actions artifact. The staggered semiconductor workflow restores that artifact and the previous `gh-pages` publication, adds annual and monthly chip observations for [`configs/chip_connectors.csv`](configs/chip_connectors.csv), emits a validated publish-to-publish `changes.json`, and deploys `site/` to the `gh-pages` branch. A `main` push uses the latest validated `data/` directory from `gh-pages` and redeploys the site without calling WITS, UN Comtrade, WITS/TRAINS, or World Bank APIs. This keeps code-only deployments fast while the weekly refresh remains the source of new published observations.
 
 The fast deployment intentionally fails if `gh-pages` does not contain `data/latest.json` and `data/meta.json`. Bootstrap or repair the published dataset by manually running **Update TradeGravity core**, then **Update TradeGravity semiconductor**; the second workflow waits out any remaining quota window before it publishes.
 
-Before deployment, `cmd/validator` checks provenance across every artifact, reporter uniqueness, periods, non-negative finite values, totals and shares, matrix availability/count identities, tariff rate identities, product keys, context coverage, and explanation evidence references.
+Before deployment, `cmd/validator` checks provenance across every artifact, reporter uniqueness, periods, non-negative finite values, totals and shares, matrix availability/count identities, tariff rate identities, product keys, bounded publication-change arithmetic and ordering, context coverage, and explanation evidence references.
 
 ## Maintenance and contributing
 

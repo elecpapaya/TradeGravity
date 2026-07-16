@@ -103,6 +103,17 @@
       "href": "./semiconductors/monthly/index.json"
     },
     {
+      "id": "publication_changes",
+      "title": "Observed publication changes",
+      "status": "partial",
+      "provider": "tradegravity",
+      "classification": "source HS revision",
+      "product_level": 6,
+      "grain": "publication × focused reporter × month × selected HS6",
+      "partitioning": "single bounded change feed",
+      "href": "./changes.json"
+    },
+    {
       "id": "mirror_reconciliation",
       "title": "Unadjusted mirror-reporting diagnostics",
       "status": "ready",

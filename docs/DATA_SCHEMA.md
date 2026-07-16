@@ -1,6 +1,6 @@
 # Published data schema 2.0
 
-TradeGravity publishes one versioned artifact set under `site/data/`. Headline, product, strategic HS6, semiconductor, tariff, bilateral-matrix, mirror-diagnostic, quality, and explanation artifacts share the trade publication timestamp. The semiconductor reference has its own additive schema and records both its editorial update date and publisher `generated_at`. `catalog.json` has an independent additive catalog schema and the same publisher timestamp. `context.json` has its own refresh time because it is built before the trade publisher.
+TradeGravity publishes one versioned artifact set under `site/data/`. Headline, product, strategic HS6, semiconductor, publish-to-publish change, tariff, bilateral-matrix, mirror-diagnostic, quality, and explanation artifacts share the trade publication timestamp. The semiconductor reference has its own additive schema and records both its editorial update date and publisher `generated_at`. `catalog.json` and `changes.json` have independent additive schemas and the same publisher timestamp. `context.json` has its own refresh time because it is built before the trade publisher.
 
 ## Time and comparison semantics
 
@@ -23,6 +23,7 @@ TradeGravity publishes one versioned artifact set under `site/data/`. Headline, 
 | `semiconductors/reference.json` | Stage taxonomy, roles, trends, policy/project signals, sources, coverage gate | Project registry + cited official/intergovernmental sources |
 | `semiconductors/monthly/index.json` | Focused monthly reporter/period discovery | UN Comtrade + semiconductor registry |
 | `semiconductors/monthly/{ISO3}.json` | Selected HS6 monthly USA/China flows | UN Comtrade |
+| `changes.json` | Previous-publication coverage, row, and value deltas for the focused monthly semiconductor layer | Publisher comparison of consecutive publications |
 | `tariffs/index.json` | Importer/year tariff partition discovery | WITS/TRAINS |
 | `tariffs/{ISO3}/{YEAR}.json` | Revision-aware strategic HS6 tariff rows | WITS/TRAINS |
 | `bilateral-matrix/index.json` | Multi-partner `TOTAL` partition discovery | UN Comtrade |
@@ -38,7 +39,7 @@ TradeGravity publishes one versioned artifact set under `site/data/`. Headline, 
 
 The catalog is the stable discovery layer for a dashboard that may grow beyond a few single-file datasets. Each resource declares an `id`, display title, `status`, analytical `grain`, `partitioning`, and an `href` only when an artifact is published. Current statuses are `ready`, `partial`, and `planned`.
 
-`strategic_hs6`, `semiconductor_atlas`, `semiconductor_monthly`, `tariff_schedules`, `bilateral_matrix`, and `mirror_reconciliation` are published resources. The last ID is retained for catalog compatibility, but its title and artifact explicitly describe **unadjusted mirror-reporting diagnostics**, not a reconciled truth. Computed value-added networks and versioned scenario results remain planned contracts and do not claim that those observations exist. Published resources use relative same-origin paths; the validator rejects duplicate IDs, invalid statuses, unsafe paths, and metadata that conflicts with `meta.json`.
+`strategic_hs6`, `semiconductor_atlas`, `semiconductor_monthly`, `publication_changes`, `tariff_schedules`, `bilateral_matrix`, and `mirror_reconciliation` are published resources. The last ID is retained for catalog compatibility, but its title and artifact explicitly describe **unadjusted mirror-reporting diagnostics**, not a reconciled truth. Computed value-added networks and versioned scenario results remain planned contracts and do not claim that those observations exist. Published resources use relative same-origin paths; the validator rejects duplicate IDs, invalid statuses, unsafe paths, and metadata that conflicts with `meta.json`.
 
 The current product resource demonstrates the intended scaling pattern: a small discovery index plus one reporter file. Higher-volume resources should use period, reporter, importer, industry, or sector chunks named in the catalog rather than expanding `latest.json`.
 
@@ -181,6 +182,32 @@ Positive balance/shift means toward USA and negative means toward China. These c
 ```
 
 Only mapped HS6 codes, monthly periods, and USA/CHN partners are admitted. The index observation count is the number of accepted source flow rows, while partition `row_count` is the number of aggregated product-month rows. Missing data remain unavailable and are never interpolated.
+
+## Publish-to-publish semiconductor changes
+
+`changes.json` uses schema `1.0` and compares the current focused monthly publication with the previously deployed `semiconductors/monthly/` dataset. This is deliberately separate from economic month-to-month movement. The comparison key is `reporter × period × classification × HS6`; matching keys are revisions when either anchor series block, total, share, or label changed.
+
+```json
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-16T02:30:00Z",
+  "previous_generated_at": "2026-07-09T02:30:00Z",
+  "status": "changed",
+  "summary": {
+    "current_observation_count": 1200,
+    "previous_observation_count": 1100,
+    "observation_delta": 100,
+    "added_rows": 25,
+    "removed_rows": 0,
+    "revised_rows": 3
+  },
+  "new_periods": ["2026-06"],
+  "new_reporters": [],
+  "top_revisions": []
+}
+```
+
+`status` is `baseline` when no earlier comparable publication exists, `unchanged` when a previous publication exists but no admitted change is found, and `changed` otherwise. A baseline never masquerades as “no change.” The revision list is capped at 20 rows and ordered by the sum of absolute USA and China trade-value changes; global counts remain complete even when the list is truncated. Added and removed rows are counted but not represented as value revisions. The validator checks current-index identity, timestamps, dimensions, counts, finite values, revision arithmetic, and descending magnitude.
 
 ## Multi-partner bilateral matrix
 

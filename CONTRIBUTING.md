@@ -48,6 +48,8 @@ Generated files under `site/data/` and `tradegravity.db` should not be committed
 ## Pull requests
 
 - Keep the change focused and explain the behavior it changes.
+- For a substantial product, data, or maintenance decision, link or add an entry in [`docs/ITERATION_LOG.md`](docs/ITERATION_LOG.md). State the observation, hypothesis, success or stop signal, available evidence, and next decision.
+- Label automated checks, maintainer inspection, production verification, and external-user evidence separately. Never invent participants, usage, or outcomes to complete an iteration record.
 - Add or update tests for parsing, calculation, or persistence changes.
 - Update README or design documentation when commands, output, or data semantics change.
 - Preserve provider attribution and never silently combine observations from different sources.
@@ -59,4 +61,4 @@ Small pull requests are easier to review. Maintainers may ask to split unrelated
 
 ## Project direction
 
-See [ROADMAP.md](ROADMAP.md) for current priorities. A pull request does not need to be listed there, but substantial changes should start with an issue so scope and data semantics can be agreed on first.
+See [ROADMAP.md](ROADMAP.md) for current priorities and [`docs/ITERATION_LOG.md`](docs/ITERATION_LOG.md) for the evidence behind implemented decisions. A pull request does not need to be listed on the roadmap, but substantial changes should start with an issue so scope and data semantics can be agreed on first.
