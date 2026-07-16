@@ -1,4 +1,4 @@
-name: Update TradeGravity
+name: Update TradeGravity core
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: tradegravity-pages
@@ -45,21 +45,6 @@ jobs:
           COMTRADE_TIMEOUT_SECONDS: "60"
         run: go run ./cmd/collector products -provider comtrade -primary-provider wits -year auto -product-level 2 -concurrency 2 -db tradegravity.db
 
-      - name: Collect curated strategic HS6 products
-        env:
-          COMTRADE_RATE_LIMIT_PER_SEC: "1"
-          COMTRADE_MAX_RETRIES: "6"
-          COMTRADE_TIMEOUT_SECONDS: "60"
-        run: go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto -history-years 4 -registry configs/strategic_hs6.csv -concurrency 2 -db tradegravity.db
-
-      - name: Collect focused monthly semiconductor signals
-        env:
-          COMTRADE_FREQUENCY: M
-          COMTRADE_RATE_LIMIT_PER_SEC: "1"
-          COMTRADE_MAX_RETRIES: "6"
-          COMTRADE_TIMEOUT_SECONDS: "60"
-        run: go run ./cmd/collector chip-monthly -provider comtrade -months 12 -reference configs/semiconductor_reference.json -allowlist configs/chip_connectors.csv -concurrency 2 -db tradegravity.db
-
       - name: Collect multi-partner bilateral matrix
         env:
           COMTRADE_RATE_LIMIT_PER_SEC: "1"
@@ -90,8 +75,12 @@ jobs:
       - name: Validate published dataset
         run: go run ./cmd/validator -dir site/data -min-reporters 40
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Save core state for the semiconductor refresh
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+          name: tradegravity-core
+          path: |
+            tradegravity.db
+            site/data/context.json
+          if-no-files-found: error
+          retention-days: 3

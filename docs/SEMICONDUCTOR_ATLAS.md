@@ -50,7 +50,7 @@ The publication declares `reference_only`, `limited`, or `research_ready`. `rese
 
 Passing the gate does not make HS6 a capacity database. It means only that the published reporter/period sample is broad enough for the atlas's descriptive comparisons. The UI always keeps the measurement limitations visible.
 
-The daily strategic collector requests the selected year plus four prior annual periods. Reporter/year files remain bounded and are loaded lazily, eight at a time, only when the Chip Lens is opened. A separate focused collector requests the latest 12 complete months for the 30 mapped codes and connector allowlist. Monthly values are a turning-point layer; absent reporters, products, or months stay missing rather than being interpolated.
+The staggered semiconductor refresh restores the latest successful core database, waits beyond the public Comtrade quota window, and requests the selected year plus four prior annual periods only for the declared connector allowlist. Reporter/year files remain bounded and are loaded lazily, eight at a time, only when the Chip Lens is opened. The same bounded refresh then requests the latest 12 complete months for the 30 mapped codes and connector allowlist. Monthly values are a turning-point layer; absent reporters, products, or months stay missing rather than being interpolated.
 
 ## Calculations
 
@@ -111,8 +111,8 @@ Process-node capacity, firm ownership, and validated input-output propagation re
 Build the reference publication and coverage metadata with:
 
 ```bash
-go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto -history-years 4
-COMTRADE_FREQUENCY=M go run ./cmd/collector chip-monthly -provider comtrade -months 12
+go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto -history-years 4 -allowlist configs/chip_connectors.csv
+COMTRADE_FREQUENCY=M go run ./cmd/collector chip-monthly -provider comtrade -months 12 -allowlist configs/chip_connectors.csv
 go run ./cmd/collector matrix -provider comtrade -primary-provider wits -year auto
 go run ./cmd/publisher build -out site/data
 go run ./cmd/validator -dir site/data -min-reporters 40

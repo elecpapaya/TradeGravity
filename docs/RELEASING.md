@@ -34,14 +34,14 @@ go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
 go run ./cmd/validator -dir examples/sample-data -min-reporters 3
 ```
 
-Confirm that all required pull-request checks pass. Then run the collector, publisher, and validator against the intended provider or verify the latest successful scheduled run:
+Confirm that all required pull-request checks pass. Then run the collector, publisher, and validator against the intended provider or verify both successful scheduled refreshes. The core refresh collects WITS history, HS2 products, the bilateral matrix, and tariffs at 01:00 UTC. It saves the database as the short-lived `tradegravity-core` Actions artifact. The semiconductor refresh starts at 02:00 UTC, waits until at least 35 minutes after the core run completed, restores that database, and adds bounded annual and monthly semiconductor observations before publishing the complete dataset.
 
 ```bash
 go run ./cmd/context
 go run ./cmd/collector run -history-years 9
 go run ./cmd/collector products -provider comtrade -primary-provider wits -year auto
-go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto -history-years 4
-COMTRADE_FREQUENCY=M go run ./cmd/collector chip-monthly -provider comtrade -months 12
+go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto -history-years 4 -allowlist configs/chip_connectors.csv
+COMTRADE_FREQUENCY=M go run ./cmd/collector chip-monthly -provider comtrade -months 12 -allowlist configs/chip_connectors.csv
 go run ./cmd/collector matrix -provider comtrade -primary-provider wits -year auto
 go run ./cmd/collector tariffs -provider trains -year auto -data-type aveestimated
 go run ./cmd/publisher build -db tradegravity.db -out site/data -series-years 10
@@ -70,5 +70,6 @@ Replace `v0.1.1` with the prepared version. Do not move an existing public tag; 
 - Verify the release page, source archive, citation metadata, and changelog link.
 - Verify the public GitHub Pages site and its `meta.json` and `latest.json` endpoints.
 - Confirm the main-branch site deployment reused the latest published dataset without running provider collectors.
-- Confirm the next scheduled collection and deployment succeeds.
+- Confirm both the core and semiconductor collection/deployment workflows succeed, and that the latter consumed the latest successful `tradegravity-core` artifact.
+- Confirm `meta.json` discovers non-empty mirror and semiconductor resources, including `mirror/index.json`, `semiconductors/reference.json`, and `semiconductors/monthly/index.json`.
 - Record any release regression in a public issue and fix it through the normal pull-request process.
