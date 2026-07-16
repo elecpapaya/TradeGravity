@@ -150,6 +150,67 @@
       lines.push("No country was selected in this view.");
     }
 
+	const semiconductor = model.semiconductor || null;
+	if (semiconductor) {
+	  const annual = semiconductor.annual || null;
+	  const monthly = semiconductor.monthly || null;
+	  const publication = semiconductor.publication || {};
+	  const evidence = semiconductor.evidence || {};
+	  lines.push(
+		"",
+		"## Semiconductor pulse",
+		"",
+		`- Reporter: ${clean(semiconductor.country) || "unknown"}`,
+		`- Value-chain stage: ${clean(semiconductor.stage) || "All mapped chip codes"}`,
+	  );
+	  if (annual) {
+		lines.push(
+		  `- Annual observation (${clean(annual.period) || "unknown"}): USA ${clean(annual.usaValue) || "—"} · China ${clean(annual.chinaValue) || "—"}`,
+		  `- Annual position: ${clean(annual.position) || "—"} · ${clean(annual.direction) || "—"} · balance shift ${clean(annual.balanceShift) || "—"}`,
+		);
+	  } else {
+		lines.push("- Annual stage position: choose a specific stage with a published observation for an additive-safe comparison.");
+	  }
+	  if (monthly) {
+		lines.push(
+		  `- Latest monthly observation: ${clean(monthly.period) || "unknown"} versus ${clean(monthly.previousPeriod) || "no prior month"}`,
+		  `- Latest USA / China values: ${clean(monthly.usaValue) || "—"} / ${clean(monthly.chinaValue) || "—"}`,
+		  `- Latest combined / USA / China growth: ${clean(monthly.combinedGrowth) || "—"} / ${clean(monthly.usaGrowth) || "—"} / ${clean(monthly.chinaGrowth) || "—"}`,
+		  `- Latest position and balance shift: ${clean(monthly.position) || "—"} · ${clean(monthly.balanceShift) || "—"}`,
+		);
+	  } else {
+		lines.push("- Latest monthly observation: not published for this reporter/stage selection.");
+	  }
+	  lines.push(
+		"",
+		"### Publication changes",
+		"",
+		`- Comparison status: ${clean(publication.status) || "unavailable"}`,
+		`- Previous publication: ${clean(publication.previousGeneratedAt) || "none (baseline)"}`,
+		`- New months: ${(publication.newPeriods || []).map(value => clean(value, 20)).filter(Boolean).join(", ") || "none"}`,
+		`- Reporter coverage added / removed: ${(publication.newReporters || []).map(value => clean(value, 3)).filter(Boolean).join(", ") || "none"} / ${(publication.removedReporters || []).map(value => clean(value, 3)).filter(Boolean).join(", ") || "none"}`,
+		`- Added / removed / revised rows: ${Number(publication.addedRows) || 0} / ${Number(publication.removedRows) || 0} / ${Number(publication.revisedRows) || 0}`,
+		`- Source observation delta: ${Number(publication.observationDelta) || 0}`,
+	  );
+	  const revisions = Array.isArray(publication.selectedRevisions) ? publication.selectedRevisions.slice(0, 5) : [];
+	  if (revisions.length > 0) {
+		lines.push("", "| Revised reporter/month/HS6 | Previous | Current | Delta |", "|---|---:|---:|---:|");
+		for (const revision of revisions) {
+		  lines.push(`| ${markdownCell(`${revision.reporterISO3} · ${revision.period} · ${revision.code} ${revision.label}`)} | ${markdownCell(revision.previousTotal)} | ${markdownCell(revision.currentTotal)} | ${markdownCell(revision.delta)} |`);
+		}
+	  }
+	  lines.push(
+		"",
+		"### Evidence endpoints",
+		"",
+		`- Stage reference: ${clean(evidence.reference) || "unavailable"}`,
+		`- Monthly index: ${clean(evidence.monthlyIndex) || "unavailable"}`,
+		`- Publish-to-publish change feed: ${clean(evidence.changes) || "unavailable"}`,
+		"",
+		"Month-to-month movement and publish-to-publish revisions are different comparisons; neither proves causality or a physical shipment route.",
+	  );
+	}
+
     lines.push("", "## Leading observations in the filtered view", "");
     if (topRows.length > 0) {
       lines.push("| Reporter | USA | China | Combined | Period quality |", "|---|---:|---:|---:|---|");

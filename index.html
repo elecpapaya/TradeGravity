@@ -257,6 +257,11 @@
       <button id="chipDownloadCSV" class="btn" type="button">Export stage CSV</button>
     </section>
 
+    <section class="chipTrendStrip" aria-labelledby="chipPublicationTitle">
+      <div class="chipSectionHeading"><div><span class="eyebrow">Observed publication delta</span><h2 id="chipPublicationTitle">What changed since the previous release</h2></div><a href="./data/changes.json" target="_blank" rel="noopener noreferrer">Change feed JSON</a></div>
+      <div id="chipPublicationChanges" class="analysisBody subtle" aria-live="polite">Loading the publish-to-publish comparison…</div>
+    </section>
+
     <section class="chipTrendStrip" aria-labelledby="chipTrendTitle">
       <div class="chipSectionHeading"><div><span class="eyebrow">Current structural shifts</span><h2 id="chipTrendTitle">What is changing</h2></div><span class="evidenceTag">External context · dated sources</span></div>
       <div id="chipTrends" class="chipTrendGrid subtle" aria-live="polite">Loading current semiconductor trends…</div>

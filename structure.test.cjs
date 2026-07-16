@@ -102,6 +102,7 @@ test("dashboard tabs and scalable intelligence targets appear exactly once", () 
 test("chip lens exposes coverage, stages, roles, monthly signals, policy, evidence, and transparent sensitivity", () => {
   for (const id of [
     "chipCoverageBadge", "chipCoverageSummary", "chipStageFilter", "chipCountryFilter", "chipDownloadCSV",
+	"chipPublicationChanges",
     "chipTrends", "chipValueChain", "chipRoleLandscape", "chipDistribution", "chipCountryProfile", "chipTimeline", "chipCapacitySignals",
     "chipMonthlySignals",
     "chipScenarioForm", "chipDisruption", "chipSubstitution", "chipScenarioBaseline", "chipScenarioResult",
