@@ -43,6 +43,7 @@ TradeGravity is maintained as a small, inspectable public-data pipeline with an 
 
 ## Near term: adoption evidence and release operations
 
+- Maintain the public [`docs/ITERATION_LOG.md`](docs/ITERATION_LOG.md) for bounded hypotheses, technical verification, production observations, external feedback, and keep/revise/revert decisions.
 - [Add browser end-to-end coverage for the documented ASEAN task](https://github.com/elecpapaya/TradeGravity/issues/8), including narrow and desktop viewports.
 - Run the documented task with at least three students, researchers, or developers and publish consented findings through [the public study tracker](https://github.com/elecpapaya/TradeGravity/issues/3).
 - Track task completion, interpretation errors, and time-to-answer in [`docs/USER_TESTING.md`](docs/USER_TESTING.md); never substitute synthetic sessions for real participants.

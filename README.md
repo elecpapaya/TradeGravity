@@ -16,6 +16,7 @@ TradeGravity is an open-source pipeline and static intelligence dashboard for un
 - **Reuse examples:** [docs/USAGE.md](docs/USAGE.md)
 - **Data rights and attribution:** [docs/DATA_RIGHTS.md](docs/DATA_RIGHTS.md)
 - **Project roadmap:** [ROADMAP.md](ROADMAP.md)
+- **Iteration evidence and decisions:** [docs/ITERATION_LOG.md](docs/ITERATION_LOG.md)
 - **How to cite:** [CITATION.cff](CITATION.cff)
 
 ## Dashboard screenshots
