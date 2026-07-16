@@ -92,4 +92,31 @@ test("monthly summary exposes recent US-China position movement for a selected s
   assert.ok(Math.abs(summary.windowShift - 0.4) < 1e-12);
   assert.equal(summary.direction, "toward USA");
   assert.equal(summary.latest.position, "US-leaning");
+	assert.equal(summary.previous.period, "2024-01");
+	assert.equal(summary.latestGrowth, 0);
+	assert.equal(summary.latestUSAGrowth, 0.5);
+	assert.ok(Math.abs(summary.latestChinaGrowth - (-1 / 3)) < 1e-12);
+	assert.ok(Math.abs(summary.latestBalanceShift - 0.4) < 1e-12);
+});
+
+test("publication pulse separates baseline, coverage changes, and selected-country revisions", () => {
+	const pulse = tools.publicationPulse({
+		status: "changed",
+		generated_at: "2026-07-16T00:00:00Z",
+		previous_generated_at: "2026-07-09T00:00:00Z",
+		summary: { current_observation_count: 12, previous_observation_count: 8, observation_delta: 4, added_rows: 2, removed_rows: 1, revised_rows: 2 },
+		new_periods: ["2026-06"],
+		new_reporters: ["TWN"],
+		top_revisions: [
+			{ reporter_iso3: "KOR", period: "2026-05", code: "854231", label: "Processors", previous_total_usd: 100, current_total_usd: 125, delta_trade_usd: 25, magnitude_trade_usd: 35, change_ratio: 0.25 },
+			{ reporter_iso3: "JPN", period: "2026-05", code: "854231", label: "Processors", previous_total_usd: 80, current_total_usd: 70, delta_trade_usd: -10, magnitude_trade_usd: 10, change_ratio: -0.125 },
+		],
+	}, "KOR");
+	assert.equal(pulse.status, "changed");
+	assert.equal(pulse.summary.observationDelta, 4);
+	assert.deepEqual(pulse.newPeriods, ["2026-06"]);
+	assert.deepEqual(pulse.newReporters, ["TWN"]);
+	assert.equal(pulse.revisions.length, 1);
+	assert.equal(pulse.revisions[0].reporterISO3, "KOR");
+	assert.equal(tools.publicationPulse({ status: "baseline" }).status, "baseline");
 });

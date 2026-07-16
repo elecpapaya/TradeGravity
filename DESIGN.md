@@ -21,7 +21,7 @@ public policy/reference registry ───────────────�
 - `cmd/collector` normalizes WITS totals/history and annual/monthly Comtrade product and partner observations. Reporter-level concurrency is bounded and provider rate limits remain global.
 - `internal/store/sqlite` uses schema-aware idempotent keys and migrates version 1 total-only databases.
 - `cmd/context` publishes country labels, region, income, project groups, population, and GDP.
-- `cmd/publisher` emits schema 2 totals, time series, annual and monthly product files, bilateral matrices, unadjusted mirror diagnostics, quality signals, context-enriched latest rows, and a resource catalog for chunk discovery.
+- `cmd/publisher` emits schema 2 totals, time series, annual and monthly product files, bilateral matrices, unadjusted mirror diagnostics, quality signals, context-enriched latest rows, a bounded previous-publication change feed, and a resource catalog for chunk discovery.
 - `cmd/explainer` generates build-time explanations whose statements cite evidence IDs. OpenAI use is optional; deterministic fallback covers every reporter.
 - `cmd/validator` rejects internally inconsistent or incompletely grounded artifact sets before deployment.
 - `site/` is a static tabbed client. It never receives provider or OpenAI credentials.
@@ -32,7 +32,7 @@ The client separates workflows without duplicating data state:
 
 - **Overview** preserves the two-anchor treemap, country snapshot, trend, and evidence-grounded explanation.
 - **US–China Lens** derives anchor shares, exposure balance, position shift, dual exposure, growth divergence, a two-anchor network, country ranking, and mirror-reporting checks from the active filters.
-- **Chip Lens** applies the same position and direction grammar to stage-mapped annual and focused monthly HS6 observations, while keeping qualitative roles, dated policies, project signals, and transparent stage-shock sensitivity separate. A coverage gate prevents a narrow sample from being described as a global measurement.
+- **Chip Lens** applies the same position and direction grammar to stage-mapped annual and focused monthly HS6 observations. Its Pulse explicitly separates latest month-to-month movement from publish-to-publish coverage/value revisions, while keeping qualitative roles, dated policies, project signals, and transparent stage-shock sensitivity separate. A coverage gate prevents a narrow sample from being described as a global measurement.
 - **Products** loads reporter-partitioned HS2 files and exposes the planned HS6/tariff boundary.
 - **Data & Quality** combines the resource catalog, quality report, accessible table, and exports.
 - **Scenario Lab** provides an explicitly illustrative constant-elasticity tariff sensitivity calculation. It is not presented as SMART, a causal forecast, or a GDP/welfare model.
@@ -41,7 +41,7 @@ The selected reporter and all filters are shared across tabs. The enumerated `ta
 
 ## Growth path for high-volume data
 
-`catalog.json` decouples resource discovery from individual artifact schemas. Every resource identifies grain, readiness, and partitioning. Products, strategic HS6, tariffs, bilateral matrices, focused monthly semiconductor observations, and unadjusted mirror diagnostics use small indexes plus bounded chunks. Computed value-added and versioned scenario resources remain planned and have no fabricated observations or URLs. New high-volume publishers should follow the same pattern rather than append millions of rows to `latest.json`.
+`catalog.json` decouples resource discovery from individual artifact schemas. Every resource identifies grain, readiness, and partitioning. Products, strategic HS6, tariffs, bilateral matrices, focused monthly semiconductor observations, the bounded publication-change feed, and unadjusted mirror diagnostics use small indexes or bounded chunks. Computed value-added and versioned scenario resources remain planned and have no fabricated observations or URLs. New high-volume publishers should follow the same pattern rather than append millions of rows to `latest.json`.
 
 ## Analytical lens
 
@@ -111,7 +111,7 @@ Filtering affects treemaps, the accessible table, and downloads. CSV is a raw fl
 
 ## Deployment sequence
 
-The weekly refresh is split to stay within the public Comtrade quota. Every Monday at 01:00 UTC the core workflow runs tests and vet, builds country context, collects ten-year WITS history, annual HS2 data, tariffs and bilateral matrices, publishes and validates a core dataset, and stores the database plus context as a three-day Actions artifact. At 02:00 UTC the semiconductor workflow restores the latest successful core artifact, waits until at least 35 minutes after that run completed, collects five bounded annual periods and the focused 12-month semiconductor panel for the declared connector allowlist, republishes and validates the complete dataset, and deploys `site/` to GitHub Pages. A main-branch code push reuses the last validated dataset instead of calling upstream APIs.
+The weekly refresh is split to stay within the public Comtrade quota. Every Monday at 01:00 UTC the core workflow runs tests and vet, builds country context, collects ten-year WITS history, annual HS2 data, tariffs and bilateral matrices, publishes and validates a core dataset, and stores the database plus context as a three-day Actions artifact. At 02:00 UTC the semiconductor workflow restores the latest successful core artifact and the previous `gh-pages` dataset, waits until at least 35 minutes after the core run completed, collects five bounded annual periods and the focused 12-month semiconductor panel for the declared connector allowlist, republishes the complete dataset with `changes.json`, validates it, and deploys `site/` to GitHub Pages. A main-branch code push reuses the last validated dataset instead of calling upstream APIs.
 
 The first release uses schema 2.0. Breaking field or meaning changes require a schema-version change and release note. Additive fields may ship within 2.x.
 

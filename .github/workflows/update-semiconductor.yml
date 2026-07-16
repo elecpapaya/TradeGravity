@@ -22,6 +22,13 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Check out the previous published dataset
+        uses: actions/checkout@v7
+        with:
+          ref: gh-pages
+          path: .published-site
+          persist-credentials: false
+
       - uses: actions/setup-go@v6
         with:
           go-version: "1.25.12"
@@ -87,7 +94,7 @@ jobs:
         run: go run ./cmd/collector chip-monthly -provider comtrade -months 12 -reference configs/semiconductor_reference.json -allowlist configs/chip_connectors.csv -concurrency 2 -db tradegravity.db
 
       - name: Run publisher
-        run: go run ./cmd/publisher build -db tradegravity.db -out site/data -context site/data/context.json -series-years 10 -product-provider comtrade -product-level 2
+        run: go run ./cmd/publisher build -db tradegravity.db -out site/data -previous-dir .published-site/data -context site/data/context.json -series-years 10 -product-provider comtrade -product-level 2
 
       - name: Build evidence-grounded explanations
         env:

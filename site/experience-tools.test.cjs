@@ -62,3 +62,28 @@ test("summary report preserves view provenance, selection, rows, and limitations
   assert.match(report, /group=ASEAN/);
   assert.match(report, /not shipment routes/i);
 });
+
+test("summary report adds an evidence-grounded semiconductor pulse when active", () => {
+	const report = buildSummaryReport({
+		exportedAt: "2026-07-16T00:00:00Z",
+		generatedAt: "2026-07-16T00:00:00Z",
+		provider: "wits",
+		tabLabel: "Chip Lens",
+		health: { label: "Data current", summary: "ready", details: [] },
+		semiconductor: {
+			country: "KOR",
+			stage: "Fabrication",
+			annual: { period: "2025", usaValue: "$10", chinaValue: "$20", position: "China-leaning", direction: "toward USA", balanceShift: "+2.0pp" },
+			monthly: { period: "2026-06", previousPeriod: "2026-05", usaValue: "$3", chinaValue: "$4", combinedGrowth: "+5.0%", usaGrowth: "+10.0%", chinaGrowth: "+1.0%", position: "balanced", balanceShift: "+1.0pp" },
+			publication: { status: "changed", previousGeneratedAt: "2026-07-09T00:00:00Z", newPeriods: ["2026-06"], newReporters: [], removedReporters: [], addedRows: 2, removedRows: 0, revisedRows: 1, observationDelta: 4, selectedRevisions: [{ reporterISO3: "KOR", period: "2026-05", code: "854231", label: "Processors", previousTotal: "$1", currentTotal: "$2", delta: "+$1" }] },
+			evidence: { reference: "https://example.test/reference.json", monthlyIndex: "https://example.test/monthly/index.json", changes: "https://example.test/changes.json" },
+		},
+		viewURL: "https://example.test/?tab=semiconductors&chipCountry=KOR",
+	});
+	assert.match(report, /## Semiconductor pulse/);
+	assert.match(report, /Latest monthly observation: 2026-06 versus 2026-05/);
+	assert.match(report, /### Publication changes/);
+	assert.match(report, /New months: 2026-06/);
+	assert.match(report, /changes\.json/);
+	assert.match(report, /different comparisons/i);
+});

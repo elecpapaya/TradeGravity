@@ -77,6 +77,7 @@ func TestBuildDataCatalogSeparatesReadyAndPlannedResources(t *testing.T) {
 		matrixIndexFile{Provider: "comtrade", ProductCode: "TOTAL", Partitions: []matrixPartition{{ReporterISO3: "KOR", Period: "2023"}}},
 		mirrorIndexFile{Provider: "comtrade", Partitions: []mirrorPartition{{ReporterISO3: "KOR", Period: "2023"}}},
 		semiconductorMonthlyIndexFile{Provider: "comtrade", Partitions: []semiconductorMonthlyPartition{{ReporterISO3: "KOR"}}},
+		publicationChangesFile{Status: "changed"},
 	)
 	if catalog.SchemaVersion != "1.0" || len(catalog.Resources) < 10 {
 		t.Fatalf("unexpected catalog shape: %+v", catalog)
@@ -99,6 +100,9 @@ func TestBuildDataCatalogSeparatesReadyAndPlannedResources(t *testing.T) {
 	}
 	if byID["mirror_reconciliation"].Status != "ready" || byID["mirror_reconciliation"].Href != "./mirror/index.json" {
 		t.Fatalf("mirror diagnostics resource is not published: %+v", byID["mirror_reconciliation"])
+	}
+	if byID["publication_changes"].Status != "ready" || byID["publication_changes"].Href != "./changes.json" {
+		t.Fatalf("publication change feed is not published: %+v", byID["publication_changes"])
 	}
 }
 

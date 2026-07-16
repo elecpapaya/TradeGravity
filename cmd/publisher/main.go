@@ -165,6 +165,7 @@ func build(args []string) {
 	hs2Path := fs.String("hs2", "configs/hs2.csv", "HS2 labels CSV")
 	strategicRegistryPath := fs.String("strategic-registry", "configs/strategic_hs6.csv", "strategic HS6 registry CSV")
 	semiconductorReferencePath := fs.String("semiconductor-reference", "configs/semiconductor_reference.json", "semiconductor value-chain reference JSON")
+	previousDir := fs.String("previous-dir", "", "previous published data directory for publish-to-publish comparison (optional)")
 	seriesYears := fs.Int("series-years", 10, "maximum number of annual periods per reporter")
 	fs.Parse(args)
 
@@ -228,6 +229,11 @@ func build(args []string) {
 	semiconductorReference.GeneratedAt = now
 	semiconductorReference.Publication = buildSemiconductorPublication(semiconductorReference, strategicFiles)
 	semiconductorMonthlyIndex, semiconductorMonthlyFiles := buildSemiconductorMonthlyFiles(now, *productProvider, partners, strategicRows, strategicProducts, semiconductorReference)
+	publicationChanges, err := buildPublicationChanges(now, *previousDir, semiconductorMonthlyIndex, semiconductorMonthlyFiles)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "failed to compare the previous semiconductor publication:", err)
+		os.Exit(1)
+	}
 	tariffRows, err := loadTariffObservations(*dbPath, "trains")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "failed to load tariff observations:", err)
@@ -247,7 +253,7 @@ func build(args []string) {
 		os.Exit(1)
 	}
 	quality := buildQualityFile(now, *provider, latest, rows, productRows, runs)
-	catalog := buildDataCatalog(now, *provider, contextData.Status, seriesOutput, productIndex, strategicIndex, tariffIndex, matrixIndex, mirrorIndex, semiconductorMonthlyIndex, semiconductorReference)
+	catalog := buildDataCatalog(now, *provider, contextData.Status, seriesOutput, productIndex, strategicIndex, tariffIndex, matrixIndex, mirrorIndex, semiconductorMonthlyIndex, publicationChanges, semiconductorReference)
 	metadata := buildMeta(now, *provider, partners, rows, latest)
 	augmentMeta(&metadata, latest, seriesOutput, productIndex, len(productRows), contextData.Status)
 	augmentStrategicMeta(&metadata, strategicIndex)
@@ -282,6 +288,10 @@ func build(args []string) {
 	}
 	if err := writeJSON(filepath.Join(*outDir, "catalog.json"), catalog); err != nil {
 		fmt.Fprintln(os.Stderr, "failed to write catalog.json:", err)
+		os.Exit(1)
+	}
+	if err := writeJSON(filepath.Join(*outDir, "changes.json"), publicationChanges); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write changes.json:", err)
 		os.Exit(1)
 	}
 	productsDir := filepath.Join(*outDir, "products")

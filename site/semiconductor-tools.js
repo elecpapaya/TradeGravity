@@ -280,6 +280,7 @@
     }
     const first = rows[0] || null;
     const latest = rows[rows.length - 1] || null;
+	const previous = rows.length > 1 ? rows[rows.length - 2] : null;
     const windowShift = first && latest ? latest.exposureBalance - first.exposureBalance : null;
     const direction = windowShift == null ? "unavailable"
       : windowShift >= 0.03 ? "toward USA"
@@ -290,10 +291,53 @@
       metric: selected,
       rows,
       first,
+	  previous,
       latest,
+	  latestGrowth: previous && previous.total > 0 ? (latest.total - previous.total) / previous.total : null,
+	  latestUSAGrowth: previous && previous.usaValue > 0 ? (latest.usaValue - previous.usaValue) / previous.usaValue : null,
+	  latestChinaGrowth: previous && previous.chinaValue > 0 ? (latest.chinaValue - previous.chinaValue) / previous.chinaValue : null,
+	  latestBalanceShift: latest?.directionShift ?? null,
       windowShift,
       direction,
     };
+  }
+
+  function publicationPulse(feed, reporterISO3 = "") {
+	const status = ["baseline", "unchanged", "changed"].includes(feed?.status) ? feed.status : "unavailable";
+	const reporter = cleanISO3(reporterISO3);
+	const summary = feed?.summary || {};
+	const revisions = (Array.isArray(feed?.top_revisions) ? feed.top_revisions : [])
+	  .filter(item => !reporter || cleanISO3(item?.reporter_iso3) === reporter)
+	  .map(item => ({
+		reporterISO3: cleanISO3(item?.reporter_iso3),
+		period: String(item?.period || ""),
+		code: String(item?.code || ""),
+		label: String(item?.label || ""),
+		previousTotal: Math.max(0, finite(item?.previous_total_usd)),
+		currentTotal: Math.max(0, finite(item?.current_total_usd)),
+		delta: finite(item?.delta_trade_usd),
+		magnitude: Math.max(0, finite(item?.magnitude_trade_usd)),
+		changeRatio: item?.change_ratio == null ? null : finite(item.change_ratio),
+	  }));
+	return {
+	  status,
+	  generatedAt: String(feed?.generated_at || ""),
+	  previousGeneratedAt: String(feed?.previous_generated_at || ""),
+	  reporterISO3: reporter,
+	  summary: {
+		currentObservationCount: Math.max(0, finite(summary.current_observation_count)),
+		previousObservationCount: Math.max(0, finite(summary.previous_observation_count)),
+		observationDelta: finite(summary.observation_delta),
+		addedRows: Math.max(0, finite(summary.added_rows)),
+		removedRows: Math.max(0, finite(summary.removed_rows)),
+		revisedRows: Math.max(0, finite(summary.revised_rows)),
+	  },
+	  newPeriods: Array.isArray(feed?.new_periods) ? feed.new_periods.map(String) : [],
+	  removedPeriods: Array.isArray(feed?.removed_periods) ? feed.removed_periods.map(String) : [],
+	  newReporters: Array.isArray(feed?.new_reporters) ? feed.new_reporters.map(cleanISO3).filter(Boolean) : [],
+	  removedReporters: Array.isArray(feed?.removed_reporters) ? feed.removed_reporters.map(cleanISO3).filter(Boolean) : [],
+	  revisions,
+	};
   }
 
   return {
@@ -305,6 +349,7 @@
     sourceIndex,
     summarizeStages,
     summarizeMonthly,
+	publicationPulse,
     exposureMetrics,
   };
 });

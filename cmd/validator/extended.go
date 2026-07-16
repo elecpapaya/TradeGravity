@@ -337,6 +337,48 @@ type validationSemiconductorMonthlyProductEntry struct {
 	ShareCN        float64               `json:"share_cn"`
 }
 
+type validationPublicationChanges struct {
+	SchemaVersion       string                             `json:"schema_version"`
+	GeneratedAt         string                             `json:"generated_at"`
+	PreviousGeneratedAt string                             `json:"previous_generated_at,omitempty"`
+	Status              string                             `json:"status"`
+	Scope               string                             `json:"scope"`
+	Summary             validationPublicationChangeSummary `json:"summary"`
+	CurrentPeriods      []string                           `json:"current_periods"`
+	NewPeriods          []string                           `json:"new_periods"`
+	RemovedPeriods      []string                           `json:"removed_periods"`
+	CurrentReporters    []string                           `json:"current_reporters"`
+	NewReporters        []string                           `json:"new_reporters"`
+	RemovedReporters    []string                           `json:"removed_reporters"`
+	TopRevisions        []validationPublicationRevision    `json:"top_revisions"`
+}
+
+type validationPublicationChangeSummary struct {
+	CurrentObservationCount  int `json:"current_observation_count"`
+	PreviousObservationCount int `json:"previous_observation_count"`
+	ObservationDelta         int `json:"observation_delta"`
+	AddedRows                int `json:"added_rows"`
+	RemovedRows              int `json:"removed_rows"`
+	RevisedRows              int `json:"revised_rows"`
+}
+
+type validationPublicationRevision struct {
+	ReporterISO3          string   `json:"reporter_iso3"`
+	Period                string   `json:"period"`
+	Classification        string   `json:"classification"`
+	Code                  string   `json:"code"`
+	Label                 string   `json:"label"`
+	PreviousUSATradeUSD   float64  `json:"previous_usa_trade_usd"`
+	CurrentUSATradeUSD    float64  `json:"current_usa_trade_usd"`
+	PreviousChinaTradeUSD float64  `json:"previous_china_trade_usd"`
+	CurrentChinaTradeUSD  float64  `json:"current_china_trade_usd"`
+	PreviousTotalUSD      float64  `json:"previous_total_usd"`
+	CurrentTotalUSD       float64  `json:"current_total_usd"`
+	DeltaTradeUSD         float64  `json:"delta_trade_usd"`
+	MagnitudeTradeUSD     float64  `json:"magnitude_trade_usd"`
+	ChangeRatio           *float64 `json:"change_ratio,omitempty"`
+}
+
 type validationQuality struct {
 	SchemaVersion      string                         `json:"schema_version"`
 	GeneratedAt        string                         `json:"generated_at"`
@@ -501,6 +543,13 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 	if err := validateSemiconductorMonthly(dataDir, metadata, semiconductorReference, semiconductorMonthlyIndex); err != nil {
 		return err
 	}
+	var publicationChanges validationPublicationChanges
+	if err := readJSON(filepath.Join(dataDir, "changes.json"), &publicationChanges); err != nil {
+		return fmt.Errorf("read changes.json: %w", err)
+	}
+	if err := validatePublicationChanges(metadata, semiconductorMonthlyIndex, publicationChanges); err != nil {
+		return err
+	}
 	var tariffIndex validationTariffIndex
 	if err := readJSON(filepath.Join(dataDir, "tariffs", "index.json"), &tariffIndex); err != nil {
 		return fmt.Errorf("read tariff index: %w", err)
@@ -526,7 +575,7 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 	if err := readJSON(filepath.Join(dataDir, "catalog.json"), &catalog); err != nil {
 		return fmt.Errorf("read catalog.json: %w", err)
 	}
-	if err := validateCatalog(metadata, catalog); err != nil {
+	if err := validateCatalog(metadata, catalog, publicationChanges); err != nil {
 		return err
 	}
 	if err := validateExplanations(dataDir, metadata, latest); err != nil {
@@ -539,7 +588,7 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 	return validateContext(metadata, latest, contextData)
 }
 
-func validateCatalog(metadata datasetMeta, catalog validationCatalog) error {
+func validateCatalog(metadata datasetMeta, catalog validationCatalog, publicationChanges validationPublicationChanges) error {
 	if catalog.SchemaVersion != "1.0" || catalog.GeneratedAt != metadata.GeneratedAt {
 		return errorsForExtended("catalog provenance does not match metadata")
 	}
@@ -562,7 +611,7 @@ func validateCatalog(metadata datasetMeta, catalog validationCatalog) error {
 		}
 		seen[resource.ID] = resource
 	}
-	for _, required := range []string{"headline_totals", "time_series", "country_context", "product_chapters", "quality", "strategic_hs6", "tariff_schedules", "bilateral_matrix", "semiconductor_atlas", "semiconductor_monthly", "mirror_reconciliation", "scenario_runs"} {
+	for _, required := range []string{"headline_totals", "time_series", "country_context", "product_chapters", "quality", "strategic_hs6", "tariff_schedules", "bilateral_matrix", "semiconductor_atlas", "semiconductor_monthly", "publication_changes", "mirror_reconciliation", "scenario_runs"} {
 		if _, ok := seen[required]; !ok {
 			return fmt.Errorf("catalog is missing resource %q", required)
 		}
@@ -611,7 +660,97 @@ func validateCatalog(metadata datasetMeta, catalog validationCatalog) error {
 	if monthlyResource.Status != wantMonthlyStatus || monthlyResource.Provider != metadata.SemiconductorMonthlyProvider || monthlyResource.ProductLevel != 6 || monthlyResource.Href != "./semiconductors/monthly/index.json" {
 		return errorsForExtended("catalog monthly semiconductor resource does not match metadata")
 	}
+	changesResource := seen["publication_changes"]
+	wantChangesStatus := "partial"
+	if publicationChanges.Status == "changed" || publicationChanges.Status == "unchanged" {
+		wantChangesStatus = "ready"
+	}
+	if changesResource.Status != wantChangesStatus || changesResource.Provider != "tradegravity" || changesResource.ProductLevel != 6 || changesResource.Href != "./changes.json" {
+		return errorsForExtended("catalog publication change resource does not match changes.json")
+	}
 	return nil
+}
+
+func validatePublicationChanges(metadata datasetMeta, monthly validationSemiconductorMonthlyIndex, changes validationPublicationChanges) error {
+	if changes.SchemaVersion != "1.0" || changes.GeneratedAt != metadata.GeneratedAt || strings.TrimSpace(changes.Scope) == "" {
+		return errorsForExtended("publication change provenance does not match metadata")
+	}
+	if changes.Status != "baseline" && changes.Status != "unchanged" && changes.Status != "changed" {
+		return fmt.Errorf("publication changes has invalid status %q", changes.Status)
+	}
+	if !reflect.DeepEqual(changes.CurrentPeriods, monthly.Periods) || !reflect.DeepEqual(changes.CurrentReporters, monthly.Reporters) || changes.Summary.CurrentObservationCount != monthly.ObservationCount {
+		return errorsForExtended("publication changes does not match the current monthly index")
+	}
+	if !sortedUnique(changes.CurrentPeriods) || !sortedUnique(changes.NewPeriods) || !sortedUnique(changes.RemovedPeriods) || !sortedUnique(changes.CurrentReporters) || !sortedUnique(changes.NewReporters) || !sortedUnique(changes.RemovedReporters) {
+		return errorsForExtended("publication change dimensions must be sorted and unique")
+	}
+	for _, period := range append(append(append([]string{}, changes.CurrentPeriods...), changes.NewPeriods...), changes.RemovedPeriods...) {
+		if !monthPattern.MatchString(period) {
+			return fmt.Errorf("publication changes has invalid month %q", period)
+		}
+	}
+	for _, reporter := range append(append(append([]string{}, changes.CurrentReporters...), changes.NewReporters...), changes.RemovedReporters...) {
+		if !iso3Pattern.MatchString(reporter) {
+			return fmt.Errorf("publication changes has invalid reporter %q", reporter)
+		}
+	}
+	if changes.Summary.CurrentObservationCount < 0 || changes.Summary.PreviousObservationCount < 0 || changes.Summary.AddedRows < 0 || changes.Summary.RemovedRows < 0 || changes.Summary.RevisedRows < 0 {
+		return errorsForExtended("publication change counts must not be negative")
+	}
+	if changes.Status == "baseline" {
+		if changes.PreviousGeneratedAt != "" || changes.Summary.PreviousObservationCount != 0 || changes.Summary.ObservationDelta != 0 || changes.Summary.AddedRows != 0 || changes.Summary.RemovedRows != 0 || changes.Summary.RevisedRows != 0 || len(changes.NewPeriods)+len(changes.RemovedPeriods)+len(changes.NewReporters)+len(changes.RemovedReporters)+len(changes.TopRevisions) != 0 {
+			return errorsForExtended("baseline publication changes must not claim a previous comparison")
+		}
+	} else {
+		if _, err := time.Parse(time.RFC3339, changes.PreviousGeneratedAt); err != nil {
+			return fmt.Errorf("publication changes has invalid previous_generated_at: %w", err)
+		}
+		if changes.Summary.ObservationDelta != changes.Summary.CurrentObservationCount-changes.Summary.PreviousObservationCount {
+			return errorsForExtended("publication observation delta is inconsistent")
+		}
+		claimsChange := changes.Summary.ObservationDelta != 0 || changes.Summary.AddedRows > 0 || changes.Summary.RemovedRows > 0 || changes.Summary.RevisedRows > 0 || len(changes.NewPeriods)+len(changes.RemovedPeriods)+len(changes.NewReporters)+len(changes.RemovedReporters) > 0
+		if (changes.Status == "changed") != claimsChange {
+			return errorsForExtended("publication change status does not match its summary")
+		}
+	}
+	if len(changes.TopRevisions) > 20 || len(changes.TopRevisions) > changes.Summary.RevisedRows {
+		return errorsForExtended("publication change revision list is not bounded by its summary")
+	}
+	previousMagnitude := math.Inf(1)
+	for _, revision := range changes.TopRevisions {
+		if !iso3Pattern.MatchString(revision.ReporterISO3) || !monthPattern.MatchString(revision.Period) || strings.TrimSpace(revision.Classification) == "" || !hs6Pattern.MatchString(revision.Code) || strings.TrimSpace(revision.Label) == "" {
+			return fmt.Errorf("publication changes has incomplete revision %+v", revision)
+		}
+		values := []float64{revision.PreviousUSATradeUSD, revision.CurrentUSATradeUSD, revision.PreviousChinaTradeUSD, revision.CurrentChinaTradeUSD, revision.PreviousTotalUSD, revision.CurrentTotalUSD, revision.MagnitudeTradeUSD}
+		for _, value := range values {
+			if !isFinite(value) || value < 0 {
+				return fmt.Errorf("publication revision has invalid nonnegative value %+v", revision)
+			}
+		}
+		if !isFinite(revision.DeltaTradeUSD) || !approximatelyEqual(revision.PreviousTotalUSD, revision.PreviousUSATradeUSD+revision.PreviousChinaTradeUSD) || !approximatelyEqual(revision.CurrentTotalUSD, revision.CurrentUSATradeUSD+revision.CurrentChinaTradeUSD) || !approximatelyEqual(revision.DeltaTradeUSD, revision.CurrentTotalUSD-revision.PreviousTotalUSD) || !approximatelyEqual(revision.MagnitudeTradeUSD, math.Abs(revision.CurrentUSATradeUSD-revision.PreviousUSATradeUSD)+math.Abs(revision.CurrentChinaTradeUSD-revision.PreviousChinaTradeUSD)) {
+			return fmt.Errorf("publication revision totals are inconsistent %+v", revision)
+		}
+		if revision.ChangeRatio != nil && (!isFinite(*revision.ChangeRatio) || revision.PreviousTotalUSD <= 0 || !approximatelyEqual(*revision.ChangeRatio, revision.DeltaTradeUSD/revision.PreviousTotalUSD)) {
+			return fmt.Errorf("publication revision ratio is inconsistent %+v", revision)
+		}
+		if revision.MagnitudeTradeUSD > previousMagnitude {
+			return errorsForExtended("publication revisions must be ordered by descending magnitude")
+		}
+		previousMagnitude = revision.MagnitudeTradeUSD
+	}
+	return nil
+}
+
+func sortedUnique(values []string) bool {
+	if !sort.StringsAreSorted(values) {
+		return false
+	}
+	for index := 1; index < len(values); index++ {
+		if values[index] == values[index-1] {
+			return false
+		}
+	}
+	return true
 }
 
 func validateSemiconductor(metadata datasetMeta, reference semiconductor.Reference) error {

@@ -52,6 +52,8 @@ Passing the gate does not make HS6 a capacity database. It means only that the p
 
 The staggered semiconductor refresh restores the latest successful core database, waits beyond the public Comtrade quota window, and requests the selected year plus four prior annual periods only for the declared connector allowlist. Reporter/year files remain bounded and are loaded lazily, eight at a time, only when the Chip Lens is opened. The same bounded refresh then requests the latest 12 complete months for the 30 mapped codes and connector allowlist. Monthly values are a turning-point layer; absent reporters, products, or months stay missing rather than being interpolated.
 
+Before publishing, the workflow also restores the previous GitHub Pages dataset. The publisher compares consecutive focused-monthly artifacts and emits `changes.json`. A missing prior artifact produces an explicit `baseline`; an available prior artifact produces `unchanged` or `changed`. New/removed months and reporters, added/removed aggregate rows, revised matching rows, and a bounded list of the largest value revisions are retained. This comparison describes publication revision and coverage drift—not economic month-to-month movement.
+
 ## Calculations
 
 For a selected stage and metric, TradeGravity sums the mapped product rows within each reporter, anchor, and period. It then calculates:
@@ -64,7 +66,7 @@ dual exposure    = 2 × min(USA share, China share)
 position shift   = current exposure balance − previous comparable exposure balance
 ```
 
-Positive balance or shift means toward the USA; negative means toward China. `dual exposure` is 100% for an even two-anchor split and 0% when only one anchor is observed. The view also retains the observed stage value, reporter count, change from the closest prior published period, anchor growth divergence, and leading reporter rows. The focused monthly view applies the same formulas over its bounded window.
+Positive balance or shift means toward the USA; negative means toward China. `dual exposure` is 100% for an even two-anchor split and 0% when only one anchor is observed. The view also retains the observed stage value, reporter count, change from the closest prior published period, anchor growth divergence, and leading reporter rows. The focused monthly view applies the same formulas over its bounded window and reports the latest month versus its immediate predecessor separately from the first-to-last window shift.
 
 These values describe the published USA/China-anchor reporter sample. They are not global production share, global supplier concentration, whole-world dependency, geopolitical alignment, value-added origin, firm revenue, or installed capacity. Coverage changes can affect the displayed period change.
 
@@ -114,8 +116,8 @@ Build the reference publication and coverage metadata with:
 go run ./cmd/collector strategic -provider comtrade -primary-provider wits -year auto -history-years 4 -allowlist configs/chip_connectors.csv
 COMTRADE_FREQUENCY=M go run ./cmd/collector chip-monthly -provider comtrade -months 12 -allowlist configs/chip_connectors.csv
 go run ./cmd/collector matrix -provider comtrade -primary-provider wits -year auto
-go run ./cmd/publisher build -out site/data
+go run ./cmd/publisher build -out site/data -previous-dir path/to/previous/data
 go run ./cmd/validator -dir site/data -min-reporters 40
 ```
 
-The canonical reference endpoint is `data/semiconductors/reference.json`; focused monthly discovery is `data/semiconductors/monthly/index.json`, and mirror diagnostics are discovered from `data/mirror/index.json`. Use the Chip Lens CSV export for the active stage distribution. Retain the reference JSON, relevant index and partition, metric, observation period, and view URL when citing a result.
+The canonical reference endpoint is `data/semiconductors/reference.json`; focused monthly discovery is `data/semiconductors/monthly/index.json`; publish-to-publish revisions are in `data/changes.json`; and mirror diagnostics are discovered from `data/mirror/index.json`. Use the Chip Lens CSV export for the active stage distribution or its Markdown report for a compact evidence bundle. Retain the reference JSON, relevant index and partition, metric, observation period, publication timestamp, and view URL when citing a result.

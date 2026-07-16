@@ -37,6 +37,7 @@ TradeGravity is maintained as a small, inspectable public-data pipeline with an 
 - Add a specialist US–China Chip Supply Chain Lens with an eight-stage taxonomy, 30 mapped HS6 codes, five-year strategic collection, country-role matrix, policy and capacity/project evidence registers, observed-distribution metrics, explicit coverage gates, stage CSV export, and a transparent disruption/substitution sensitivity.
 - Publish USA/China exposure balance, position shift, and dual-exposure metrics with explicit formulas and non-alignment caveats across the Intelligence and Chip Lens views.
 - Collect and publish a focused 12-month, 30-code semiconductor turning-point panel for selected connector economies.
+- Publish a validated semiconductor Pulse with latest-month movement, previous-publication coverage/value changes, a bounded machine-readable change feed, and evidence endpoints in the Markdown report.
 - Publish unadjusted mirror-reporting diagnostics against USA and China counterpart reports without selecting a ground truth or claiming fraud, rerouting, or reconciliation.
 - Register only free/public semiconductor evidence layers, including OECD ICIO as lagged industry context, and validate that paid/proprietary sources cannot become required metric inputs.
 
@@ -64,7 +65,7 @@ TradeGravity is maintained as a small, inspectable public-data pipeline with an 
 ## Later: provider resilience and interpretation
 
 - Add configurable provider fallback without mixing provenance silently.
-- [Track data lag and coverage changes across scheduled runs](https://github.com/elecpapaya/TradeGravity/issues/7), not only within the latest artifact.
+- Extend the implemented semiconductor publication-change feed to headline, tariff, and matrix artifacts after each layer has a stable comparison key and revision policy.
 - Expand grounded explanations after external evaluation confirms they reduce rather than increase interpretation errors.
 
 Priorities may change when upstream APIs change or users report higher-impact needs. Roadmap discussion should happen in a GitHub issue so decisions remain public and reviewable.
