@@ -34,7 +34,7 @@ go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
 go run ./cmd/validator -dir examples/sample-data -min-reporters 3
 ```
 
-Confirm that all required pull-request checks pass. Then run the collector, publisher, and validator against the intended provider or verify both successful scheduled refreshes. The core refresh collects WITS history, HS2 products, the bilateral matrix, and tariffs at 01:00 UTC. It saves the database as the short-lived `tradegravity-core` Actions artifact. The semiconductor refresh starts at 02:00 UTC, waits until at least 35 minutes after the core run completed, restores that database, and adds bounded annual and monthly semiconductor observations before publishing the complete dataset.
+Confirm that all required pull-request checks pass. Then run the collector, publisher, and validator against the intended provider or verify both successful scheduled refreshes. Every Monday the core refresh collects WITS history, HS2 products, the bilateral matrix, and tariffs at 01:00 UTC. It saves the database as the short-lived `tradegravity-core` Actions artifact. The semiconductor refresh starts at 02:00 UTC, waits until at least 35 minutes after the core run completed, restores that database, and adds bounded annual and monthly semiconductor observations before publishing the complete dataset.
 
 ```bash
 go run ./cmd/context
