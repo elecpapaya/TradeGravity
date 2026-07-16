@@ -73,8 +73,9 @@ func runChipMonthlyCollector(providerID string, periods, codes []string, partner
 	if err != nil {
 		return err
 	}
-	monthlyProvider, ok := provider.(providers.SelectedProductPeriodsProvider)
-	if !ok {
+	monthlyProvider, supportsSingleReporter := provider.(providers.SelectedProductPeriodsProvider)
+	batchProvider, supportsBatch := provider.(providers.SelectedProductPeriodBatchProvider)
+	if !supportsSingleReporter && !supportsBatch {
 		return fmt.Errorf("provider %s does not support selected monthly product periods", providerID)
 	}
 	allowed, err := loadAllowlist(allowlistPath)
@@ -117,38 +118,100 @@ func runChipMonthlyCollector(providerID string, periods, codes []string, partner
 		}
 	}()
 
-	type result struct {
-		reporter, partner string
-		flow              model.Flow
-		rows              []model.Observation
-		err               error
-		requested         bool
+	type request struct {
+		reporters []string
+		partners  []string
+		flow      model.Flow
+		periods   []string
+		label     string
 	}
-	workerCount := max(1, min(concurrency, len(reporters)))
-	jobs := make(chan model.Reporter)
+	type result struct {
+		label string
+		rows  []model.Observation
+		err   error
+	}
+
+	requests := make([]request, 0)
+	if supportsBatch {
+		// Six reporters × two partners × thirty reference codes stays below
+		// the public preview response ceiling for a single flow and month.
+		const reporterBatchSize = 6
+		for start := 0; start < len(reporters); start += reporterBatchSize {
+			end := min(start+reporterBatchSize, len(reporters))
+			reporterBatch := make([]string, 0, end-start)
+			for _, reporter := range reporters[start:end] {
+				reporterBatch = append(reporterBatch, reporter.ISO3)
+			}
+			for _, period := range periods {
+				for _, flow := range flows {
+					requests = append(requests, request{
+						reporters: reporterBatch,
+						partners:  partners,
+						flow:      flow,
+						periods:   []string{period},
+						label:     fmt.Sprintf("reporters=%s/partners=%s/%s/%s", strings.Join(reporterBatch, ","), strings.Join(partners, ","), flow, period),
+					})
+				}
+			}
+		}
+	} else {
+		for _, reporter := range reporters {
+			for _, partner := range partners {
+				if strings.EqualFold(reporter.ISO3, partner) {
+					runRecord.SkippedCount += len(flows)
+					continue
+				}
+				for _, flow := range flows {
+					requests = append(requests, request{
+						reporters: []string{reporter.ISO3},
+						partners:  []string{partner},
+						flow:      flow,
+						periods:   periods,
+						label:     fmt.Sprintf("%s/%s/%s", reporter.ISO3, partner, flow),
+					})
+				}
+			}
+		}
+	}
+	if len(requests) == 0 {
+		return errors.New("no monthly semiconductor requests after filtering")
+	}
+
+	workerCount := max(1, min(concurrency, len(requests)))
+	jobs := make(chan request)
 	results := make(chan result, workerCount*2)
 	var workers sync.WaitGroup
 	for range workerCount {
 		workers.Add(1)
 		go func() {
 			defer workers.Done()
-			for reporter := range jobs {
-				for _, partner := range partners {
-					for _, flow := range flows {
-						if strings.EqualFold(reporter.ISO3, partner) {
-							results <- result{reporter: reporter.ISO3, partner: partner, flow: flow}
-							continue
+			for request := range jobs {
+				var rows []model.Observation
+				var fetchErr error
+				if supportsBatch {
+					rows, fetchErr = batchProvider.FetchProductPeriodBatch(ctx, request.reporters, request.partners, request.flow, request.periods[0], 6, codes)
+					if fetchErr == nil {
+						filtered := rows[:0]
+						for _, row := range rows {
+							if !strings.EqualFold(row.ReporterISO3, row.PartnerISO3) {
+								filtered = append(filtered, row)
+							}
 						}
-						rows, fetchErr := monthlyProvider.FetchProductPeriods(ctx, reporter.ISO3, partner, flow, periods, 6, codes)
-						results <- result{reporter: reporter.ISO3, partner: partner, flow: flow, rows: rows, err: fetchErr, requested: true}
+						rows = filtered
+						if len(rows) == 0 {
+							fetchErr = comtrade.ErrNoRecords
+						}
 					}
+				} else {
+					rows, fetchErr = monthlyProvider.FetchProductPeriods(ctx, request.reporters[0], request.partners[0], request.flow, request.periods, 6, codes)
 				}
+				results <- result{label: request.label, rows: rows, err: fetchErr}
 			}
 		}()
 	}
 	go func() {
-		for _, reporter := range reporters {
-			jobs <- reporter
+		for _, request := range requests {
+			jobs <- request
 		}
 		close(jobs)
 		workers.Wait()
@@ -156,10 +219,6 @@ func runChipMonthlyCollector(providerID string, periods, codes []string, partner
 	}()
 	var persistErr, quotaErr error
 	for item := range results {
-		if !item.requested {
-			runRecord.SkippedCount++
-			continue
-		}
 		runRecord.RequestCount++
 		if item.err != nil {
 			if errors.Is(item.err, comtrade.ErrNoRecords) {
@@ -170,7 +229,7 @@ func runChipMonthlyCollector(providerID string, periods, codes []string, partner
 				quotaErr = item.err
 			}
 			runRecord.FailureCount++
-			runRecord.Errors = appendLimited(runRecord.Errors, fmt.Sprintf("%s/%s/%s: %v", item.reporter, item.partner, item.flow, item.err))
+			runRecord.Errors = appendLimited(runRecord.Errors, fmt.Sprintf("%s: %v", item.label, item.err))
 			continue
 		}
 		if persistErr != nil {
@@ -183,7 +242,7 @@ func runChipMonthlyCollector(providerID string, periods, codes []string, partner
 		runRecord.SuccessCount++
 		runRecord.StoredCount += len(item.rows)
 		if verbose {
-			fmt.Printf("chip-monthly reporter=%s partner=%s flow=%s rows=%d\n", item.reporter, item.partner, item.flow, len(item.rows))
+			fmt.Printf("chip-monthly %s rows=%d\n", item.label, len(item.rows))
 		}
 	}
 	if persistErr != nil {
@@ -193,6 +252,9 @@ func runChipMonthlyCollector(providerID string, periods, codes []string, partner
 		return quotaErr
 	}
 	if runRecord.SuccessCount == 0 {
+		if len(runRecord.Errors) > 0 {
+			return fmt.Errorf("no monthly semiconductor observations collected; first request error: %s", runRecord.Errors[0])
+		}
 		return errors.New("no monthly semiconductor observations collected")
 	}
 	fmt.Printf("monthly semiconductor collector complete (periods=%s..%s reporters=%d requests=%d observations=%d)\n", periods[0], periods[len(periods)-1], len(reporters), runRecord.RequestCount, runRecord.StoredCount)
