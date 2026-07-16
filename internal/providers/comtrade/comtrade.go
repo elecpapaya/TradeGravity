@@ -458,6 +458,116 @@ func (p *Provider) FetchProductPeriods(ctx context.Context, reporterISO3, partne
 	return filtered, nil
 }
 
+// FetchProductPeriodBatch requests one monthly period for bounded reporter and
+// partner sets. The public preview endpoint accepts multiple reporters,
+// partners, and products, but only one period. Numeric area codes in preview
+// responses are mapped back to ISO3 here because rt3ISO/pt3ISO can be null.
+func (p *Provider) FetchProductPeriodBatch(ctx context.Context, reporterISO3s, partnerISO3s []string, flow model.Flow, period string, level int, codes []string) ([]model.Observation, error) {
+	if !strings.EqualFold(strings.TrimSpace(p.config.Frequency), "M") {
+		return nil, fmt.Errorf("comtrade: selected product period batch requires monthly frequency M, got %q", p.config.Frequency)
+	}
+	if level != 6 {
+		return nil, fmt.Errorf("comtrade: selected product period batch requires HS6, got level %d", level)
+	}
+	normalizedCodes, err := normalizeProductCodes(codes, level)
+	if err != nil {
+		return nil, err
+	}
+	normalizedPeriods, apiPeriods, err := normalizeMonthlyPeriods([]string{period})
+	if err != nil {
+		return nil, err
+	}
+	if err := p.ensureReferences(ctx); err != nil {
+		return nil, err
+	}
+
+	reporterCodes, reporterISOByCode, err := p.resolveReporterBatch(reporterISO3s)
+	if err != nil {
+		return nil, err
+	}
+	partnerCodes, partnerISOByCode, err := p.resolvePartnerBatch(partnerISO3s)
+	if err != nil {
+		return nil, err
+	}
+
+	params := url.Values{}
+	params.Set("reporterCode", strings.Join(reporterCodes, ","))
+	params.Set("flowCode", p.flowCode(flow))
+	params.Set("period", apiPeriods[0])
+	params.Set("cmdCode", strings.Join(normalizedCodes, ","))
+	params.Set("partnerCode", strings.Join(partnerCodes, ","))
+	params.Set("partner2Code", "0")
+	params.Set("customsCode", "C00")
+	params.Set("motCode", "0")
+	params.Set("format", p.config.Format)
+	if p.config.MaxRecords > 0 {
+		params.Set("maxRecords", strconv.Itoa(p.config.MaxRecords))
+	}
+
+	body, err := p.doRequest(ctx, p.dataURL(), params)
+	if err != nil {
+		return nil, err
+	}
+	observations, err := parseAreaCodeObservations(body, flow, reporterISOByCode, partnerISOByCode, p.config.ValueMultiplier)
+	if err != nil {
+		return nil, err
+	}
+	wantedCodes := make(map[string]struct{}, len(normalizedCodes))
+	for _, code := range normalizedCodes {
+		wantedCodes[code] = struct{}{}
+	}
+	filtered := make([]model.Observation, 0, len(observations))
+	for _, observation := range observations {
+		if observation.PeriodType != model.PeriodMonth || observation.Period != normalizedPeriods[0] || observation.ProductLevel != level {
+			continue
+		}
+		if _, ok := wantedCodes[observation.ProductCode]; !ok {
+			continue
+		}
+		observation.Provider = p.Name()
+		filtered = append(filtered, observation)
+	}
+	if len(filtered) == 0 {
+		return nil, ErrNoRecords
+	}
+	return filtered, nil
+}
+
+func (p *Provider) resolveReporterBatch(iso3s []string) ([]string, map[string]string, error) {
+	return resolveAreaBatch(iso3s, p.resolveReporterCode)
+}
+
+func (p *Provider) resolvePartnerBatch(iso3s []string) ([]string, map[string]string, error) {
+	return resolveAreaBatch(iso3s, p.resolvePartnerCode)
+}
+
+func resolveAreaBatch(iso3s []string, resolve func(string) (string, error)) ([]string, map[string]string, error) {
+	if len(iso3s) == 0 {
+		return nil, nil, errors.New("comtrade: at least one area is required")
+	}
+	codes := make([]string, 0, len(iso3s))
+	isoByCode := make(map[string]string, len(iso3s))
+	for _, raw := range iso3s {
+		iso3 := strings.ToUpper(strings.TrimSpace(raw))
+		if iso3 == "" {
+			continue
+		}
+		code, err := resolve(iso3)
+		if err != nil {
+			return nil, nil, err
+		}
+		if _, exists := isoByCode[code]; exists {
+			continue
+		}
+		codes = append(codes, code)
+		isoByCode[code] = iso3
+	}
+	if len(codes) == 0 {
+		return nil, nil, errors.New("comtrade: no resolvable areas")
+	}
+	return codes, isoByCode, nil
+}
+
 func normalizeMonthlyPeriods(periods []string) ([]string, []string, error) {
 	if len(periods) == 0 {
 		return nil, nil, errors.New("comtrade: at least one monthly period is required")
@@ -989,6 +1099,37 @@ func parseObservations(body []byte, fallbackFlow model.Flow, reporterISO3, partn
 		observations = append(observations, observation)
 	}
 
+	return observations, nil
+}
+
+func parseAreaCodeObservations(body []byte, fallbackFlow model.Flow, reporterISOByCode, partnerISOByCode map[string]string, multiplier float64) ([]model.Observation, error) {
+	var payload any
+	if err := json.Unmarshal(body, &payload); err != nil {
+		return nil, err
+	}
+	rows, err := extractRows(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	observations := make([]model.Observation, 0, len(rows))
+	for _, row := range rows {
+		reporterCode, reporterOK := getString(row, "reporterCode", "ReporterCode", "rtCode")
+		partnerCode, partnerOK := getString(row, "partnerCode", "PartnerCode", "ptCode")
+		if !reporterOK || !partnerOK {
+			continue
+		}
+		reporterISO3, reporterOK := reporterISOByCode[strings.TrimSpace(reporterCode)]
+		partnerISO3, partnerOK := partnerISOByCode[strings.TrimSpace(partnerCode)]
+		if !reporterOK || !partnerOK {
+			continue
+		}
+		observation, err := rowToObservation(row, reporterISO3, partnerISO3, fallbackFlow, multiplier)
+		if err != nil {
+			continue
+		}
+		observations = append(observations, observation)
+	}
 	return observations, nil
 }
 

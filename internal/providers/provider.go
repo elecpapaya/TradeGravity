@@ -34,6 +34,14 @@ type SelectedProductPeriodsProvider interface {
 	FetchProductPeriods(ctx context.Context, reporterISO3, partnerISO3 string, flow model.Flow, periods []string, level int, codes []string) ([]model.Observation, error)
 }
 
+// SelectedProductPeriodBatchProvider fetches one explicit monthly period for
+// bounded reporter, partner, and product-code sets. Keeping the period scalar
+// matches the public UN Comtrade preview contract while batching the other
+// dimensions keeps focused monthly collection within the public call budget.
+type SelectedProductPeriodBatchProvider interface {
+	FetchProductPeriodBatch(ctx context.Context, reporterISO3s, partnerISO3s []string, flow model.Flow, period string, level int, codes []string) ([]model.Observation, error)
+}
+
 // TariffProvider exposes detailed HS6 tariff schedules separately from trade
 // values. Implementations must preserve the source nomenclature and data type
 // so reported rates are never silently mixed with estimated AVEs.

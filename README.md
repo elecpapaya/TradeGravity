@@ -76,7 +76,7 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 - Year-over-year growth coloring when prior-period data is available.
 - Optional World Bank indicators and an experimental GDELT trade/supply-chain headline panel with a 14-day window, title relevance checks, deduplication, source-country scope, and visible caveats.
 - Reporter allowlist for controlled coverage.
-- Daily collection and GitHub Pages deployment through GitHub Actions.
+- Weekly, staggered collection and GitHub Pages deployment through GitHub Actions.
 
 ## How it works
 
@@ -244,7 +244,7 @@ Common flags:
 - `COMTRADE_REPORTERS_URL`
 - `COMTRADE_PARTNERS_URL`
 
-The focused semiconductor command uses `COMTRADE_FREQUENCY=M`, the 30-code reference, and [`configs/chip_connectors.csv`](configs/chip_connectors.csv). It requests one bounded period/code batch per reporter, anchor, and flow for at most 36 months; the scheduled workflow publishes the latest 12 complete months. It is a turning-point layer, not a complete semiconductor market database.
+The focused semiconductor command uses `COMTRADE_FREQUENCY=M`, the 30-code reference, and [`configs/chip_connectors.csv`](configs/chip_connectors.csv). The public preview accepts only one period per request, so the collector requests one month at a time while batching up to six reporters and both anchor partners for each flow. This keeps the latest 12 complete months within the public call and response limits without narrowing the published turning-point window. It is a turning-point layer, not a complete semiconductor market database.
 
 The `matrix` collector omits `partnerCode` to request the partner breakdown. It never treats `partnerCode=0` (World) as a country row. Public preview responses may provide only numeric partner codes; TradeGravity resolves them through the official partner reference and excludes non-alphabetic special aggregates.
 

@@ -145,3 +145,57 @@ func TestFetchProductPeriodsBatchesMonthlyPeriodsAndFiltersExactCodes(t *testing
 		t.Fatalf("unexpected monthly rows: %#v", rows)
 	}
 }
+
+func TestFetchProductPeriodBatchUsesOnePeriodAndMapsNumericAreas(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		switch request.URL.Path {
+		case "/files/reporters":
+			_, _ = writer.Write([]byte(`{"results":[
+				{"id":"410","iso3":"KOR","text":"Korea","isReporter":true,"isGroup":false},
+				{"id":"392","iso3":"JPN","text":"Japan","isReporter":true,"isGroup":false}
+			]}`))
+		case "/files/partners":
+			_, _ = writer.Write([]byte(`{"results":[
+				{"id":"842","iso3":"USA","text":"United States","isPartner":true,"isGroup":false},
+				{"id":"156","iso3":"CHN","text":"China","isPartner":true,"isGroup":false}
+			]}`))
+		case "/data/M", "/data/M/":
+			query := request.URL.Query()
+			if query.Get("period") != "202401" {
+				t.Fatalf("batch request must contain one period, got %s", query.Get("period"))
+			}
+			if query.Get("reporterCode") != "410,392" || query.Get("partnerCode") != "842,156" {
+				t.Fatalf("unexpected batched areas in query %s", request.URL.RawQuery)
+			}
+			_, _ = writer.Write([]byte(`{"data":[
+				{"period":"202401","primaryValue":100,"reporterCode":410,"rt3ISO":null,"partnerCode":842,"pt3ISO":null,"cmdCode":"854231","classificationSearchCode":"H6"},
+				{"period":"202401","primaryValue":120,"reporterCode":392,"rt3ISO":null,"partnerCode":156,"pt3ISO":null,"cmdCode":"854232","classificationSearchCode":"H6"},
+				{"period":"202401","primaryValue":999,"reporterCode":999,"partnerCode":842,"cmdCode":"854231","classificationSearchCode":"H6"}
+			]}`))
+		default:
+			http.NotFound(writer, request)
+		}
+	}))
+	defer server.Close()
+	provider, err := NewWithConfig(Config{
+		BaseURL: server.URL, DataPath: "data/{freq}", PreviewDataPath: "data/{freq}", Frequency: "M",
+		ReportersURL: server.URL + "/files/reporters", PartnersURL: server.URL + "/files/partners",
+		MaxRecords: 500, Timeout: time.Second, RateLimitPerSec: 100, RateLimitBurst: 10,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows, err := provider.FetchProductPeriodBatch(context.Background(), []string{"KOR", "JPN"}, []string{"USA", "CHN"}, model.FlowExport, "2024-01", 6, []string{"854231", "854232"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 2 {
+		t.Fatalf("batch returned %d rows, want 2: %#v", len(rows), rows)
+	}
+	if rows[0].ReporterISO3 != "KOR" || rows[0].PartnerISO3 != "USA" || rows[0].Period != "2024-01" {
+		t.Fatalf("unexpected first batch row: %#v", rows[0])
+	}
+	if rows[1].ReporterISO3 != "JPN" || rows[1].PartnerISO3 != "CHN" || rows[1].Flow != model.FlowExport || rows[1].Provider != "comtrade" {
+		t.Fatalf("unexpected second batch row: %#v", rows[1])
+	}
+}
