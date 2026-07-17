@@ -347,7 +347,7 @@ type providerComparison struct {
 	DeltaRatio        float64 `json:"delta_ratio"`
 }
 
-func buildDataCatalog(generatedAt, provider, contextStatus string, series seriesFile, products productIndexFile, strategicIndex strategicIndexFile, tariffIndex tariffIndexFile, matrixIndex matrixIndexFile, mirrorIndex mirrorIndexFile, semiconductorMonthlyIndex semiconductorMonthlyIndexFile, publicationChanges publicationChangesFile, semiconductorReferences ...semiconductor.Reference) dataCatalogFile {
+func buildDataCatalog(generatedAt, provider, contextStatus string, series seriesFile, products productIndexFile, strategicIndex strategicIndexFile, tariffIndex tariffIndexFile, matrixIndex matrixIndexFile, mirrorIndex mirrorIndexFile, semiconductorMonthlyIndex semiconductorMonthlyIndexFile, publicationChanges publicationChangesFile, briefing briefingFile, semiconductorReferences ...semiconductor.Reference) dataCatalogFile {
 	semiconductorReference := semiconductor.Reference{}
 	if len(semiconductorReferences) > 0 {
 		semiconductorReference = semiconductorReferences[0]
@@ -389,6 +389,10 @@ func buildDataCatalog(generatedAt, provider, contextStatus string, series series
 	if publicationChanges.Status == "changed" || publicationChanges.Status == "unchanged" {
 		publicationChangesStatus = "ready"
 	}
+	briefingStatus := "partial"
+	if briefing.Status == "ready" {
+		briefingStatus = "ready"
+	}
 	return dataCatalogFile{
 		SchemaVersion: "1.0",
 		GeneratedAt:   generatedAt,
@@ -404,6 +408,7 @@ func buildDataCatalog(generatedAt, provider, contextStatus string, series series
 			{ID: "semiconductor_atlas", Title: "Semiconductor value-chain atlas", Status: semiconductorStatus, Provider: "tradegravity + cited official sources", Classification: "stage-mapped source HS revision", ProductLevel: 6, Grain: "stage taxonomy + country role context + policy event + published HS6 coverage", Partitioning: "reference publication + strategic HS6 reporter/year chunks", Href: "./semiconductors/reference.json"},
 			{ID: "semiconductor_monthly", Title: "Focused US-China semiconductor turning points", Status: semiconductorMonthlyStatus, Provider: semiconductorMonthlyIndex.Provider, Classification: "source HS revision", ProductLevel: 6, Grain: "focused reporter × USA/CHN partner × flow × selected HS6 × month", Partitioning: "index + one file per reporter", Href: "./semiconductors/monthly/index.json"},
 			{ID: "publication_changes", Title: "Observed publication changes", Status: publicationChangesStatus, Provider: "tradegravity", Classification: "source HS revision", ProductLevel: 6, Grain: "publication × focused reporter × month × selected HS6", Partitioning: "single bounded change feed", Href: "./changes.json"},
+			{ID: "distribution_briefing", Title: "Deterministic email and social briefing", Status: briefingStatus, Provider: "tradegravity", Classification: "source HS revision", ProductLevel: 6, Grain: "edition × selected monthly observation × distribution channel", Partitioning: "single reviewed-draft publication", Href: "./briefing.json"},
 			{ID: "mirror_reconciliation", Title: "Unadjusted mirror-reporting diagnostics", Status: mirrorStatus, Provider: mirrorIndex.Provider, ProductLevel: 0, Grain: "third-country reporter × USA/CHN anchor × mirrored flow × TOTAL × annual period", Partitioning: "index + reporter/year chunks", Href: "./mirror/index.json"},
 			{ID: "value_added_network", Title: "Value-added supply-chain exposure", Status: "planned", Grain: "origin × destination × industry × year", Partitioning: "year/industry chunks"},
 			{ID: "scenario_runs", Title: "Versioned scenario outputs", Status: "planned", Grain: "scenario × market × product × partner", Partitioning: "one manifest and result set per run"},

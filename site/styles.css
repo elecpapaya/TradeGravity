@@ -690,6 +690,15 @@ select option{background:#fff;color:#111}
 .chipSectionHeading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
 .chipSectionHeading h2{margin:3px 0 0;font-size:17px}
 .chipSectionHeading .analysisNote{max-width:520px;margin:0;text-align:right}
+.briefingDesk{background:linear-gradient(135deg,rgba(90,162,255,.055),rgba(231,211,124,.03) 55%,rgba(255,255,255,.015))}
+.briefingSignalGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.briefingSignalCard{display:flex;min-width:0;min-height:142px;flex-direction:column;padding:14px;border:1px solid var(--border);border-radius:11px;background:rgba(255,255,255,.018)}
+.briefingSignalCard > span{color:var(--hi);font:700 9px var(--mono);text-transform:uppercase}
+.briefingSignalCard h3{margin:9px 0 6px;font-size:12px;line-height:1.35}
+.briefingSignalCard p{margin:0;color:var(--muted);font-size:10px;line-height:1.5}
+.briefingSignalCard small{margin-top:auto;padding-top:12px;color:var(--muted2);font:8px var(--mono);line-height:1.4}
+.briefingActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.briefingActions .btn:disabled{cursor:not-allowed;opacity:.45}
 .chipTrendGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
 .chipTrendCard{min-width:0;padding:14px;border:1px solid var(--border);border-radius:11px;background:linear-gradient(145deg,rgba(90,162,255,.055),rgba(255,255,255,.015))}
 .chipTrendCard > span{color:var(--hi);font:9px var(--mono)}
@@ -782,7 +791,7 @@ select option{background:#fff;color:#111}
   .modelRoadmap{grid-template-columns:repeat(2,minmax(0,1fr))}
   .chipControlBar{grid-template-columns:repeat(2,minmax(0,1fr))}
   .chipCoverageSummary{grid-column:1/-1}
-  .chipTrendGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .chipTrendGrid,.briefingSignalGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width: 650px){
   .tabBar{padding:0 10px}
@@ -793,7 +802,7 @@ select option{background:#fff;color:#111}
   .chipControlBar{grid-template-columns:1fr}
   .chipAnalysisGrid{padding:10px 10px 0}
   .chipEvidenceGrid{padding-bottom:10px}
-  .chipTrendGrid,.sourceRegister,.chipScenarioForm{grid-template-columns:1fr}
+  .chipTrendGrid,.briefingSignalGrid,.sourceRegister,.chipScenarioForm{grid-template-columns:1fr}
   .chipTrendCard p{min-height:0}
   .chipSignalMetrics{grid-template-columns:repeat(2,minmax(0,1fr))}
   .chipSectionHeading{flex-direction:column}.chipSectionHeading .analysisNote{text-align:left}

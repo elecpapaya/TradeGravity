@@ -18,6 +18,7 @@ const CATALOG_URL = "./data/catalog.json";
 const SEMICONDUCTOR_REFERENCE_URL = "./data/semiconductors/reference.json";
 const SEMICONDUCTOR_MONTHLY_INDEX_URL = "./data/semiconductors/monthly/index.json";
 const PUBLICATION_CHANGES_URL = "./data/changes.json";
+const BRIEFING_URL = "./data/briefing.json";
 const security = globalThis.TradeGravitySecurity;
 if (!security) {
   throw new Error("TradeGravity security helpers failed to load.");
@@ -45,6 +46,10 @@ if (!experienceTools) {
 const newsTools = globalThis.TradeGravityNewsTools;
 if (!newsTools) {
   throw new Error("TradeGravity news helpers failed to load.");
+}
+const briefingTools = globalThis.TradeGravityBriefingTools;
+if (!briefingTools) {
+  throw new Error("TradeGravity briefing helpers failed to load.");
 }
 const { encodeCSV, escapeHTML, normalizeISO2, normalizeISO3, safeHTTPSURL } = security;
 const { buildCSVMatrix: createCSVMatrix } = dataTools;
@@ -87,6 +92,12 @@ const {
   buildGdeltURL,
   curateNewsArticles,
 } = newsTools;
+const {
+  normalizeBriefing,
+  materializeEmailMarkdown,
+  buildCarouselBundle,
+  briefingFilename,
+} = briefingTools;
 
 const els = {
   svgUSA: document.getElementById("svg-usa"),
@@ -135,6 +146,12 @@ const els = {
   chipCountryFilter: document.getElementById("chipCountryFilter"),
   chipDownloadCSV: document.getElementById("chipDownloadCSV"),
 	chipPublicationChanges: document.getElementById("chipPublicationChanges"),
+  chipBriefingStatus: document.getElementById("chipBriefingStatus"),
+  chipBriefingSignals: document.getElementById("chipBriefingSignals"),
+  briefingDownloadEmail: document.getElementById("briefingDownloadEmail"),
+  briefingDownloadCarousel: document.getElementById("briefingDownloadCarousel"),
+  briefingCopyLink: document.getElementById("briefingCopyLink"),
+  briefingDeliveryNote: document.getElementById("briefingDeliveryNote"),
   chipTrends: document.getElementById("chipTrends"),
   chipValueChain: document.getElementById("chipValueChain"),
   chipRoleLandscape: document.getElementById("chipRoleLandscape"),
@@ -204,6 +221,7 @@ let state = {
   semiconductorReference: null,
   semiconductorMonthlyIndex: null,
 	publicationChanges: null,
+  briefing: null,
   semiconductorMonthlyFileCache: {},
   semiconductorMonthlyFile: null,
   semiconductorMonthlyLoading: false,
@@ -2511,6 +2529,68 @@ function renderChipPublicationChanges(){
 	els.chipPublicationChanges.innerHTML = `<div class="positionHeadline"><span class="statusPill ${pulse.status === "changed" ? "warning" : "success"}">${escapeHTML(pulse.status)}</span><strong>${pulse.status === "changed" ? "The published observation set changed" : "No observed publication delta"}</strong><small>Compared with ${escapeHTML(pulse.previousGeneratedAt || "the previous release")}</small></div><div class="signalMetrics"><div class="signalMetric"><span>New / removed months</span><b>${escapeHTML(periods)}</b></div><div class="signalMetric"><span>Reporter coverage</span><b>${escapeHTML(coverage)}</b></div><div class="signalMetric"><span>Added / removed rows</span><b>${summary.addedRows} added · ${summary.removedRows} removed</b></div><div class="signalMetric"><span>Revised matching rows</span><b>${summary.revisedRows}</b></div><div class="signalMetric"><span>Source observation delta</span><b>${summary.observationDelta > 0 ? "+" : ""}${summary.observationDelta}</b></div></div>${revisionDetail}<div class="analysisNote">This compares generated publications at identical reporter–month–classification–HS6 keys. It does not describe economic month-to-month growth, causality, or a physical shipment route.</div>`;
 }
 
+function renderDistributionBriefing(){
+  if (!els.chipBriefingSignals || !els.chipBriefingStatus) return;
+  const briefing = state.briefing;
+  const ready = briefing?.status === "ready";
+  els.briefingDownloadEmail.disabled = !ready;
+  els.briefingDownloadCarousel.disabled = !ready;
+  els.briefingCopyLink.disabled = !ready;
+  if (!briefing) {
+    els.chipBriefingStatus.textContent = "Unavailable";
+    els.chipBriefingStatus.className = "scopeBadge warningBadge";
+    els.chipBriefingSignals.innerHTML = `<div class="emptyState"><b>Distribution briefing unavailable</b><span>The data remains usable, but briefing.json was missing or failed its browser contract check. No email or social draft is inferred.</span></div>`;
+    if (els.briefingDeliveryNote) els.briefingDeliveryNote.textContent = "Delivery is not configured, and no subscriber data is collected by this static site.";
+    return;
+  }
+  if (!ready) {
+    els.chipBriefingStatus.textContent = "Insufficient monthly comparison";
+    els.chipBriefingStatus.className = "scopeBadge warningBadge";
+    els.chipBriefingSignals.innerHTML = `<div class="emptyState"><b>No distribution draft generated</b><span>${escapeHTML(briefing.email?.preview || "Two comparable monthly observations were not available. This is not interpreted as no change.")}</span></div>`;
+    return;
+  }
+  els.chipBriefingStatus.textContent = `${briefing.latest_period} · review required`;
+  els.chipBriefingStatus.className = "scopeBadge";
+  const kindLabels = {
+    reporter_total_change: "Scale observation",
+    anchor_share_shift: "Anchor-balance observation",
+    product_total_change: "Product observation",
+  };
+  els.chipBriefingSignals.innerHTML = briefing.signals.map(signal => {
+    const product = signal.code ? ` · HS6 ${escapeHTML(signal.code)}` : "";
+    const evidenceCount = Array.isArray(signal.evidence) ? signal.evidence.length : 0;
+    return `<article class="briefingSignalCard"><span>${escapeHTML(kindLabels[signal.kind] || signal.kind)}</span><h3>${escapeHTML(signal.title)}</h3><p>${escapeHTML(signal.summary)}</p><small>${escapeHTML(signal.previous_period)} → ${escapeHTML(signal.period)}${product} · ${evidenceCount} cited artifacts</small></article>`;
+  }).join("");
+  if (els.briefingDeliveryNote) {
+    els.briefingDeliveryNote.textContent = `Edition ${briefing.edition_id}. Draft exports require human review. Delivery is not configured; this static site stores no subscriber data and does not publish to social platforms.`;
+  }
+}
+
+function downloadBriefingEmail(){
+  if (state.briefing?.status !== "ready") return;
+  const baseURL = new URL(".", window.location.href).href;
+  const markdown = materializeEmailMarkdown(state.briefing, baseURL);
+  if (!markdown) return;
+  downloadBlob(new Blob([markdown + "\n"], { type: "text/markdown;charset=utf-8" }), briefingFilename(state.briefing, "email-draft", "md"));
+}
+
+function downloadBriefingCarousel(){
+  if (state.briefing?.status !== "ready") return;
+  const evidenceBaseURL = new URL("./data/", window.location.href).href;
+  const bundle = buildCarouselBundle(state.briefing, evidenceBaseURL);
+  if (!bundle) return;
+  downloadBlob(new Blob([JSON.stringify(bundle, null, 2) + "\n"], { type: "application/json;charset=utf-8" }), briefingFilename(state.briefing, "carousel-copy", "json"));
+}
+
+async function copyBriefingEvidenceLink(){
+  if (state.briefing?.status !== "ready" || !els.briefingCopyLink) return;
+  const href = new URL(state.briefing.evidence_entry_point || "./?tab=semiconductors", window.location.href).href;
+  const copied = await copyTextToClipboard(href);
+  els.briefingCopyLink.textContent = copied ? "Evidence link copied" : "Link ready in address bar";
+  if (!copied) window.history.replaceState(null, "", href);
+  setTimeout(() => { els.briefingCopyLink.textContent = "Copy evidence link"; }, 1600);
+}
+
 function renderChipMonthly(){
   if (!els.chipMonthlySignals) return;
   const file = normalizeISO3(state.semiconductorMonthlyFile?.reporter_iso3) === state.chipCountry ? state.semiconductorMonthlyFile : null;
@@ -2675,7 +2755,8 @@ function renderSemiconductorAtlas(){
   renderChipDistribution(summary);
   renderChipCountry(summary);
 	renderChipPublicationChanges();
-  renderChipMonthly();
+	renderDistributionBriefing();
+	renderChipMonthly();
   renderChipTimeline(reference, sources);
   renderChipCapacitySignals(reference, sources);
   renderChipSources(reference);
@@ -2996,7 +3077,7 @@ async function main(){
     console.warn("[TradeGravity] iso3_to_iso2.json not loaded, using fallback map.", err);
   }
 
-  const [res, metaRes, seriesRes, qualityRes, productIndexRes, strategicIndexRes, tariffIndexRes, matrixIndexRes, mirrorIndexRes, catalogRes, semiconductorReferenceRes, semiconductorMonthlyIndexRes, publicationChangesRes] = await Promise.all([
+  const [res, metaRes, seriesRes, qualityRes, productIndexRes, strategicIndexRes, tariffIndexRes, matrixIndexRes, mirrorIndexRes, catalogRes, semiconductorReferenceRes, semiconductorMonthlyIndexRes, publicationChangesRes, briefingRes] = await Promise.all([
     fetch(DATA_URL, { cache: "no-store" }),
     fetch(META_URL, { cache: "no-store" }).catch(() => null),
     fetch(SERIES_URL, { cache: "no-store" }).catch(() => null),
@@ -3010,6 +3091,7 @@ async function main(){
     fetch(SEMICONDUCTOR_REFERENCE_URL, { cache: "no-store" }).catch(() => null),
     fetch(SEMICONDUCTOR_MONTHLY_INDEX_URL, { cache: "no-store" }).catch(() => null),
 	fetch(PUBLICATION_CHANGES_URL, { cache: "no-store" }).catch(() => null),
+    fetch(BRIEFING_URL, { cache: "no-store" }).catch(() => null),
   ]);
   if (!res.ok) throw new Error(`Dataset request failed (${res.status})`);
   const data = await res.json();
@@ -3028,6 +3110,7 @@ async function main(){
   const semiconductorReference = semiconductorReferenceRes?.ok ? await semiconductorReferenceRes.json().catch(() => null) : null;
   const semiconductorMonthlyIndex = semiconductorMonthlyIndexRes?.ok ? await semiconductorMonthlyIndexRes.json().catch(() => null) : null;
 	const publicationChanges = publicationChangesRes?.ok ? await publicationChangesRes.json().catch(() => null) : null;
+  const briefing = briefingRes?.ok ? normalizeBriefing(await briefingRes.json().catch(() => null)) : null;
 
   state.generatedAt = data.generated_at || data.generatedAt || "-";
   state.schemaVersion = String(metadata?.schema_version || data.schema_version || "");
@@ -3044,6 +3127,7 @@ async function main(){
   state.semiconductorReference = semiconductorReference;
   state.semiconductorMonthlyIndex = semiconductorMonthlyIndex;
 	state.publicationChanges = publicationChanges;
+  state.briefing = briefing;
   state.meta = metadata;
   state.resourceStates = [
     { label: "metadata", ready: Boolean(metadata) },
@@ -3058,6 +3142,7 @@ async function main(){
     { label: "semiconductor atlas", ready: Boolean(semiconductorReference) },
     { label: "monthly semiconductor index", ready: Boolean(semiconductorMonthlyIndex) },
 	{ label: "publication change feed", ready: Boolean(publicationChanges) },
+    { label: "distribution briefing", ready: Boolean(briefing) },
   ];
   const initialView = parseViewState(window.location.search);
   state.metric = initialView.metric;
@@ -3245,6 +3330,9 @@ async function main(){
   els.chipRoleLandscape?.addEventListener("click", handleChipNavigation);
   els.chipDistribution?.addEventListener("click", handleChipNavigation);
   els.chipDownloadCSV?.addEventListener("click", downloadChipCSV);
+  els.briefingDownloadEmail?.addEventListener("click", downloadBriefingEmail);
+  els.briefingDownloadCarousel?.addEventListener("click", downloadBriefingCarousel);
+  els.briefingCopyLink?.addEventListener("click", copyBriefingEvidenceLink);
   els.chipScenarioForm?.addEventListener("submit", event => {
     event.preventDefault();
     runChipScenario();

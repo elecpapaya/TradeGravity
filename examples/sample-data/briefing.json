@@ -1,0 +1,190 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-15T19:53:00Z",
+  "edition_id": "semiconductor-pulse-2023-12-20260715T195300Z",
+  "status": "ready",
+  "title": "TradeGravity Semiconductor Pulse",
+  "scope": "Deterministic distribution brief from selected monthly UN Comtrade HS6 observations against USA and China; not a complete semiconductor market, causal claim, or investment recommendation",
+  "latest_period": "2023-12",
+  "previous_period": "2023-11",
+  "publication_status": "baseline",
+  "review_required": true,
+  "signals": [
+    {
+      "id": "monthly-total-kor",
+      "kind": "reporter_total_change",
+      "title": "Korea, Rep. selected chip trade increased",
+      "summary": "Selected monthly HS6 trade with USA and China moved from US$18.91B to US$19.21B (+1.6%).",
+      "reporter_iso3": "KOR",
+      "reporter_name": "Korea, Rep.",
+      "period": "2023-12",
+      "previous_period": "2023-11",
+      "current": {
+        "usa_trade_usd": 9550853736,
+        "china_trade_usd": 9662829262.560001,
+        "total_trade_usd": 19213682998.56,
+        "china_share": 0.502913952691121
+      },
+      "previous": {
+        "usa_trade_usd": 9371308266.666666,
+        "china_trade_usd": 9537108336,
+        "total_trade_usd": 18908416602.666664,
+        "china_share": 0.5043842927945101
+      },
+      "delta_trade_usd": 305266395.89333725,
+      "change_ratio": 0.016144471655563448,
+      "china_share_delta": -0.0014703401033890895,
+      "evidence": [
+        "./semiconductors/monthly/KOR.json",
+        "./semiconductors/monthly/index.json"
+      ],
+      "interpretation": "A change in the selected two-anchor customs observations worth investigating; it does not establish production, demand, or causality.",
+      "measurement_limit": "Selected monthly HS6 observations against USA and China only; subject to source revisions and coverage limits."
+    },
+    {
+      "id": "anchor-share-jpn",
+      "kind": "anchor_share_shift",
+      "title": "Japan two-anchor balance shifted toward USA",
+      "summary": "China's share of the selected USA-plus-China total moved from 50.4% to 50.3% (-0.1 percentage points).",
+      "reporter_iso3": "JPN",
+      "reporter_name": "Japan",
+      "period": "2023-12",
+      "previous_period": "2023-11",
+      "current": {
+        "usa_trade_usd": 8626577568.000002,
+        "china_trade_usd": 8727716753.280003,
+        "total_trade_usd": 17354294321.280006,
+        "china_share": 0.5029139526911209
+      },
+      "previous": {
+        "usa_trade_usd": 8464407466.666669,
+        "china_trade_usd": 8614162368.000002,
+        "total_trade_usd": 17078569834.666672,
+        "china_share": 0.50438429279451
+      },
+      "delta_trade_usd": 275724486.61333466,
+      "change_ratio": 0.01614447165556331,
+      "china_share_delta": -0.0014703401033890895,
+      "evidence": [
+        "./semiconductors/monthly/JPN.json",
+        "./semiconductors/monthly/index.json"
+      ],
+      "interpretation": "The sign describes movement within the published USA-China anchor pair, not political alignment or global market share.",
+      "measurement_limit": "Selected monthly HS6 observations against USA and China only; subject to source revisions and coverage limits."
+    },
+    {
+      "id": "product-kor-854231",
+      "kind": "product_total_change",
+      "title": "Korea, Rep. · Processors and controllers increased",
+      "summary": "HS6 854231 selected trade moved from US$6.14B to US$6.24B (+1.6%).",
+      "reporter_iso3": "KOR",
+      "reporter_name": "Korea, Rep.",
+      "classification": "H6",
+      "code": "854231",
+      "label": "Processors and controllers",
+      "period": "2023-12",
+      "previous_period": "2023-11",
+      "current": {
+        "usa_trade_usd": 3101765760,
+        "china_trade_usd": 3138131289.6000004,
+        "total_trade_usd": 6239897049.6,
+        "china_share": 0.502913952691121
+      },
+      "previous": {
+        "usa_trade_usd": 3043456000,
+        "china_trade_usd": 3097301760,
+        "total_trade_usd": 6140757760,
+        "china_share": 0.5043842927945101
+      },
+      "delta_trade_usd": 99139289.60000038,
+      "change_ratio": 0.0161444716555633,
+      "china_share_delta": -0.0014703401033890895,
+      "evidence": [
+        "./semiconductors/monthly/KOR.json",
+        "./semiconductors/reference.json"
+      ],
+      "interpretation": "This is a product-level customs observation against USA and China, not company revenue, capacity, or a shipment route.",
+      "measurement_limit": "Selected monthly HS6 observations against USA and China only; subject to source revisions and coverage limits."
+    }
+  ],
+  "email": {
+    "subject": "TradeGravity Semiconductor Pulse · 2023-12",
+    "preview": "Three cited USA-China semiconductor observations for 2023-12; monthly movement is kept separate from publication revisions.",
+    "markdown": "# TradeGravity Semiconductor Pulse\n\nObservation window: 2023-12 vs 2023-11 · publication status: baseline\n\n## Korea, Rep. selected chip trade increased\n\nSelected monthly HS6 trade with USA and China moved from US$18.91B to US$19.21B (+1.6%).\n\nInterpretation boundary: A change in the selected two-anchor customs observations worth investigating; it does not establish production, demand, or causality.\n\n## Japan two-anchor balance shifted toward USA\n\nChina's share of the selected USA-plus-China total moved from 50.4% to 50.3% (-0.1 percentage points).\n\nInterpretation boundary: The sign describes movement within the published USA-China anchor pair, not political alignment or global market share.\n\n## Korea, Rep. · Processors and controllers increased\n\nHS6 854231 selected trade moved from US$6.14B to US$6.24B (+1.6%).\n\nInterpretation boundary: This is a product-level customs observation against USA and China, not company revenue, capacity, or a shipment route.\n\nReview the cited evidence before forwarding or publishing this draft.\n\n[Inspect the evidence]({{BASE_URL}}/?tab=semiconductors)\n\nData scope: selected monthly UN Comtrade HS6 observations against USA and China. Not investment, legal, or policy advice.",
+    "cta_label": "Inspect the evidence",
+    "cta_path": "./?tab=semiconductors",
+    "send_policy": "manual_review_required",
+    "primary_goal": "Return the reader to the cited TradeGravity evidence"
+  },
+  "social_carousel": {
+    "format": "carousel_copy",
+    "aspect_ratio": "4:5",
+    "review_policy": "manual_review_required",
+    "slides": [
+      {
+        "order": 1,
+        "role": "cover",
+        "headline": "TradeGravity Semiconductor Pulse",
+        "body": "Three USA-China semiconductor observations · 2023-12 vs 2023-11",
+        "evidence": [
+          "./semiconductors/monthly/index.json"
+        ]
+      },
+      {
+        "order": 2,
+        "role": "scale",
+        "headline": "Korea, Rep. selected chip trade increased",
+        "body": "Selected monthly HS6 trade with USA and China moved from US$18.91B to US$19.21B (+1.6%).",
+        "evidence": [
+          "./semiconductors/monthly/KOR.json",
+          "./semiconductors/monthly/index.json"
+        ]
+      },
+      {
+        "order": 3,
+        "role": "anchor_balance",
+        "headline": "Japan two-anchor balance shifted toward USA",
+        "body": "China's share of the selected USA-plus-China total moved from 50.4% to 50.3% (-0.1 percentage points).",
+        "evidence": [
+          "./semiconductors/monthly/JPN.json",
+          "./semiconductors/monthly/index.json"
+        ]
+      },
+      {
+        "order": 4,
+        "role": "product",
+        "headline": "Korea, Rep. · Processors and controllers increased",
+        "body": "HS6 854231 selected trade moved from US$6.14B to US$6.24B (+1.6%).",
+        "evidence": [
+          "./semiconductors/monthly/KOR.json",
+          "./semiconductors/reference.json"
+        ]
+      },
+      {
+        "order": 5,
+        "role": "method",
+        "headline": "Read the clocks separately",
+        "body": "Month-to-month customs movement and publish-to-publish revisions answer different questions. Neither proves causality or a physical route.",
+        "evidence": [
+          "./changes.json",
+          "./semiconductors/monthly/index.json"
+        ]
+      },
+      {
+        "order": 6,
+        "role": "cta",
+        "headline": "Inspect the evidence",
+        "body": "Open TradeGravity's Chip Lens for periods, values, sources, coverage, and limitations.",
+        "evidence": [
+          "./?tab=semiconductors"
+        ]
+      }
+    ]
+  },
+  "caveats": [
+    "Monthly customs observations can be volatile, incomplete, and revised.",
+    "USA and China values are the two published anchor relationships, not world totals or physical shipment routes.",
+    "Publication-to-publication revisions are separate from economic month-to-month movement."
+  ],
+  "evidence_entry_point": "./?tab=semiconductors"
+}

@@ -15,9 +15,10 @@ test("index loads trusted helpers before the application and keeps D3 pinned", (
   const semiconductorToolsIndex = html.indexOf('src="./semiconductor-tools.js"');
   const experienceToolsIndex = html.indexOf('src="./experience-tools.js"');
   const newsToolsIndex = html.indexOf('src="./news-tools.js"');
+  const briefingToolsIndex = html.indexOf('src="./briefing-tools.js"');
   const d3Index = html.indexOf('src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"');
   const appIndex = html.indexOf('src="./app.js"');
-  assert.ok(securityIndex >= 0 && dataToolsIndex > securityIndex && explorerToolsIndex > dataToolsIndex && intelligenceToolsIndex > explorerToolsIndex && semiconductorToolsIndex > intelligenceToolsIndex && experienceToolsIndex > semiconductorToolsIndex && newsToolsIndex > experienceToolsIndex && d3Index > newsToolsIndex && appIndex > d3Index);
+  assert.ok(securityIndex >= 0 && dataToolsIndex > securityIndex && explorerToolsIndex > dataToolsIndex && intelligenceToolsIndex > explorerToolsIndex && semiconductorToolsIndex > intelligenceToolsIndex && experienceToolsIndex > semiconductorToolsIndex && newsToolsIndex > experienceToolsIndex && briefingToolsIndex > newsToolsIndex && d3Index > briefingToolsIndex && appIndex > d3Index);
   assert.match(html, /integrity="sha384-[A-Za-z0-9+/=]+"/);
   assert.match(html, /Content-Security-Policy/);
 });
@@ -105,6 +106,7 @@ test("chip lens exposes coverage, stages, roles, monthly signals, policy, eviden
 	"chipPublicationChanges",
     "chipTrends", "chipValueChain", "chipRoleLandscape", "chipDistribution", "chipCountryProfile", "chipTimeline", "chipCapacitySignals",
     "chipMonthlySignals",
+    "chipBriefingStatus", "chipBriefingSignals", "briefingDownloadEmail", "briefingDownloadCarousel", "briefingCopyLink", "briefingDeliveryNote",
     "chipScenarioForm", "chipDisruption", "chipSubstitution", "chipScenarioBaseline", "chipScenarioResult",
     "chipSources", "chipCaveats",
   ]) {
@@ -117,10 +119,15 @@ test("chip lens exposes coverage, stages, roles, monthly signals, policy, eviden
   assert.match(app, /async function loadSelectedChipMonthly/);
   assert.match(app, /async function renderMirrorDiagnostics/);
   assert.match(app, /function runChipScenario/);
+  assert.match(app, /function renderDistributionBriefing/);
+  assert.match(app, /function downloadBriefingEmail/);
+  assert.match(app, /function downloadBriefingCarousel/);
   assert.match(css, /\.chipValueChain/);
+  assert.match(css, /\.briefingSignalGrid/);
   assert.match(css, /\.policyTimeline/);
   assert.match(css, /\.chipRoleTable/);
   assert.match(html, /announcements are never counted as operating capacity/i);
+  assert.match(html, /does not collect subscriber data or publish directly to social platforms/i);
 });
 
 test("overview treemaps survive hidden-tab resizes and redraw when shown", () => {

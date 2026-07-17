@@ -1,0 +1,68 @@
+name: Build reviewed distribution kit
+
+on:
+  workflow_dispatch:
+    inputs:
+      theme:
+        description: Native carousel theme
+        required: true
+        default: intelligence-dark
+        type: choice
+        options:
+          - intelligence-dark
+          - editorial-light
+
+permissions:
+  contents: read
+
+concurrency:
+  group: distribution-kit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Check out published data
+        uses: actions/checkout@v7
+        with:
+          ref: gh-pages
+          path: published
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.25.12"
+          cache: true
+
+      - name: Validate the published evidence bundle
+        run: go run ./cmd/validator -dir published/data -min-reporters 40
+
+      - name: Build the review-pending kit
+        run: |
+          go run ./cmd/distributor \
+            -briefing published/data/briefing.json \
+            -out "${RUNNER_TEMP}/distribution-kit" \
+            -base-url https://elecpapaya.github.io/TradeGravity/ \
+            -theme "${{ inputs.theme }}"
+
+      - name: Verify upload assets remain review-gated
+        shell: bash
+        run: |
+          test -f "${RUNNER_TEMP}/distribution-kit/carousel/slide-01.png"
+          test -f "${RUNNER_TEMP}/distribution-kit/carousel/slide-06.png"
+          test -f "${RUNNER_TEMP}/distribution-kit/carousel/caption.md"
+          grep -q '"distribution_status": "review_pending"' "${RUNNER_TEMP}/distribution-kit/manifest.json"
+          grep -q '"social_publish_authorized": false' "${RUNNER_TEMP}/distribution-kit/manifest.json"
+          grep -q '"theme": "${{ inputs.theme }}"' "${RUNNER_TEMP}/distribution-kit/manifest.json"
+          grep -q '"caption_path": "carousel/caption.md"' "${RUNNER_TEMP}/distribution-kit/manifest.json"
+
+      - name: Upload review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradegravity-distribution-kit-${{ github.run_id }}
+          path: ${{ runner.temp }}/distribution-kit
+          if-no-files-found: error
+          retention-days: 14

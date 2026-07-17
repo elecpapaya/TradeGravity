@@ -78,6 +78,7 @@ func TestBuildDataCatalogSeparatesReadyAndPlannedResources(t *testing.T) {
 		mirrorIndexFile{Provider: "comtrade", Partitions: []mirrorPartition{{ReporterISO3: "KOR", Period: "2023"}}},
 		semiconductorMonthlyIndexFile{Provider: "comtrade", Partitions: []semiconductorMonthlyPartition{{ReporterISO3: "KOR"}}},
 		publicationChangesFile{Status: "changed"},
+		briefingFile{Status: "ready"},
 	)
 	if catalog.SchemaVersion != "1.0" || len(catalog.Resources) < 10 {
 		t.Fatalf("unexpected catalog shape: %+v", catalog)
@@ -103,6 +104,9 @@ func TestBuildDataCatalogSeparatesReadyAndPlannedResources(t *testing.T) {
 	}
 	if byID["publication_changes"].Status != "ready" || byID["publication_changes"].Href != "./changes.json" {
 		t.Fatalf("publication change feed is not published: %+v", byID["publication_changes"])
+	}
+	if byID["distribution_briefing"].Status != "ready" || byID["distribution_briefing"].Href != "./briefing.json" {
+		t.Fatalf("distribution briefing is not published: %+v", byID["distribution_briefing"])
 	}
 }
 
