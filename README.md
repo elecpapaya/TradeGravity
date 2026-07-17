@@ -12,6 +12,11 @@ TradeGravity is an open-source pipeline and static intelligence dashboard for un
 - **Live demo:** https://elecpapaya.github.io/TradeGravity/
 - **System design:** [DESIGN.md](DESIGN.md)
 - **Published data schema:** [docs/DATA_SCHEMA.md](docs/DATA_SCHEMA.md)
+- **Reviewed distribution workflow:** [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md)
+- **Email consent and suppression preflight:** [docs/EMAIL_DELIVERY_PREFLIGHT.md](docs/EMAIL_DELIVERY_PREFLIGHT.md)
+- **Provider-backed email pilot:** [docs/EMAIL_PROVIDER_PILOT.md](docs/EMAIL_PROVIDER_PILOT.md)
+- **Private registry and unsubscribe service:** [docs/UNSUBSCRIBE_SERVICE.md](docs/UNSUBSCRIBE_SERVICE.md)
+- **Instagram manual-publish preflight:** [docs/INSTAGRAM_PREFLIGHT.md](docs/INSTAGRAM_PREFLIGHT.md)
 - **Semiconductor atlas methodology:** [docs/SEMICONDUCTOR_ATLAS.md](docs/SEMICONDUCTOR_ATLAS.md)
 - **Reuse examples:** [docs/USAGE.md](docs/USAGE.md)
 - **Data rights and attribution:** [docs/DATA_RIGHTS.md](docs/DATA_RIGHTS.md)
@@ -70,6 +75,13 @@ The pipeline refresh timestamp indicates when TradeGravity generated the site; i
 - HS2 product mix for the selected reporter, kept separate from WITS headline totals.
 - Shareable Overview, US–China Lens, Chip Lens, Products, Data & Quality, and Scenario Lab tabs with synchronized filters, country, semiconductor stage/context, product, tariff, and scenario-assumption state.
 - A semiconductor Pulse that separates latest month-to-month movement from publish-to-publish coverage and value revisions, with a machine-readable bounded change feed.
+- A deterministic `briefing.json` distribution draft with three cited semiconductor observations, review-gated email Markdown, and review-gated 4:5 carousel copy. The static site does not collect subscribers, send email, or publish to social platforms.
+- An offline `cmd/distributor` build that turns a ready briefing into email HTML/Markdown, a cited Instagram caption, alt text, and six matched 1080×1350 SVG/PNG cards in either `intelligence-dark` or `editorial-light`; all assets share review gates and deterministic hashes without making a network request.
+- An aggregate-only `cmd/instagram-preflight` that requires an unchanged Instagram approval, decodes all six PNGs, validates caption evidence/scope/tags and six alt-text sections, refuses output inside the kit, and keeps credentials and automatic publishing explicitly false.
+- A fail-closed `cmd/distribution-approval` step that verifies the complete file set and SHA-256 manifest before recording a channel-specific content approval; provider delivery, subscriber consent, and automatic publishing remain explicitly false.
+- A local `cmd/distribution-preflight` gate that validates private double-opt-in and suppression CSVs, approved-audience identity, and unique opaque HTTPS unsubscribe URLs, enforces a pilot ceiling, and writes only aggregate counts and digests—never recipient addresses or tokens—while keeping provider configuration and delivery authorization false.
+- A separate SQLite `cmd/subscription-registry` and bounded `cmd/unsubscribe-service` that can collect double-opt-in consent outside the static dashboard, send short-lived Resend confirmations, activate only on explicit confirmation POST, issue HMAC-authenticated links without email/audience claims, keep link-scanner GETs read-only, record idempotent RFC one-click suppressions, verify signed Resend feedback, and export private preflight inputs.
+- A fail-closed Resend pilot path that binds a one-hour launch approval to the exact aggregate preflight, sender, audience, and content/input digests; reruns the consent and suppression checks immediately before delivery; adds visible and header one-click unsubscribe links; isolates every recipient in a separate provider request; and records only HMAC recipient keys in a private SQLite ledger. Accepted or uncertain attempts are never sent again automatically; provider-confirmed non-acceptance still requires a recorded reconciliation and a new launch approval.
 - Two-anchor position metrics whose formulas are visible: USA share, China share, exposure balance, position shift, dual exposure, and anchor-growth divergence.
 - Unadjusted bilateral mirror-reporting diagnostics that compare both countries' reports without choosing either as ground truth or treating the difference as fraud, evasion, rerouting, or an adjusted estimate.
 - An illustrative HS6 tariff sensitivity lab that can load a published MFN rate and product import baseline while exposing elasticity, pass-through, fallback, and source assumptions.
@@ -141,6 +153,7 @@ The public deployment exposes stable machine-readable endpoints:
 - `https://elecpapaya.github.io/TradeGravity/data/semiconductors/reference.json`
 - `https://elecpapaya.github.io/TradeGravity/data/semiconductors/monthly/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/changes.json`
+- `https://elecpapaya.github.io/TradeGravity/data/briefing.json`
 - `https://elecpapaya.github.io/TradeGravity/data/tariffs/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/bilateral-matrix/index.json`
 - `https://elecpapaya.github.io/TradeGravity/data/mirror/index.json`
@@ -276,13 +289,13 @@ This repository reads operating-system environment variables and does not load a
 ## Generated files and deployment
 
 - Local SQLite database: `tradegravity.db`
-- Published JSON: `meta.json`, `catalog.json`, `changes.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, `strategic-hs6/`, `semiconductors/reference.json`, `semiconductors/monthly/`, `tariffs/`, `bilateral-matrix/`, `mirror/`, and `explanations/` under `site/data/`
+- Published JSON: `meta.json`, `catalog.json`, `changes.json`, `briefing.json`, `latest.json`, `series.json`, `quality.json`, `context.json`, `products/`, `strategic-hs6/`, `semiconductors/reference.json`, `semiconductors/monthly/`, `tariffs/`, `bilateral-matrix/`, `mirror/`, and `explanations/` under `site/data/`
 
 Generated data and the local database are intentionally not committed to the default branch. The scheduled or manually dispatched core workflow runs the broad collectors and saves its validated database as a three-day Actions artifact. The staggered semiconductor workflow restores that artifact and the previous `gh-pages` publication, adds annual and monthly chip observations for [`configs/chip_connectors.csv`](configs/chip_connectors.csv), emits a validated publish-to-publish `changes.json`, and deploys `site/` to the `gh-pages` branch. A `main` push uses the latest validated `data/` directory from `gh-pages` and redeploys the site without calling WITS, UN Comtrade, WITS/TRAINS, or World Bank APIs. This keeps code-only deployments fast while the weekly refresh remains the source of new published observations.
 
 The fast deployment intentionally fails if `gh-pages` does not contain `data/latest.json` and `data/meta.json`. Bootstrap or repair the published dataset by manually running **Update TradeGravity core**, then **Update TradeGravity semiconductor**; the second workflow waits out any remaining quota window before it publishes.
 
-Before deployment, `cmd/validator` checks provenance across every artifact, reporter uniqueness, periods, non-negative finite values, totals and shares, matrix availability/count identities, tariff rate identities, product keys, bounded publication-change arithmetic and ordering, context coverage, and explanation evidence references.
+Before deployment, `cmd/validator` checks provenance across every artifact, reporter uniqueness, periods, non-negative finite values, totals and shares, matrix availability/count identities, tariff rate identities, product keys, bounded publication-change arithmetic and ordering, briefing arithmetic and mandatory human-review gates, context coverage, and explanation evidence references.
 
 ## Maintenance and contributing
 

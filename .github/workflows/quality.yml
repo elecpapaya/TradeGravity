@@ -45,11 +45,43 @@ jobs:
       - name: Validate offline sample dataset
         run: go run ./cmd/validator -dir examples/sample-data -min-reporters 3
 
+      - name: Build offline distribution kit
+        run: |
+          go run ./cmd/distributor \
+            -briefing examples/sample-data/briefing.json \
+            -out "${RUNNER_TEMP}/distribution-kit" \
+            -base-url https://example.org/TradeGravity/
+          test -f "${RUNNER_TEMP}/distribution-kit/email/body.html"
+          grep -q '{{UNSUBSCRIBE_URL}}' "${RUNNER_TEMP}/distribution-kit/email/body.html"
+          test -f "${RUNNER_TEMP}/distribution-kit/carousel/slide-06.svg"
+          test -f "${RUNNER_TEMP}/distribution-kit/carousel/slide-06.png"
+          test -f "${RUNNER_TEMP}/distribution-kit/carousel/caption.md"
+          grep -q 'https://example.org/TradeGravity/?tab=semiconductors' "${RUNNER_TEMP}/distribution-kit/carousel/caption.md"
+          test -f "${RUNNER_TEMP}/distribution-kit/manifest.json"
+          grep -q '"theme": "intelligence-dark"' "${RUNNER_TEMP}/distribution-kit/manifest.json"
+          grep -q '"caption_path": "carousel/caption.md"' "${RUNNER_TEMP}/distribution-kit/manifest.json"
+          go run ./cmd/distribution-approval \
+            -kit "${RUNNER_TEMP}/distribution-kit" \
+            -reviewer ci-synthetic-reviewer \
+            -audience synthetic-internal-pilot \
+            -channels email,instagram \
+            -approved-at 2026-07-17T12:00:00Z \
+            -attest-reviewed
+          test -f "${RUNNER_TEMP}/distribution-kit/approval.json"
+          grep -q '"provider_delivery_ready": false' "${RUNNER_TEMP}/distribution-kit/approval.json"
+          go run ./cmd/instagram-preflight \
+            -kit "${RUNNER_TEMP}/distribution-kit" \
+            -out "${RUNNER_TEMP}/instagram-preflight.json" \
+            -generated-at 2026-07-17T13:00:00Z
+          grep -q '"manual_upload_required": true' "${RUNNER_TEMP}/instagram-preflight.json"
+          grep -q '"automatic_publish_authorized": false' "${RUNNER_TEMP}/instagram-preflight.json"
+          grep -q '"contains_credentials": false' "${RUNNER_TEMP}/instagram-preflight.json"
+
       - name: Check browser JavaScript
-        run: node --check site/app.js && node --check site/security.js && node --check site/data-tools.js && node --check site/explorer-tools.js && node --check site/intelligence-tools.js && node --check site/semiconductor-tools.js && node --check site/experience-tools.js && node --check site/news-tools.js
+        run: node --check site/app.js && node --check site/security.js && node --check site/data-tools.js && node --check site/explorer-tools.js && node --check site/intelligence-tools.js && node --check site/semiconductor-tools.js && node --check site/experience-tools.js && node --check site/news-tools.js && node --check site/briefing-tools.js
 
       - name: Test browser data helpers
-        run: node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/semiconductor-tools.test.cjs site/experience-tools.test.cjs site/news-tools.test.cjs site/structure.test.cjs
+        run: node --test site/security.test.cjs site/data-tools.test.cjs site/explorer-tools.test.cjs site/intelligence-tools.test.cjs site/semiconductor-tools.test.cjs site/experience-tools.test.cjs site/news-tools.test.cjs site/briefing-tools.test.cjs site/structure.test.cjs
 
       - name: Validate citation metadata
         run: |

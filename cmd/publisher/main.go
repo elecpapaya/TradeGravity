@@ -234,6 +234,7 @@ func build(args []string) {
 		fmt.Fprintln(os.Stderr, "failed to compare the previous semiconductor publication:", err)
 		os.Exit(1)
 	}
+	briefing := buildBriefing(now, latest, semiconductorMonthlyIndex, semiconductorMonthlyFiles, publicationChanges)
 	tariffRows, err := loadTariffObservations(*dbPath, "trains")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "failed to load tariff observations:", err)
@@ -253,7 +254,7 @@ func build(args []string) {
 		os.Exit(1)
 	}
 	quality := buildQualityFile(now, *provider, latest, rows, productRows, runs)
-	catalog := buildDataCatalog(now, *provider, contextData.Status, seriesOutput, productIndex, strategicIndex, tariffIndex, matrixIndex, mirrorIndex, semiconductorMonthlyIndex, publicationChanges, semiconductorReference)
+	catalog := buildDataCatalog(now, *provider, contextData.Status, seriesOutput, productIndex, strategicIndex, tariffIndex, matrixIndex, mirrorIndex, semiconductorMonthlyIndex, publicationChanges, briefing, semiconductorReference)
 	metadata := buildMeta(now, *provider, partners, rows, latest)
 	augmentMeta(&metadata, latest, seriesOutput, productIndex, len(productRows), contextData.Status)
 	augmentStrategicMeta(&metadata, strategicIndex)
@@ -292,6 +293,10 @@ func build(args []string) {
 	}
 	if err := writeJSON(filepath.Join(*outDir, "changes.json"), publicationChanges); err != nil {
 		fmt.Fprintln(os.Stderr, "failed to write changes.json:", err)
+		os.Exit(1)
+	}
+	if err := writeJSON(filepath.Join(*outDir, "briefing.json"), briefing); err != nil {
+		fmt.Fprintln(os.Stderr, "failed to write briefing.json:", err)
 		os.Exit(1)
 	}
 	productsDir := filepath.Join(*outDir, "products")
