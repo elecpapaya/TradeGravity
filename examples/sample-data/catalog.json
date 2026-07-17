@@ -114,6 +114,17 @@
       "href": "./changes.json"
     },
     {
+      "id": "distribution_briefing",
+      "title": "Deterministic email and social briefing",
+      "status": "ready",
+      "provider": "tradegravity",
+      "classification": "source HS revision",
+      "product_level": 6,
+      "grain": "edition × selected monthly observation × distribution channel",
+      "partitioning": "single reviewed-draft publication",
+      "href": "./briefing.json"
+    },
+    {
       "id": "mirror_reconciliation",
       "title": "Unadjusted mirror-reporting diagnostics",
       "status": "ready",

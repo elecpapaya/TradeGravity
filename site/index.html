@@ -15,6 +15,7 @@
   <script src="./semiconductor-tools.js"></script>
   <script src="./experience-tools.js"></script>
   <script src="./news-tools.js"></script>
+  <script src="./briefing-tools.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -260,6 +261,20 @@
     <section class="chipTrendStrip" aria-labelledby="chipPublicationTitle">
       <div class="chipSectionHeading"><div><span class="eyebrow">Observed publication delta</span><h2 id="chipPublicationTitle">What changed since the previous release</h2></div><a href="./data/changes.json" target="_blank" rel="noopener noreferrer">Change feed JSON</a></div>
       <div id="chipPublicationChanges" class="analysisBody subtle" aria-live="polite">Loading the publish-to-publish comparison…</div>
+    </section>
+
+    <section class="chipTrendStrip briefingDesk" aria-labelledby="chipBriefingTitle">
+      <div class="chipSectionHeading">
+        <div><span class="eyebrow">Distribution desk · reviewed drafts</span><h2 id="chipBriefingTitle">Email brief and social carousel</h2></div>
+        <span id="chipBriefingStatus" class="scopeBadge warningBadge">Loading briefing…</span>
+      </div>
+      <div id="chipBriefingSignals" class="briefingSignalGrid subtle" aria-live="polite">Loading the deterministic distribution brief…</div>
+      <div class="briefingActions" aria-label="Distribution briefing exports">
+        <button id="briefingDownloadEmail" class="btn" type="button" disabled>Download email draft</button>
+        <button id="briefingDownloadCarousel" class="btn" type="button" disabled>Download carousel copy</button>
+        <button id="briefingCopyLink" class="btn" type="button" disabled>Copy evidence link</button>
+      </div>
+      <p id="briefingDeliveryNote" class="analysisNote">Delivery is not configured. This static build creates manually reviewed drafts and does not collect subscriber data or publish directly to social platforms.</p>
     </section>
 
     <section class="chipTrendStrip" aria-labelledby="chipTrendTitle">

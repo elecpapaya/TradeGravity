@@ -20,6 +20,16 @@ All notable changes to TradeGravity will be documented in this file. The project
 - Global PNG snapshot, CSV, and Markdown summary-report exports for the active analysis view.
 - Always-visible metric, observation-period, scope, and limitation context plus a definitions dialog.
 - Current, partial, and degraded publication-health states with recovery guidance.
+- A validated `briefing.json` contract that derives three cited semiconductor observations and exposes review-gated email Markdown and 4:5 social-carousel copy without collecting subscribers or publishing automatically.
+- An offline distribution-kit CLI and manual read-only Actions workflow that render one-primary-CTA email HTML with an unsubscribe placeholder, six matched 1080×1350 SVG originals and PNG upload assets, alt text, approval gates, and deterministic file hashes without sending or posting.
+- A second original `editorial-light` native carousel theme behind the same validated renderer interface; theme choice is recorded in the manifest and therefore bound to editorial approval, with no browser runtime, remote font, image fetch, or arbitrary HTML input.
+- Automated palette contrast checks across every gradient stop, including normal text and large bold role labels; the light theme's muted and accent colors were tightened to retain the documented floor.
+- A review-pending Instagram `caption.md` derived from the same three validated signals, with comparison period, evidence link, conservative scope note, restrained tags, an editorial length ceiling, and manifest/approval tamper protection.
+- An Instagram manual-publish preflight CLI that requires channel approval, verifies every PNG plus caption and alt-text contracts, emits content-free aggregate evidence outside the kit, and explicitly carries no credentials or publish authorization.
+- A content-release approval CLI that rejects changed, missing, or untracked kit files and binds the verified manifest to a reviewer, audience label, time, and email/Instagram channel set without claiming delivery readiness.
+- A local email preflight CLI that validates double opt-in, audience identity, suppression precedence, timestamps, duplicate addresses, unique opaque HTTPS unsubscribe URLs, and a pilot ceiling while emitting an aggregate plan with no recipient addresses or tokens and no delivery authorization.
+- A private SQLite subscription-registry CLI and subscription HTTP service with a default-off double-opt-in signup form, short-lived purpose-separated HMAC confirmation links, read-only scanner-safe GET plus explicit confirmation POST, stable Resend confirmation idempotency, form-encoded one-click unsubscribe, signed raw-body provider feedback, durable global suppression, security headers, and private preflight exports.
+- A short-lived email launch-approval contract and Resend pilot CLI that replay consent/suppression checks at send time, render recipient-specific visible and RFC one-click unsubscribe links, use one recipient and one provider idempotency key per request, and prevent automatic duplicate or uncertain retries with a private HMAC-keyed SQLite delivery ledger. A separate reconciliation CLI records provider-confirmed acceptance or non-acceptance without storing recipient PII; only the latter plus a different launch-authorization digest permits retry.
 
 ### Changed
 

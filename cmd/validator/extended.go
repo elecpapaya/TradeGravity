@@ -379,6 +379,78 @@ type validationPublicationRevision struct {
 	ChangeRatio           *float64 `json:"change_ratio,omitempty"`
 }
 
+type validationBriefing struct {
+	SchemaVersion      string                           `json:"schema_version"`
+	GeneratedAt        string                           `json:"generated_at"`
+	EditionID          string                           `json:"edition_id"`
+	Status             string                           `json:"status"`
+	Title              string                           `json:"title"`
+	Scope              string                           `json:"scope"`
+	LatestPeriod       string                           `json:"latest_period,omitempty"`
+	PreviousPeriod     string                           `json:"previous_period,omitempty"`
+	PublicationStatus  string                           `json:"publication_status"`
+	ReviewRequired     bool                             `json:"review_required"`
+	Signals            []validationBriefingSignal       `json:"signals"`
+	Email              validationBriefingEmail          `json:"email"`
+	SocialCarousel     validationBriefingSocialCarousel `json:"social_carousel"`
+	Caveats            []string                         `json:"caveats"`
+	EvidenceEntryPoint string                           `json:"evidence_entry_point"`
+}
+
+type validationBriefingSignal struct {
+	ID               string                          `json:"id"`
+	Kind             string                          `json:"kind"`
+	Title            string                          `json:"title"`
+	Summary          string                          `json:"summary"`
+	ReporterISO3     string                          `json:"reporter_iso3"`
+	ReporterName     string                          `json:"reporter_name"`
+	Classification   string                          `json:"classification,omitempty"`
+	Code             string                          `json:"code,omitempty"`
+	Label            string                          `json:"label,omitempty"`
+	Period           string                          `json:"period"`
+	PreviousPeriod   string                          `json:"previous_period"`
+	Current          validationBriefingObservedValue `json:"current"`
+	Previous         validationBriefingObservedValue `json:"previous"`
+	DeltaTradeUSD    float64                         `json:"delta_trade_usd"`
+	ChangeRatio      *float64                        `json:"change_ratio,omitempty"`
+	ChinaShareDelta  float64                         `json:"china_share_delta"`
+	Evidence         []string                        `json:"evidence"`
+	Interpretation   string                          `json:"interpretation"`
+	MeasurementLimit string                          `json:"measurement_limit"`
+}
+
+type validationBriefingObservedValue struct {
+	USATradeUSD   float64 `json:"usa_trade_usd"`
+	ChinaTradeUSD float64 `json:"china_trade_usd"`
+	TotalTradeUSD float64 `json:"total_trade_usd"`
+	ChinaShare    float64 `json:"china_share"`
+}
+
+type validationBriefingEmail struct {
+	Subject     string `json:"subject"`
+	Preview     string `json:"preview"`
+	Markdown    string `json:"markdown"`
+	CTALabel    string `json:"cta_label"`
+	CTAPath     string `json:"cta_path"`
+	SendPolicy  string `json:"send_policy"`
+	PrimaryGoal string `json:"primary_goal"`
+}
+
+type validationBriefingSocialCarousel struct {
+	Format       string                            `json:"format"`
+	AspectRatio  string                            `json:"aspect_ratio"`
+	ReviewPolicy string                            `json:"review_policy"`
+	Slides       []validationBriefingCarouselSlide `json:"slides"`
+}
+
+type validationBriefingCarouselSlide struct {
+	Order    int      `json:"order"`
+	Role     string   `json:"role"`
+	Headline string   `json:"headline"`
+	Body     string   `json:"body"`
+	Evidence []string `json:"evidence"`
+}
+
 type validationQuality struct {
 	SchemaVersion      string                         `json:"schema_version"`
 	GeneratedAt        string                         `json:"generated_at"`
@@ -550,6 +622,13 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 	if err := validatePublicationChanges(metadata, semiconductorMonthlyIndex, publicationChanges); err != nil {
 		return err
 	}
+	var briefing validationBriefing
+	if err := readJSON(filepath.Join(dataDir, "briefing.json"), &briefing); err != nil {
+		return fmt.Errorf("read briefing.json: %w", err)
+	}
+	if err := validateBriefing(metadata, publicationChanges, briefing); err != nil {
+		return err
+	}
 	var tariffIndex validationTariffIndex
 	if err := readJSON(filepath.Join(dataDir, "tariffs", "index.json"), &tariffIndex); err != nil {
 		return fmt.Errorf("read tariff index: %w", err)
@@ -575,7 +654,7 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 	if err := readJSON(filepath.Join(dataDir, "catalog.json"), &catalog); err != nil {
 		return fmt.Errorf("read catalog.json: %w", err)
 	}
-	if err := validateCatalog(metadata, catalog, publicationChanges); err != nil {
+	if err := validateCatalog(metadata, catalog, publicationChanges, briefing); err != nil {
 		return err
 	}
 	if err := validateExplanations(dataDir, metadata, latest); err != nil {
@@ -588,7 +667,7 @@ func validateExtendedDataset(dataDir string, metadata datasetMeta, latest datase
 	return validateContext(metadata, latest, contextData)
 }
 
-func validateCatalog(metadata datasetMeta, catalog validationCatalog, publicationChanges validationPublicationChanges) error {
+func validateCatalog(metadata datasetMeta, catalog validationCatalog, publicationChanges validationPublicationChanges, briefing validationBriefing) error {
 	if catalog.SchemaVersion != "1.0" || catalog.GeneratedAt != metadata.GeneratedAt {
 		return errorsForExtended("catalog provenance does not match metadata")
 	}
@@ -611,7 +690,7 @@ func validateCatalog(metadata datasetMeta, catalog validationCatalog, publicatio
 		}
 		seen[resource.ID] = resource
 	}
-	for _, required := range []string{"headline_totals", "time_series", "country_context", "product_chapters", "quality", "strategic_hs6", "tariff_schedules", "bilateral_matrix", "semiconductor_atlas", "semiconductor_monthly", "publication_changes", "mirror_reconciliation", "scenario_runs"} {
+	for _, required := range []string{"headline_totals", "time_series", "country_context", "product_chapters", "quality", "strategic_hs6", "tariff_schedules", "bilateral_matrix", "semiconductor_atlas", "semiconductor_monthly", "publication_changes", "distribution_briefing", "mirror_reconciliation", "scenario_runs"} {
 		if _, ok := seen[required]; !ok {
 			return fmt.Errorf("catalog is missing resource %q", required)
 		}
@@ -667,6 +746,14 @@ func validateCatalog(metadata datasetMeta, catalog validationCatalog, publicatio
 	}
 	if changesResource.Status != wantChangesStatus || changesResource.Provider != "tradegravity" || changesResource.ProductLevel != 6 || changesResource.Href != "./changes.json" {
 		return errorsForExtended("catalog publication change resource does not match changes.json")
+	}
+	briefingResource := seen["distribution_briefing"]
+	wantBriefingStatus := "partial"
+	if briefing.Status == "ready" {
+		wantBriefingStatus = "ready"
+	}
+	if briefingResource.Status != wantBriefingStatus || briefingResource.Provider != "tradegravity" || briefingResource.ProductLevel != 6 || briefingResource.Href != "./briefing.json" {
+		return errorsForExtended("catalog distribution briefing resource does not match briefing.json")
 	}
 	return nil
 }
@@ -739,6 +826,120 @@ func validatePublicationChanges(metadata datasetMeta, monthly validationSemicond
 		previousMagnitude = revision.MagnitudeTradeUSD
 	}
 	return nil
+}
+
+func validateBriefing(metadata datasetMeta, changes validationPublicationChanges, briefing validationBriefing) error {
+	if briefing.SchemaVersion != "1.0" || briefing.GeneratedAt != metadata.GeneratedAt || strings.TrimSpace(briefing.EditionID) == "" || strings.TrimSpace(briefing.Title) == "" || strings.TrimSpace(briefing.Scope) == "" {
+		return errorsForExtended("briefing provenance does not match metadata")
+	}
+	if briefing.Status != "ready" && briefing.Status != "unavailable" {
+		return fmt.Errorf("briefing has invalid status %q", briefing.Status)
+	}
+	if briefing.PublicationStatus != changes.Status || !briefing.ReviewRequired || len(briefing.Caveats) < 3 || !validBriefingHref(briefing.EvidenceEntryPoint) {
+		return errorsForExtended("briefing does not preserve publication status, review, caveat, or evidence requirements")
+	}
+	for _, caveat := range briefing.Caveats {
+		if strings.TrimSpace(caveat) == "" {
+			return errorsForExtended("briefing caveats must not be blank")
+		}
+	}
+	email := briefing.Email
+	if strings.TrimSpace(email.Subject) == "" || strings.TrimSpace(email.Preview) == "" || strings.TrimSpace(email.Markdown) == "" || strings.TrimSpace(email.CTALabel) == "" || !validBriefingHref(email.CTAPath) || email.SendPolicy != "manual_review_required" || strings.TrimSpace(email.PrimaryGoal) == "" {
+		return errorsForExtended("briefing email draft is incomplete or not review-gated")
+	}
+	carousel := briefing.SocialCarousel
+	if carousel.Format != "carousel_copy" || carousel.AspectRatio != "4:5" || carousel.ReviewPolicy != "manual_review_required" {
+		return errorsForExtended("briefing carousel contract is invalid")
+	}
+	if briefing.Status == "unavailable" {
+		if len(briefing.Signals) != 0 || len(carousel.Slides) != 0 {
+			return errorsForExtended("unavailable briefing must not publish signals or carousel slides")
+		}
+		return nil
+	}
+	if !monthPattern.MatchString(briefing.LatestPeriod) || !monthPattern.MatchString(briefing.PreviousPeriod) || briefing.LatestPeriod <= briefing.PreviousPeriod || !strings.Contains(email.Markdown, "{{BASE_URL}}") {
+		return errorsForExtended("ready briefing has invalid periods or unresolved delivery template")
+	}
+	wantKinds := []string{"reporter_total_change", "anchor_share_shift", "product_total_change"}
+	if len(briefing.Signals) != len(wantKinds) {
+		return fmt.Errorf("ready briefing has %d signals, want %d", len(briefing.Signals), len(wantKinds))
+	}
+	seenIDs := make(map[string]struct{}, len(briefing.Signals))
+	for index, signal := range briefing.Signals {
+		if signal.Kind != wantKinds[index] || strings.TrimSpace(signal.ID) == "" || strings.TrimSpace(signal.Title) == "" || strings.TrimSpace(signal.Summary) == "" || !iso3Pattern.MatchString(signal.ReporterISO3) || strings.TrimSpace(signal.ReporterName) == "" || !monthPattern.MatchString(signal.Period) || !monthPattern.MatchString(signal.PreviousPeriod) || signal.Period <= signal.PreviousPeriod || strings.TrimSpace(signal.Interpretation) == "" || strings.TrimSpace(signal.MeasurementLimit) == "" {
+			return fmt.Errorf("briefing has incomplete signal %+v", signal)
+		}
+		if _, exists := seenIDs[signal.ID]; exists {
+			return fmt.Errorf("briefing repeats signal id %q", signal.ID)
+		}
+		seenIDs[signal.ID] = struct{}{}
+		if signal.Kind == "product_total_change" {
+			if strings.TrimSpace(signal.Classification) == "" || !hs6Pattern.MatchString(signal.Code) || strings.TrimSpace(signal.Label) == "" {
+				return fmt.Errorf("briefing product signal is incomplete %+v", signal)
+			}
+		} else if signal.Classification != "" || signal.Code != "" || signal.Label != "" {
+			return fmt.Errorf("briefing aggregate signal claims product identity %+v", signal)
+		}
+		if err := validateBriefingObservedValue(signal.Current); err != nil {
+			return fmt.Errorf("briefing signal %s current value: %w", signal.ID, err)
+		}
+		if err := validateBriefingObservedValue(signal.Previous); err != nil {
+			return fmt.Errorf("briefing signal %s previous value: %w", signal.ID, err)
+		}
+		if !isFinite(signal.DeltaTradeUSD) || !approximatelyEqual(signal.DeltaTradeUSD, signal.Current.TotalTradeUSD-signal.Previous.TotalTradeUSD) || !isFinite(signal.ChinaShareDelta) || !approximatelyEqual(signal.ChinaShareDelta, signal.Current.ChinaShare-signal.Previous.ChinaShare) {
+			return fmt.Errorf("briefing signal %s has inconsistent deltas", signal.ID)
+		}
+		if signal.Previous.TotalTradeUSD > 0 {
+			if signal.ChangeRatio == nil || !isFinite(*signal.ChangeRatio) || !approximatelyEqual(*signal.ChangeRatio, signal.DeltaTradeUSD/signal.Previous.TotalTradeUSD) {
+				return fmt.Errorf("briefing signal %s has inconsistent change ratio", signal.ID)
+			}
+		} else if signal.ChangeRatio != nil {
+			return fmt.Errorf("briefing signal %s must omit a ratio with a zero baseline", signal.ID)
+		}
+		if len(signal.Evidence) < 2 {
+			return fmt.Errorf("briefing signal %s has insufficient evidence links", signal.ID)
+		}
+		for _, href := range signal.Evidence {
+			if !validBriefingHref(href) {
+				return fmt.Errorf("briefing signal %s has invalid evidence href %q", signal.ID, href)
+			}
+		}
+	}
+	if briefing.Signals[0].Period != briefing.LatestPeriod || briefing.Signals[0].PreviousPeriod != briefing.PreviousPeriod {
+		return errorsForExtended("briefing edition periods do not match the leading signal")
+	}
+	wantRoles := []string{"cover", "scale", "anchor_balance", "product", "method", "cta"}
+	if len(carousel.Slides) != len(wantRoles) {
+		return fmt.Errorf("briefing carousel has %d slides, want %d", len(carousel.Slides), len(wantRoles))
+	}
+	for index, slide := range carousel.Slides {
+		if slide.Order != index+1 || slide.Role != wantRoles[index] || strings.TrimSpace(slide.Headline) == "" || strings.TrimSpace(slide.Body) == "" || len(slide.Evidence) == 0 {
+			return fmt.Errorf("briefing carousel has invalid slide %+v", slide)
+		}
+		for _, href := range slide.Evidence {
+			if !validBriefingHref(href) {
+				return fmt.Errorf("briefing carousel slide %d has invalid evidence href %q", slide.Order, href)
+			}
+		}
+	}
+	return nil
+}
+
+func validateBriefingObservedValue(value validationBriefingObservedValue) error {
+	values := []float64{value.USATradeUSD, value.ChinaTradeUSD, value.TotalTradeUSD, value.ChinaShare}
+	for _, item := range values {
+		if !isFinite(item) || item < 0 {
+			return fmt.Errorf("contains invalid nonnegative value %v", item)
+		}
+	}
+	if value.ChinaShare > 1 || !approximatelyEqual(value.TotalTradeUSD, value.USATradeUSD+value.ChinaTradeUSD) || (value.TotalTradeUSD > 0 && !approximatelyEqual(value.ChinaShare, value.ChinaTradeUSD/value.TotalTradeUSD)) || (value.TotalTradeUSD == 0 && value.ChinaShare != 0) {
+		return errorsForExtended("totals or China share are inconsistent")
+	}
+	return nil
+}
+
+func validBriefingHref(href string) bool {
+	return strings.HasPrefix(href, "./") && !strings.Contains(href, "..") && !strings.ContainsAny(href, "\r\n")
 }
 
 func sortedUnique(values []string) bool {
