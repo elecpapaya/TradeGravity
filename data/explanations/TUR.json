@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-16T08:51:09Z",
+  "generated_at": "2026-07-20T05:52:15Z",
   "reporter_iso3": "TUR",
   "name": "Türkiye",
   "generator": {
@@ -8,7 +8,7 @@
     "status": "fallback",
     "model": "none"
   },
-  "summary": "Türkiye has a larger published USA-plus-China trade relationship with USA in the current view.",
+  "summary": "Türkiye has a larger published USA-plus-China trade relationship with China in the current view.",
   "statements": [
     {
       "text": "Trade with USA is $30,660,024,370 for 2023.",
@@ -17,7 +17,7 @@
       ]
     },
     {
-      "text": "Trade with China is $3,306,083,517 for 2023.",
+      "text": "Trade with China is $48,354,051,980 for 2023.",
       "evidence_ids": [
         "TOTAL-CHN"
       ]
@@ -49,8 +49,8 @@
     {
       "id": "TOTAL-CHN",
       "label": "Headline trade with China",
-      "value": 3306083517,
-      "display_value": "$3,306,083,517",
+      "value": 48354051980,
+      "display_value": "$48,354,051,980",
       "unit": "current USD",
       "period": "2023",
       "source": "WITS",
@@ -59,8 +59,8 @@
     {
       "id": "SHARE-CHN",
       "label": "China share of USA-plus-China trade",
-      "value": 0.09733477641885935,
-      "display_value": "9.7%",
+      "value": 0.6119675659538353,
+      "display_value": "61.2%",
       "unit": "share",
       "period": "2023",
       "source": "TradeGravity calculation",
@@ -97,8 +97,8 @@
     {
       "id": "TREND-CHN-FIRST",
       "label": "First comparable annual China trade",
-      "value": 2970633344,
-      "display_value": "$2,970,633,344",
+      "value": 28703498444,
+      "display_value": "$28,703,498,444",
       "unit": "current USD",
       "period": "2014",
       "source": "WITS",
@@ -107,8 +107,8 @@
     {
       "id": "TREND-CHN-LAST",
       "label": "Latest comparable annual China trade",
-      "value": 3306083517,
-      "display_value": "$3,306,083,517",
+      "value": 48354051980,
+      "display_value": "$48,354,051,980",
       "unit": "current USD",
       "period": "2023",
       "source": "WITS",

@@ -1,13 +1,13 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-16T08:51:09Z",
+  "generated_at": "2026-07-20T05:52:15Z",
   "provider": "wits",
   "partners": [
     "USA",
     "CHN"
   ],
   "reporter_count": 51,
-  "observation_count": 1986,
+  "observation_count": 1996,
   "expected_partner_blocks": 102,
   "available_partner_blocks": 100,
   "missing_partner_blocks": 2,
@@ -26,14 +26,14 @@
   "product_classification": "HS",
   "product_level": 2,
   "product_reporter_count": 49,
-  "product_observation_count": 17580,
+  "product_observation_count": 17574,
   "context_status": "partial",
   "strategic_provider": "comtrade",
   "strategic_level": 6,
   "strategic_product_count": 39,
   "strategic_reporter_count": 11,
   "strategic_partition_count": 55,
-  "strategic_observation_count": 6175,
+  "strategic_observation_count": 6278,
   "tariff_provider": "trains",
   "tariff_importer_count": 41,
   "tariff_partition_count": 41,
@@ -54,5 +54,5 @@
   "semiconductor_monthly_provider": "comtrade",
   "semiconductor_monthly_reporter_count": 9,
   "semiconductor_monthly_period_count": 11,
-  "semiconductor_monthly_observation_count": 7837
+  "semiconductor_monthly_observation_count": 7588
 }

@@ -1,6 +1,7 @@
 {
   "schema_version": "1.0",
   "updated_at": "2026-07-16",
+  "generated_at": "2026-07-20T05:52:15Z",
   "title": "US–China Chip Supply Chain Lens",
   "scope": "A stage-based semiconductor observatory that shows where connector economies sit and move between United States and China trade exposure while keeping customs observations, industrial context, policy events, and analytical estimates separate.",
   "perspective": {
@@ -90,7 +91,7 @@
     {
       "id": "design_eda",
       "order": 1,
-      "label": "Design, IP & EDA",
+      "label": "Design, IP \u0026 EDA",
       "short_label": "Design/IP",
       "description": "Architecture, chip design, reusable IP and electronic-design-automation software.",
       "observation_type": "external_context",
@@ -100,7 +101,7 @@
     {
       "id": "materials_wafers",
       "order": 2,
-      "label": "Materials & wafers",
+      "label": "Materials \u0026 wafers",
       "short_label": "Materials",
       "description": "High-purity silicon, doped wafers and broad lithography-chemical proxies.",
       "observation_type": "mixed_proxy",
@@ -133,7 +134,7 @@
     {
       "id": "logic_foundry",
       "order": 4,
-      "label": "Logic & foundry output",
+      "label": "Logic \u0026 foundry output",
       "short_label": "Logic/foundry",
       "description": "Processors, controllers, amplifiers and other integrated circuits used as a customs-trade proxy for fabricated logic output.",
       "observation_type": "observed_goods",
@@ -147,7 +148,7 @@
     {
       "id": "memory_hbm",
       "order": 5,
-      "label": "Memory & HBM",
+      "label": "Memory \u0026 HBM",
       "short_label": "Memory/HBM",
       "description": "Memory integrated circuits, with HBM treated as current industry context rather than a separately observed HS6 product.",
       "observation_type": "observed_with_gap",
@@ -159,7 +160,7 @@
     {
       "id": "discrete_power",
       "order": 6,
-      "label": "Discrete, power & sensors",
+      "label": "Discrete, power \u0026 sensors",
       "short_label": "Discrete/power",
       "description": "Diodes, transistors, power switches, photosensitive devices and semiconductor transducers.",
       "observation_type": "revision_sensitive",
@@ -181,7 +182,7 @@
     {
       "id": "packaging_test",
       "order": 7,
-      "label": "Packaging, substrates & test",
+      "label": "Packaging, substrates \u0026 test",
       "short_label": "Packaging/test",
       "description": "Assembly machinery, printed circuits, IC parts, inspection and test-equipment proxies.",
       "observation_type": "mixed_proxy",
@@ -198,7 +199,7 @@
     {
       "id": "downstream_demand",
       "order": 8,
-      "label": "Downstream compute & network demand",
+      "label": "Downstream compute \u0026 network demand",
       "short_label": "End demand",
       "description": "Broad processing units and network equipment used only as downstream demand context.",
       "observation_type": "broad_proxy",
@@ -211,25 +212,36 @@
   ],
   "country_roles": [
     {
-      "iso3": "USA",
-      "name": "United States",
+      "iso3": "CHN",
+      "name": "China",
       "roles": [
-        "design_eda",
-        "manufacturing_equipment",
         "logic_foundry",
+        "discrete_power",
+        "packaging_test",
         "downstream_demand"
       ],
-      "note": "Strong design, EDA, equipment and AI-compute demand context; domestic manufacturing and packaging policy is expanding.",
+      "note": "Large manufacturing, assembly and end-demand context with rapidly changing export-control exposure.",
       "evidence": "contextual"
     },
     {
-      "iso3": "TWN",
-      "name": "Chinese Taipei",
+      "iso3": "DEU",
+      "name": "Germany",
       "roles": [
-        "logic_foundry",
-        "packaging_test"
+        "manufacturing_equipment",
+        "discrete_power",
+        "downstream_demand"
       ],
-      "note": "Foundry and advanced-packaging specialization is material to leading-edge supply-chain monitoring.",
+      "note": "Equipment, industrial and automotive-semiconductor context.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "JPN",
+      "name": "Japan",
+      "roles": [
+        "materials_wafers",
+        "manufacturing_equipment"
+      ],
+      "note": "Materials, wafers and manufacturing equipment are prominent supply-chain roles; next-generation fabrication support is expanding.",
       "evidence": "contextual"
     },
     {
@@ -244,13 +256,12 @@
       "evidence": "contextual"
     },
     {
-      "iso3": "JPN",
-      "name": "Japan",
+      "iso3": "MYS",
+      "name": "Malaysia",
       "roles": [
-        "materials_wafers",
-        "manufacturing_equipment"
+        "packaging_test"
       ],
-      "note": "Materials, wafers and manufacturing equipment are prominent supply-chain roles; next-generation fabrication support is expanding.",
+      "note": "Assembly, packaging and test specialization makes the country relevant to diversification analysis.",
       "evidence": "contextual"
     },
     {
@@ -263,24 +274,12 @@
       "evidence": "contextual"
     },
     {
-      "iso3": "CHN",
-      "name": "China",
-      "roles": [
-        "logic_foundry",
-        "discrete_power",
-        "packaging_test",
-        "downstream_demand"
-      ],
-      "note": "Large manufacturing, assembly and end-demand context with rapidly changing export-control exposure.",
-      "evidence": "contextual"
-    },
-    {
-      "iso3": "MYS",
-      "name": "Malaysia",
+      "iso3": "PHL",
+      "name": "Philippines",
       "roles": [
         "packaging_test"
       ],
-      "note": "Assembly, packaging and test specialization makes the country relevant to diversification analysis.",
+      "note": "Assembly and test specialization is relevant to Southeast Asian supply-chain mapping.",
       "evidence": "contextual"
     },
     {
@@ -295,12 +294,25 @@
       "evidence": "contextual"
     },
     {
-      "iso3": "PHL",
-      "name": "Philippines",
+      "iso3": "TWN",
+      "name": "Chinese Taipei",
       "roles": [
+        "logic_foundry",
         "packaging_test"
       ],
-      "note": "Assembly and test specialization is relevant to Southeast Asian supply-chain mapping.",
+      "note": "Foundry and advanced-packaging specialization is material to leading-edge supply-chain monitoring.",
+      "evidence": "contextual"
+    },
+    {
+      "iso3": "USA",
+      "name": "United States",
+      "roles": [
+        "design_eda",
+        "manufacturing_equipment",
+        "logic_foundry",
+        "downstream_demand"
+      ],
+      "note": "Strong design, EDA, equipment and AI-compute demand context; domestic manufacturing and packaging policy is expanding.",
       "evidence": "contextual"
     },
     {
@@ -311,17 +323,6 @@
         "downstream_demand"
       ],
       "note": "Growing electronics assembly and packaging context; customs data should not be treated as proof of physical rerouting.",
-      "evidence": "contextual"
-    },
-    {
-      "iso3": "DEU",
-      "name": "Germany",
-      "roles": [
-        "manufacturing_equipment",
-        "discrete_power",
-        "downstream_demand"
-      ],
-      "note": "Equipment, industrial and automotive-semiconductor context.",
       "evidence": "contextual"
     }
   ],
@@ -528,7 +529,7 @@
       "announced_at": "2024-12-19",
       "country": "United States",
       "iso3": "USA",
-      "title": "SK hynix advanced-packaging and R&D facility in Indiana",
+      "title": "SK hynix advanced-packaging and R\u0026D facility in Indiana",
       "stage": "packaging_test",
       "status": "planned",
       "expected_operation": "2028-H2",
@@ -809,7 +810,6 @@
     "substitution_percent": 25,
     "warning": "A transparent exposure sensitivity based on observed trade, not a capacity, price, GDP, welfare or causal forecast."
   },
-  "generated_at": "2026-07-16T08:51:09Z",
   "publication": {
     "status": "limited",
     "scope": "UN Comtrade reporter observations against USA and China partners; not total world semiconductor trade or physical routes",
