@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-20T05:52:15Z",
+  "generated_at": "2026-07-27T05:57:01Z",
   "provider": "comtrade",
   "reporter_iso3": "CAN",
   "period": "2023",
@@ -12,12 +12,10 @@
   "rows": [
     {
       "anchor_iso3": "USA",
-      "reporter_export_available": true,
+      "reporter_export_available": false,
       "anchor_import_available": true,
-      "reporter_export_usd": 438650206291.982,
+      "reporter_export_usd": 0,
       "anchor_import_usd": 429604898391,
-      "export_gap_usd": 9045307900.981995,
-      "export_symmetric_gap_ratio": 0.02083559970380969,
       "reporter_import_available": true,
       "anchor_export_available": true,
       "reporter_import_usd": 276807213354.706,
@@ -27,12 +25,10 @@
     },
     {
       "anchor_iso3": "CHN",
-      "reporter_export_available": true,
+      "reporter_export_available": false,
       "anchor_import_available": true,
-      "reporter_export_usd": 22612235334.833,
+      "reporter_export_usd": 0,
       "anchor_import_usd": 43919904880,
-      "export_gap_usd": -21307669545.167,
-      "export_symmetric_gap_ratio": -0.6405225948350468,
       "reporter_import_available": true,
       "anchor_export_available": true,
       "reporter_import_usd": 66087387913.469,

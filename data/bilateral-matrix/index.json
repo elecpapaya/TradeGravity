@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-20T05:52:15Z",
+  "generated_at": "2026-07-27T05:57:01Z",
   "provider": "comtrade",
   "product_code": "TOTAL",
   "product_level": 0,
@@ -36,7 +36,6 @@
     "KOR",
     "MEX",
     "MYS",
-    "NGA",
     "NLD",
     "NOR",
     "NZL",
@@ -333,7 +332,7 @@
       "reporter_iso3": "CAN",
       "period": "2023",
       "href": "./CAN/2023.json",
-      "row_count": 221
+      "row_count": 220
     },
     {
       "reporter_iso3": "CHE",
@@ -480,12 +479,6 @@
       "row_count": 223
     },
     {
-      "reporter_iso3": "NGA",
-      "period": "2023",
-      "href": "./NGA/2023.json",
-      "row_count": 192
-    },
-    {
       "reporter_iso3": "NLD",
       "period": "2023",
       "href": "./NLD/2023.json",
@@ -588,6 +581,6 @@
       "row_count": 227
     }
   ],
-  "partner_row_count": 10586,
-  "observation_count": 20108
+  "partner_row_count": 10393,
+  "observation_count": 19575
 }

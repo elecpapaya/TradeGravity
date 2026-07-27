@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-20T05:52:15Z",
+  "generated_at": "2026-07-27T05:57:01Z",
   "provider": "comtrade",
   "level": 6,
   "partners": [
@@ -2662,62 +2662,42 @@
     {
       "period": "2026-01",
       "classification": "HS",
-      "code": "854239",
-      "label": "Other integrated circuits",
-      "usa": {
-        "available": true,
-        "export": 128710565,
-        "import": 151329042,
-        "trade": 280039607
-      },
-      "chn": {
-        "available": true,
-        "export": 74702319,
-        "import": 305440874,
-        "trade": 380143193
-      },
-      "total": 660182800,
-      "share_cn": 0.5758150515281525
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
       "code": "854231",
       "label": "Processors and controllers",
       "usa": {
         "available": true,
         "export": 44034529,
-        "import": 5460554,
-        "trade": 49495083
+        "import": 0,
+        "trade": 44034529
       },
       "chn": {
         "available": true,
         "export": 164241903,
-        "import": 6647918,
-        "trade": 170889821
+        "import": 0,
+        "trade": 164241903
       },
-      "total": 220384904,
-      "share_cn": 0.7754152752676744
+      "total": 208276432,
+      "share_cn": 0.7885765154647935
     },
     {
       "period": "2026-01",
       "classification": "HS",
-      "code": "853400",
-      "label": "Printed circuits",
+      "code": "854239",
+      "label": "Other integrated circuits",
       "usa": {
         "available": true,
-        "export": 4144083,
-        "import": 1859289,
-        "trade": 6003372
+        "export": 128710565,
+        "import": 0,
+        "trade": 128710565
       },
       "chn": {
         "available": true,
-        "export": 6273458,
-        "import": 78391407,
-        "trade": 84664865
+        "export": 74702319,
+        "import": 0,
+        "trade": 74702319
       },
-      "total": 90668237,
-      "share_cn": 0.9337874850263164
+      "total": 203412884,
+      "share_cn": 0.3672447759012158
     },
     {
       "period": "2026-01",
@@ -2727,17 +2707,17 @@
       "usa": {
         "available": true,
         "export": 57983678,
-        "import": 87204,
-        "trade": 58070882
+        "import": 0,
+        "trade": 57983678
       },
       "chn": {
         "available": true,
         "export": 8795544,
-        "import": 284068,
-        "trade": 9079612
+        "import": 0,
+        "trade": 8795544
       },
-      "total": 67150494,
-      "share_cn": 0.13521288465874876
+      "total": 66779222,
+      "share_cn": 0.1317107887240735
     },
     {
       "period": "2026-01",
@@ -2747,37 +2727,17 @@
       "usa": {
         "available": true,
         "export": 20695952,
-        "import": 6471272,
-        "trade": 27167224
+        "import": 0,
+        "trade": 20695952
       },
       "chn": {
         "available": true,
         "export": 142307,
-        "import": 28076941,
-        "trade": 28219248
+        "import": 0,
+        "trade": 142307
       },
-      "total": 55386472,
-      "share_cn": 0.5094971205243042
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "903090",
-      "label": "Parts of measuring and checking instruments",
-      "usa": {
-        "available": true,
-        "export": 2475600,
-        "import": 28015124,
-        "trade": 30490724
-      },
-      "chn": {
-        "available": true,
-        "export": 2606865,
-        "import": 9481735,
-        "trade": 12088600
-      },
-      "total": 42579324,
-      "share_cn": 0.28390774827707455
+      "total": 20838259,
+      "share_cn": 0.006829121377174552
     },
     {
       "period": "2026-01",
@@ -2787,17 +2747,17 @@
       "usa": {
         "available": true,
         "export": 3554939,
-        "import": 3542346,
-        "trade": 7097285
+        "import": 0,
+        "trade": 3554939
       },
       "chn": {
         "available": true,
         "export": 13970253,
-        "import": 9169732,
-        "trade": 23139985
+        "import": 0,
+        "trade": 13970253
       },
-      "total": 30237270,
-      "share_cn": 0.7652802319786145
+      "total": 17525192,
+      "share_cn": 0.7971526360452998
     },
     {
       "period": "2026-01",
@@ -2807,17 +2767,57 @@
       "usa": {
         "available": true,
         "export": 14797777,
-        "import": 879258,
-        "trade": 15677035
+        "import": 0,
+        "trade": 14797777
       },
       "chn": {
         "available": true,
         "export": 2506764,
-        "import": 51299,
-        "trade": 2558063
+        "import": 0,
+        "trade": 2506764
       },
-      "total": 18235098,
-      "share_cn": 0.14028238290795036
+      "total": 17304541,
+      "share_cn": 0.14486162909492947
+    },
+    {
+      "period": "2026-01",
+      "classification": "HS",
+      "code": "853400",
+      "label": "Printed circuits",
+      "usa": {
+        "available": true,
+        "export": 4144083,
+        "import": 0,
+        "trade": 4144083
+      },
+      "chn": {
+        "available": true,
+        "export": 6273458,
+        "import": 0,
+        "trade": 6273458
+      },
+      "total": 10417541,
+      "share_cn": 0.6022014216214748
+    },
+    {
+      "period": "2026-01",
+      "classification": "HS",
+      "code": "903090",
+      "label": "Parts of measuring and checking instruments",
+      "usa": {
+        "available": true,
+        "export": 2475600,
+        "import": 0,
+        "trade": 2475600
+      },
+      "chn": {
+        "available": true,
+        "export": 2606865,
+        "import": 0,
+        "trade": 2606865
+      },
+      "total": 5082465,
+      "share_cn": 0.512913517358211
     },
     {
       "period": "2026-01",
@@ -2827,37 +2827,17 @@
       "usa": {
         "available": true,
         "export": 1430576,
-        "import": 1347534,
-        "trade": 2778110
+        "import": 0,
+        "trade": 1430576
       },
       "chn": {
         "available": true,
         "export": 2643201,
-        "import": 11099153,
-        "trade": 13742354
+        "import": 0,
+        "trade": 2643201
       },
-      "total": 16520464,
-      "share_cn": 0.8318382582958929
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "847150",
-      "label": "Processing units",
-      "usa": {
-        "available": true,
-        "export": 0,
-        "import": 540725,
-        "trade": 540725
-      },
-      "chn": {
-        "available": true,
-        "export": 0,
-        "import": 13214470,
-        "trade": 13214470
-      },
-      "total": 13755195,
-      "share_cn": 0.960689397714827
+      "total": 4073777,
+      "share_cn": 0.6488330117235185
     },
     {
       "period": "2026-01",
@@ -2867,157 +2847,17 @@
       "usa": {
         "available": true,
         "export": 2661120,
-        "import": 13084,
-        "trade": 2674204
+        "import": 0,
+        "trade": 2661120
       },
       "chn": {
-        "available": true,
+        "available": false,
         "export": 0,
-        "import": 5209828,
-        "trade": 5209828
+        "import": 0,
+        "trade": 0
       },
-      "total": 7884032,
-      "share_cn": 0.6608075664837484
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "854159",
-      "label": "Other semiconductor devices",
-      "usa": {
-        "available": true,
-        "export": 724493,
-        "import": 3086017,
-        "trade": 3810510
-      },
-      "chn": {
-        "available": true,
-        "export": 236766,
-        "import": 532879,
-        "trade": 769645
-      },
-      "total": 4580155,
-      "share_cn": 0.16803907291347128
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "854110",
-      "label": "Diodes other than photosensitive or LED",
-      "usa": {
-        "available": true,
-        "export": 964122,
-        "import": 1006520,
-        "trade": 1970642
-      },
-      "chn": {
-        "available": true,
-        "export": 243434,
-        "import": 2173273,
-        "trade": 2416707
-      },
-      "total": 4387349,
-      "share_cn": 0.5508353677813185
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "854190",
-      "label": "Parts of semiconductor devices",
-      "usa": {
-        "available": true,
-        "export": 165215,
-        "import": 1942697,
-        "trade": 2107912
-      },
-      "chn": {
-        "available": true,
-        "export": 13676,
-        "import": 2130314,
-        "trade": 2143990
-      },
-      "total": 4251902,
-      "share_cn": 0.5042425719125229
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "848620",
-      "label": "Semiconductor manufacturing machinery",
-      "usa": {
-        "available": true,
-        "export": 0,
-        "import": 3689069,
-        "trade": 3689069
-      },
-      "chn": {
-        "available": true,
-        "export": 0,
-        "import": 205969,
-        "trade": 205969
-      },
-      "total": 3895038,
-      "share_cn": 0.05287984353426077
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "903082",
-      "label": "Semiconductor wafer and device measuring instruments",
-      "usa": {
-        "available": true,
-        "export": 13710,
-        "import": 1284137,
-        "trade": 1297847
-      },
-      "chn": {
-        "available": true,
-        "export": 1295147,
-        "import": 302156,
-        "trade": 1597303
-      },
-      "total": 2895150,
-      "share_cn": 0.5517168367787507
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "848690",
-      "label": "Semiconductor equipment parts and accessories",
-      "usa": {
-        "available": true,
-        "export": 1423856,
-        "import": 210495,
-        "trade": 1634351
-      },
-      "chn": {
-        "available": true,
-        "export": 37751,
-        "import": 788452,
-        "trade": 826203
-      },
-      "total": 2460554,
-      "share_cn": 0.3357792594675833
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "854149",
-      "label": "Other photosensitive semiconductor devices",
-      "usa": {
-        "available": true,
-        "export": 467452,
-        "import": 34618,
-        "trade": 502070
-      },
-      "chn": {
-        "available": true,
-        "export": 7042,
-        "import": 1185710,
-        "trade": 1192752
-      },
-      "total": 1694822,
-      "share_cn": 0.7037624010073035
+      "total": 2661120,
+      "share_cn": 0
     },
     {
       "period": "2026-01",
@@ -3027,17 +2867,117 @@
       "usa": {
         "available": true,
         "export": 1253795,
-        "import": 6899,
-        "trade": 1260694
+        "import": 0,
+        "trade": 1253795
       },
       "chn": {
         "available": true,
         "export": 226100,
-        "import": 39227,
-        "trade": 265327
+        "import": 0,
+        "trade": 226100
       },
-      "total": 1526021,
-      "share_cn": 0.17386851163909278
+      "total": 1479895,
+      "share_cn": 0.15278110947060433
+    },
+    {
+      "period": "2026-01",
+      "classification": "HS",
+      "code": "848690",
+      "label": "Semiconductor equipment parts and accessories",
+      "usa": {
+        "available": true,
+        "export": 1423856,
+        "import": 0,
+        "trade": 1423856
+      },
+      "chn": {
+        "available": true,
+        "export": 37751,
+        "import": 0,
+        "trade": 37751
+      },
+      "total": 1461607,
+      "share_cn": 0.025828420361971447
+    },
+    {
+      "period": "2026-01",
+      "classification": "HS",
+      "code": "903082",
+      "label": "Semiconductor wafer and device measuring instruments",
+      "usa": {
+        "available": true,
+        "export": 13710,
+        "import": 0,
+        "trade": 13710
+      },
+      "chn": {
+        "available": true,
+        "export": 1295147,
+        "import": 0,
+        "trade": 1295147
+      },
+      "total": 1308857,
+      "share_cn": 0.9895252116923392
+    },
+    {
+      "period": "2026-01",
+      "classification": "HS",
+      "code": "854110",
+      "label": "Diodes other than photosensitive or LED",
+      "usa": {
+        "available": true,
+        "export": 964122,
+        "import": 0,
+        "trade": 964122
+      },
+      "chn": {
+        "available": true,
+        "export": 243434,
+        "import": 0,
+        "trade": 243434
+      },
+      "total": 1207556,
+      "share_cn": 0.20159230710625428
+    },
+    {
+      "period": "2026-01",
+      "classification": "HS",
+      "code": "854159",
+      "label": "Other semiconductor devices",
+      "usa": {
+        "available": true,
+        "export": 724493,
+        "import": 0,
+        "trade": 724493
+      },
+      "chn": {
+        "available": true,
+        "export": 236766,
+        "import": 0,
+        "trade": 236766
+      },
+      "total": 961259,
+      "share_cn": 0.24630822702310198
+    },
+    {
+      "period": "2026-01",
+      "classification": "HS",
+      "code": "854149",
+      "label": "Other photosensitive semiconductor devices",
+      "usa": {
+        "available": true,
+        "export": 467452,
+        "import": 0,
+        "trade": 467452
+      },
+      "chn": {
+        "available": true,
+        "export": 7042,
+        "import": 0,
+        "trade": 7042
+      },
+      "total": 474494,
+      "share_cn": 0.01484107280597858
     },
     {
       "period": "2026-01",
@@ -3047,57 +2987,37 @@
       "usa": {
         "available": true,
         "export": 109948,
-        "import": 79811,
-        "trade": 189759
+        "import": 0,
+        "trade": 109948
       },
       "chn": {
         "available": true,
         "export": 213350,
-        "import": 812552,
-        "trade": 1025902
+        "import": 0,
+        "trade": 213350
       },
-      "total": 1215661,
-      "share_cn": 0.8439046740826596
+      "total": 323298,
+      "share_cn": 0.6599174755179432
     },
     {
       "period": "2026-01",
       "classification": "HS",
-      "code": "848640",
-      "label": "Specified semiconductor assembly machinery",
+      "code": "854190",
+      "label": "Parts of semiconductor devices",
       "usa": {
         "available": true,
-        "export": 14200,
-        "import": 107000,
-        "trade": 121200
+        "export": 165215,
+        "import": 0,
+        "trade": 165215
       },
       "chn": {
         "available": true,
-        "export": 0,
-        "import": 492741,
-        "trade": 492741
+        "export": 13676,
+        "import": 0,
+        "trade": 13676
       },
-      "total": 613941,
-      "share_cn": 0.802586893528857
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "370790",
-      "label": "Other photographic chemicals",
-      "usa": {
-        "available": true,
-        "export": 0,
-        "import": 341536,
-        "trade": 341536
-      },
-      "chn": {
-        "available": true,
-        "export": 0,
-        "import": 85946,
-        "trade": 85946
-      },
-      "total": 427482,
-      "share_cn": 0.20105174019023023
+      "total": 178891,
+      "share_cn": 0.0764487872503368
     },
     {
       "period": "2026-01",
@@ -3107,57 +3027,37 @@
       "usa": {
         "available": true,
         "export": 6676,
-        "import": 33825,
-        "trade": 40501
+        "import": 0,
+        "trade": 6676
       },
       "chn": {
         "available": true,
         "export": 14008,
-        "import": 324333,
-        "trade": 338341
+        "import": 0,
+        "trade": 14008
       },
-      "total": 378842,
-      "share_cn": 0.893092634924322
+      "total": 20684,
+      "share_cn": 0.6772384451750145
     },
     {
       "period": "2026-01",
       "classification": "HS",
-      "code": "280461",
-      "label": "High-purity silicon",
+      "code": "848640",
+      "label": "Specified semiconductor assembly machinery",
       "usa": {
         "available": true,
-        "export": 0,
-        "import": 298452,
-        "trade": 298452
+        "export": 14200,
+        "import": 0,
+        "trade": 14200
       },
       "chn": {
-        "available": true,
+        "available": false,
         "export": 0,
-        "import": 15908,
-        "trade": 15908
+        "import": 0,
+        "trade": 0
       },
-      "total": 314360,
-      "share_cn": 0.050604402595750095
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "903141",
-      "label": "Optical semiconductor inspection instruments",
-      "usa": {
-        "available": true,
-        "export": 0,
-        "import": 7234,
-        "trade": 7234
-      },
-      "chn": {
-        "available": true,
-        "export": 0,
-        "import": 277277,
-        "trade": 277277
-      },
-      "total": 284511,
-      "share_cn": 0.9745739180558924
+      "total": 14200,
+      "share_cn": 0
     },
     {
       "period": "2026-01",
@@ -3167,37 +3067,17 @@
       "usa": {
         "available": true,
         "export": 26,
-        "import": 18079,
-        "trade": 18105
+        "import": 0,
+        "trade": 26
       },
       "chn": {
-        "available": true,
-        "export": 0,
-        "import": 241687,
-        "trade": 241687
-      },
-      "total": 259792,
-      "share_cn": 0.9303096323212416
-    },
-    {
-      "period": "2026-01",
-      "classification": "HS",
-      "code": "848610",
-      "label": "Wafer and boule manufacturing machinery",
-      "usa": {
         "available": false,
         "export": 0,
         "import": 0,
         "trade": 0
       },
-      "chn": {
-        "available": true,
-        "export": 0,
-        "import": 19726,
-        "trade": 19726
-      },
-      "total": 19726,
-      "share_cn": 1
+      "total": 26,
+      "share_cn": 0
     },
     {
       "period": "2026-02",
