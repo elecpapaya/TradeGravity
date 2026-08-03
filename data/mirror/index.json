@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-27T05:57:01Z",
+  "generated_at": "2026-08-03T05:55:50Z",
   "provider": "comtrade",
   "anchors": [
     "USA",
@@ -37,6 +37,7 @@
     "KOR",
     "MEX",
     "MYS",
+    "NGA",
     "NLD",
     "NOR",
     "NZL",
@@ -98,7 +99,7 @@
       "reporter_iso3": "CAN",
       "period": "2023",
       "href": "./CAN/2023.json",
-      "comparison_count": 2
+      "comparison_count": 4
     },
     {
       "reporter_iso3": "CHE",
@@ -239,6 +240,12 @@
       "comparison_count": 4
     },
     {
+      "reporter_iso3": "NGA",
+      "period": "2023",
+      "href": "./NGA/2023.json",
+      "comparison_count": 4
+    },
+    {
       "reporter_iso3": "NLD",
       "period": "2023",
       "href": "./NLD/2023.json",
@@ -335,5 +342,5 @@
       "comparison_count": 4
     }
   ],
-  "comparison_count": 178
+  "comparison_count": 184
 }

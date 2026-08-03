@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-07-27T05:57:01Z",
+  "generated_at": "2026-08-03T05:55:50Z",
   "provider": "comtrade",
   "level": 6,
   "partners": [
@@ -19,7 +19,6 @@
     "USA"
   ],
   "periods": [
-    "2025-07",
     "2025-08",
     "2025-09",
     "2025-10",
@@ -35,32 +34,32 @@
     {
       "reporter_iso3": "DEU",
       "href": "./DEU.json",
-      "row_count": 308,
-      "period_count": 11
+      "row_count": 280,
+      "period_count": 10
     },
     {
       "reporter_iso3": "JPN",
       "href": "./JPN.json",
-      "row_count": 308,
-      "period_count": 11
+      "row_count": 280,
+      "period_count": 10
     },
     {
       "reporter_iso3": "KOR",
       "href": "./KOR.json",
-      "row_count": 168,
-      "period_count": 6
+      "row_count": 140,
+      "period_count": 5
     },
     {
       "reporter_iso3": "MEX",
       "href": "./MEX.json",
-      "row_count": 266,
-      "period_count": 11
+      "row_count": 242,
+      "period_count": 10
     },
     {
       "reporter_iso3": "MYS",
       "href": "./MYS.json",
-      "row_count": 277,
-      "period_count": 10
+      "row_count": 249,
+      "period_count": 9
     },
     {
       "reporter_iso3": "NLD",
@@ -71,22 +70,22 @@
     {
       "reporter_iso3": "PHL",
       "href": "./PHL.json",
-      "row_count": 207,
-      "period_count": 8
+      "row_count": 185,
+      "period_count": 7
     },
     {
       "reporter_iso3": "SGP",
       "href": "./SGP.json",
-      "row_count": 168,
-      "period_count": 6
+      "row_count": 140,
+      "period_count": 5
     },
     {
       "reporter_iso3": "USA",
       "href": "./USA.json",
-      "row_count": 308,
-      "period_count": 11
+      "row_count": 280,
+      "period_count": 10
     }
   ],
-  "observation_count": 7946,
+  "observation_count": 7252,
   "scope": "Selected monthly UN Comtrade HS6 observations against USA and China; a turning-point signal, not a complete semiconductor market or physical route"
 }
