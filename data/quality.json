@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-08-03T05:55:50Z",
+  "generated_at": "2026-08-10T04:27:58Z",
   "primary_provider": "wits",
   "dominant_period": "Y:2023",
   "summary": {
@@ -9,7 +9,7 @@
     "incomparable_reporters": 2,
     "missing_partner_blocks": 2,
     "stale_partner_blocks": 4,
-    "provider_comparison_count": 96
+    "provider_comparison_count": 95
   },
   "reporter_issues": [
     {
@@ -49,58 +49,58 @@
   ],
   "collection_runs": [
     {
-      "run_id": "1785736424031874835-comtrade-products-semiconductor-monthly-hs6",
+      "run_id": "1786335969126679617-comtrade-products-semiconductor-monthly-hs6",
       "provider": "comtrade",
       "mode": "products-semiconductor-monthly-hs6",
-      "started_at": "2026-08-03T05:53:44.031880265Z",
-      "finished_at": "2026-08-03T05:55:50.356755028Z",
+      "started_at": "2026-08-10T04:26:09.126684784Z",
+      "finished_at": "2026-08-10T04:27:58.230975425Z",
       "status": "success",
       "reporter_count": 11,
       "request_count": 48,
-      "success_count": 40,
+      "success_count": 42,
       "failure_count": 0,
-      "skipped_count": 8,
-      "stored_count": 7252,
+      "skipped_count": 6,
+      "stored_count": 7558,
       "errors": []
     },
     {
-      "run_id": "1785735884944214832-comtrade-products-strategic-hs6",
+      "run_id": "1786335467595112894-comtrade-products-strategic-hs6",
       "provider": "comtrade",
       "mode": "products-strategic-hs6",
-      "started_at": "2026-08-03T05:44:44.944216886Z",
-      "finished_at": "2026-08-03T05:53:42.091598731Z",
-      "status": "success",
+      "started_at": "2026-08-10T04:17:47.595114566Z",
+      "finished_at": "2026-08-10T04:26:07.199156335Z",
+      "status": "partial",
       "reporter_count": 11,
       "request_count": 200,
-      "success_count": 200,
-      "failure_count": 0,
-      "skipped_count": 20,
-      "stored_count": 6310,
-      "errors": []
-    },
-    {
-      "run_id": "1785732181988955028-trains-tariffs-strategic-hs6",
-      "provider": "trains",
-      "mode": "tariffs-strategic-hs6",
-      "started_at": "2026-08-03T04:43:01.988961458Z",
-      "finished_at": "2026-08-03T05:09:38.611569073Z",
-      "status": "partial",
-      "reporter_count": 41,
-      "request_count": 41,
-      "success_count": 40,
+      "success_count": 199,
       "failure_count": 1,
-      "skipped_count": 0,
-      "stored_count": 1244,
+      "skipped_count": 20,
+      "stored_count": 6279,
       "errors": [
-        "ISR/WLD/2021: trains: request failed: context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+        "PHL/CHN/import/2020: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }"
       ]
     },
     {
-      "run_id": "1785731925336273752-comtrade-bilateral-matrix",
+      "run_id": "1786332374686605977-trains-tariffs-strategic-hs6",
+      "provider": "trains",
+      "mode": "tariffs-strategic-hs6",
+      "started_at": "2026-08-10T03:26:14.686611578Z",
+      "finished_at": "2026-08-10T03:42:38.197385924Z",
+      "status": "success",
+      "reporter_count": 41,
+      "request_count": 41,
+      "success_count": 41,
+      "failure_count": 0,
+      "skipped_count": 0,
+      "stored_count": 1277,
+      "errors": []
+    },
+    {
+      "run_id": "1786332088078829614-comtrade-bilateral-matrix",
       "provider": "comtrade",
       "mode": "bilateral-matrix",
-      "started_at": "2026-08-03T04:38:45.336280292Z",
-      "finished_at": "2026-08-03T04:43:01.878546651Z",
+      "started_at": "2026-08-10T03:21:28.078835354Z",
+      "finished_at": "2026-08-10T03:26:14.566383409Z",
       "status": "success",
       "reporter_count": 51,
       "request_count": 102,
@@ -111,26 +111,28 @@
       "errors": []
     },
     {
-      "run_id": "1785731429659213742-comtrade-products-hs2",
+      "run_id": "1786331543719341317-comtrade-products-hs2",
       "provider": "comtrade",
       "mode": "products-hs2",
-      "started_at": "2026-08-03T04:30:29.659217067Z",
-      "finished_at": "2026-08-03T04:38:45.227449473Z",
-      "status": "success",
+      "started_at": "2026-08-10T03:12:23.719343501Z",
+      "finished_at": "2026-08-10T03:21:27.964996512Z",
+      "status": "partial",
       "reporter_count": 51,
       "request_count": 200,
-      "success_count": 192,
-      "failure_count": 0,
+      "success_count": 191,
+      "failure_count": 1,
       "skipped_count": 12,
-      "stored_count": 17670,
-      "errors": []
+      "stored_count": 17581,
+      "errors": [
+        "GRC/USA/export/2023: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }"
+      ]
     },
     {
-      "run_id": "1785731201517989963-wits-totals",
+      "run_id": "1786331333089455505-wits-totals",
       "provider": "wits",
       "mode": "totals",
-      "started_at": "2026-08-03T04:26:41.518000529Z",
-      "finished_at": "2026-08-03T04:30:29.546460984Z",
+      "started_at": "2026-08-10T03:08:53.089466596Z",
+      "finished_at": "2026-08-10T03:12:23.610509699Z",
       "status": "success",
       "reporter_count": 51,
       "request_count": 200,
@@ -559,17 +561,6 @@
       "primary_trade_usd": 7877243231.079,
       "secondary_trade_usd": 7877243231.08,
       "delta_ratio": 1.2687823065441236e-13
-    },
-    {
-      "iso3": "GRC",
-      "partner": "USA",
-      "period_type": "Y",
-      "period": "2023",
-      "primary_provider": "wits",
-      "secondary_provider": "comtrade",
-      "primary_trade_usd": 3911794715.023,
-      "secondary_trade_usd": 3911794715.026,
-      "delta_ratio": 7.669777219882619e-13
     },
     {
       "iso3": "HUN",
@@ -1085,8 +1076,8 @@
       "primary_provider": "wits",
       "secondary_provider": "comtrade",
       "primary_trade_usd": 104999831474.183,
-      "secondary_trade_usd": 104999831474.18697,
-      "delta_ratio": 3.778372879794062e-14
+      "secondary_trade_usd": 104999831474.18297,
+      "delta_ratio": -2.906440676764663e-16
     },
     {
       "iso3": "THA",

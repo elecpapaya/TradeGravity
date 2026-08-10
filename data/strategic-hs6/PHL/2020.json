@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-08-03T05:55:50Z",
+  "generated_at": "2026-08-10T04:27:58Z",
   "provider": "comtrade",
   "level": 6,
   "partners": [
@@ -44,13 +44,13 @@
         "trade": 86517
       },
       "chn": {
-        "available": true,
+        "available": false,
         "export": 0,
-        "import": 1397810,
-        "trade": 1397810
+        "import": 0,
+        "trade": 0
       },
-      "total": 1484327,
-      "share_cn": 0.9417129783396785
+      "total": 86517,
+      "share_cn": 0
     },
     {
       "classification": "HS",
@@ -65,34 +65,13 @@
         "trade": 1209
       },
       "chn": {
-        "available": true,
-        "export": 0,
-        "import": 275750,
-        "trade": 275750
-      },
-      "total": 276959,
-      "share_cn": 0.9956347329388104
-    },
-    {
-      "classification": "HS",
-      "code": "283691",
-      "sector": "critical_minerals",
-      "label": "Lithium carbonates",
-      "revision_note": "Compatible HS revisions",
-      "usa": {
         "available": false,
         "export": 0,
         "import": 0,
         "trade": 0
       },
-      "chn": {
-        "available": true,
-        "export": 0,
-        "import": 6841,
-        "trade": 6841
-      },
-      "total": 6841,
-      "share_cn": 1
+      "total": 1209,
+      "share_cn": 0
     },
     {
       "classification": "HS",
@@ -109,11 +88,11 @@
       "chn": {
         "available": true,
         "export": 71878523,
-        "import": 662649184,
-        "trade": 734527707
+        "import": 0,
+        "trade": 71878523
       },
-      "total": 995608508,
-      "share_cn": 0.7377676075463991
+      "total": 332959324,
+      "share_cn": 0.21587778992487383
     },
     {
       "classification": "HS",
@@ -130,11 +109,32 @@
       "chn": {
         "available": true,
         "export": 260633,
-        "import": 28401226,
-        "trade": 28661859
+        "import": 0,
+        "trade": 260633
       },
-      "total": 37509781,
-      "share_cn": 0.7641169379261372
+      "total": 9108555,
+      "share_cn": 0.028614088623277786
+    },
+    {
+      "classification": "HS",
+      "code": "850790",
+      "sector": "ev_batteries",
+      "label": "Electric accumulator parts",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 253945,
+        "import": 4581106,
+        "trade": 4835051
+      },
+      "chn": {
+        "available": false,
+        "export": 0,
+        "import": 0,
+        "trade": 0
+      },
+      "total": 4835051,
+      "share_cn": 0
     },
     {
       "classification": "HS",
@@ -151,32 +151,11 @@
       "chn": {
         "available": true,
         "export": 640,
-        "import": 74443043,
-        "trade": 74443683
+        "import": 0,
+        "trade": 640
       },
-      "total": 76126748,
-      "share_cn": 0.9778912794225756
-    },
-    {
-      "classification": "HS",
-      "code": "850790",
-      "sector": "ev_batteries",
-      "label": "Electric accumulator parts",
-      "revision_note": "Compatible HS revisions",
-      "usa": {
-        "available": true,
-        "export": 253945,
-        "import": 4581106,
-        "trade": 4835051
-      },
-      "chn": {
-        "available": true,
-        "export": 0,
-        "import": 1096984,
-        "trade": 1096984
-      },
-      "total": 5932035,
-      "share_cn": 0.18492540923983086
+      "total": 1683705,
+      "share_cn": 0.0003801140936209134
     },
     {
       "classification": "HS",
@@ -191,34 +170,13 @@
         "trade": 254107
       },
       "chn": {
-        "available": true,
+        "available": false,
         "export": 0,
-        "import": 251502,
-        "trade": 251502
+        "import": 0,
+        "trade": 0
       },
-      "total": 505609,
-      "share_cn": 0.4974238987043348
-    },
-    {
-      "classification": "HS",
-      "code": "854239",
-      "sector": "semiconductors",
-      "label": "Other integrated circuits",
-      "revision_note": "HS 2007 and later",
-      "usa": {
-        "available": true,
-        "export": 490921383,
-        "import": 1351742593,
-        "trade": 1842663976
-      },
-      "chn": {
-        "available": true,
-        "export": 1148012638,
-        "import": 1314117761,
-        "trade": 2462130399
-      },
-      "total": 4304794375,
-      "share_cn": 0.5719507564167917
+      "total": 254107,
+      "share_cn": 0
     },
     {
       "classification": "HS",
@@ -235,11 +193,32 @@
       "chn": {
         "available": true,
         "export": 1499259832,
-        "import": 222880945,
-        "trade": 1722140777
+        "import": 0,
+        "trade": 1499259832
       },
-      "total": 3423335024,
-      "share_cn": 0.503059374827931
+      "total": 3200454079,
+      "share_cn": 0.4684522242757666
+    },
+    {
+      "classification": "HS",
+      "code": "854239",
+      "sector": "semiconductors",
+      "label": "Other integrated circuits",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 490921383,
+        "import": 1351742593,
+        "trade": 1842663976
+      },
+      "chn": {
+        "available": true,
+        "export": 1148012638,
+        "import": 0,
+        "trade": 1148012638
+      },
+      "total": 2990676614,
+      "share_cn": 0.3838638496137985
     },
     {
       "classification": "HS",
@@ -256,11 +235,11 @@
       "chn": {
         "available": true,
         "export": 330833315,
-        "import": 116806248,
-        "trade": 447639563
+        "import": 0,
+        "trade": 330833315
       },
-      "total": 731811955,
-      "share_cn": 0.6116865950898548
+      "total": 615005707,
+      "share_cn": 0.5379353577283146
     },
     {
       "classification": "HS",
@@ -277,11 +256,11 @@
       "chn": {
         "available": true,
         "export": 59432226,
-        "import": 132779784,
-        "trade": 192212010
+        "import": 0,
+        "trade": 59432226
       },
-      "total": 353656493,
-      "share_cn": 0.5434991688389559
+      "total": 220876709,
+      "share_cn": 0.2690742100834181
     },
     {
       "classification": "HS",
@@ -298,11 +277,11 @@
       "chn": {
         "available": true,
         "export": 114897594,
-        "import": 44047121,
-        "trade": 158944715
+        "import": 0,
+        "trade": 114897594
       },
-      "total": 192058484,
-      "share_cn": 0.8275849714610889
+      "total": 148011363,
+      "share_cn": 0.7762754944699752
     },
     {
       "classification": "HS",
@@ -319,11 +298,11 @@
       "chn": {
         "available": true,
         "export": 40108961,
-        "import": 52869425,
-        "trade": 92978386
+        "import": 0,
+        "trade": 40108961
       },
-      "total": 191454928,
-      "share_cn": 0.4856411217579106
+      "total": 138585503,
+      "share_cn": 0.2894167148204528
     },
     {
       "classification": "HS",
@@ -340,11 +319,11 @@
       "chn": {
         "available": true,
         "export": 6213088,
-        "import": 39256483,
-        "trade": 45469571
+        "import": 0,
+        "trade": 6213088
       },
-      "total": 165971781,
-      "share_cn": 0.27395964980336024
+      "total": 126715298,
+      "share_cn": 0.04903186985363046
     },
     {
       "classification": "HS",
@@ -361,11 +340,11 @@
       "chn": {
         "available": true,
         "export": 89918507,
-        "import": 5238422,
-        "trade": 95156929
+        "import": 0,
+        "trade": 89918507
       },
-      "total": 113681432,
-      "share_cn": 0.8370490002272315
+      "total": 108443010,
+      "share_cn": 0.8291775283625934
     },
     {
       "classification": "HS",
@@ -382,11 +361,11 @@
       "chn": {
         "available": true,
         "export": 23498229,
-        "import": 25828928,
-        "trade": 49327157
+        "import": 0,
+        "trade": 23498229
       },
-      "total": 87603768,
-      "share_cn": 0.5630711797693451
+      "total": 61774840,
+      "share_cn": 0.3803851050039142
     },
     {
       "classification": "HS",
@@ -403,32 +382,11 @@
       "chn": {
         "available": true,
         "export": 2136,
-        "import": 27277749,
-        "trade": 27279885
+        "import": 0,
+        "trade": 2136
       },
-      "total": 53985538,
-      "share_cn": 0.5053183873058744
-    },
-    {
-      "classification": "HS",
-      "code": "854110",
-      "sector": "semiconductors",
-      "label": "Diodes other than photosensitive or LED",
-      "revision_note": "Compatible HS revisions",
-      "usa": {
-        "available": true,
-        "export": 6749084,
-        "import": 15429517,
-        "trade": 22178601
-      },
-      "chn": {
-        "available": true,
-        "export": 1405720,
-        "import": 19392930,
-        "trade": 20798650
-      },
-      "total": 42977251,
-      "share_cn": 0.4839455645964885
+      "total": 26707789,
+      "share_cn": 0.00007997666897847665
     },
     {
       "classification": "HS",
@@ -445,11 +403,32 @@
       "chn": {
         "available": true,
         "export": 447396,
-        "import": 16632973,
-        "trade": 17080369
+        "import": 0,
+        "trade": 447396
       },
-      "total": 41445103,
-      "share_cn": 0.4121203173267539
+      "total": 24812130,
+      "share_cn": 0.018031341928322963
+    },
+    {
+      "classification": "HS",
+      "code": "854110",
+      "sector": "semiconductors",
+      "label": "Diodes other than photosensitive or LED",
+      "revision_note": "Compatible HS revisions",
+      "usa": {
+        "available": true,
+        "export": 6749084,
+        "import": 15429517,
+        "trade": 22178601
+      },
+      "chn": {
+        "available": true,
+        "export": 1405720,
+        "import": 0,
+        "trade": 1405720
+      },
+      "total": 23584321,
+      "share_cn": 0.05960400555945622
     },
     {
       "classification": "HS",
@@ -466,11 +445,11 @@
       "chn": {
         "available": true,
         "export": 2630731,
-        "import": 18889341,
-        "trade": 21520072
+        "import": 0,
+        "trade": 2630731
       },
-      "total": 40869900,
-      "share_cn": 0.5265506399575237
+      "total": 21980559,
+      "share_cn": 0.11968444478595835
     },
     {
       "classification": "HS",
@@ -487,11 +466,11 @@
       "chn": {
         "available": true,
         "export": 1263390,
-        "import": 1181677,
-        "trade": 2445067
+        "import": 0,
+        "trade": 1263390
       },
-      "total": 17974975,
-      "share_cn": 0.13602616971650863
+      "total": 16793298,
+      "share_cn": 0.07523179782791921
     },
     {
       "classification": "HS",
@@ -508,32 +487,11 @@
       "chn": {
         "available": true,
         "export": 241907,
-        "import": 1350755,
-        "trade": 1592662
+        "import": 0,
+        "trade": 241907
       },
-      "total": 11446112,
-      "share_cn": 0.13914436622671525
-    },
-    {
-      "classification": "HS",
-      "code": "848640",
-      "sector": "semiconductors",
-      "label": "Specified semiconductor assembly machinery",
-      "revision_note": "HS 2007 and later",
-      "usa": {
-        "available": true,
-        "export": 9098,
-        "import": 1735858,
-        "trade": 1744956
-      },
-      "chn": {
-        "available": true,
-        "export": 0,
-        "import": 4322325,
-        "trade": 4322325
-      },
-      "total": 6067281,
-      "share_cn": 0.71239901366032
+      "total": 10095357,
+      "share_cn": 0.023962203614988555
     },
     {
       "classification": "HS",
@@ -548,13 +506,34 @@
         "trade": 2102642
       },
       "chn": {
-        "available": true,
+        "available": false,
         "export": 0,
-        "import": 2324718,
-        "trade": 2324718
+        "import": 0,
+        "trade": 0
       },
-      "total": 4427360,
-      "share_cn": 0.5250799573560767
+      "total": 2102642,
+      "share_cn": 0
+    },
+    {
+      "classification": "HS",
+      "code": "848640",
+      "sector": "semiconductors",
+      "label": "Specified semiconductor assembly machinery",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 9098,
+        "import": 1735858,
+        "trade": 1744956
+      },
+      "chn": {
+        "available": false,
+        "export": 0,
+        "import": 0,
+        "trade": 0
+      },
+      "total": 1744956,
+      "share_cn": 0
     },
     {
       "classification": "HS",
@@ -571,32 +550,11 @@
       "chn": {
         "available": true,
         "export": 151900,
-        "import": 2263954,
-        "trade": 2415854
+        "import": 0,
+        "trade": 151900
       },
-      "total": 3890519,
-      "share_cn": 0.6209593115982727
-    },
-    {
-      "classification": "HS",
-      "code": "848610",
-      "sector": "semiconductors",
-      "label": "Wafer and boule manufacturing machinery",
-      "revision_note": "HS 2007 and later",
-      "usa": {
-        "available": true,
-        "export": 74210,
-        "import": 211296,
-        "trade": 285506
-      },
-      "chn": {
-        "available": true,
-        "export": 2640,
-        "import": 3264204,
-        "trade": 3266844
-      },
-      "total": 3552350,
-      "share_cn": 0.9196289780004786
+      "total": 1626565,
+      "share_cn": 0.09338698422749782
     },
     {
       "classification": "HS",
@@ -613,11 +571,32 @@
       "chn": {
         "available": true,
         "export": 6431,
-        "import": 140073,
-        "trade": 146504
+        "import": 0,
+        "trade": 6431
       },
-      "total": 929507,
-      "share_cn": 0.15761473555336322
+      "total": 789434,
+      "share_cn": 0.008146342822832562
+    },
+    {
+      "classification": "HS",
+      "code": "848610",
+      "sector": "semiconductors",
+      "label": "Wafer and boule manufacturing machinery",
+      "revision_note": "HS 2007 and later",
+      "usa": {
+        "available": true,
+        "export": 74210,
+        "import": 211296,
+        "trade": 285506
+      },
+      "chn": {
+        "available": true,
+        "export": 2640,
+        "import": 0,
+        "trade": 2640
+      },
+      "total": 288146,
+      "share_cn": 0.009162022030498427
     },
     {
       "classification": "HS",
@@ -632,13 +611,13 @@
         "trade": 54907
       },
       "chn": {
-        "available": true,
+        "available": false,
         "export": 0,
-        "import": 60189,
-        "trade": 60189
+        "import": 0,
+        "trade": 0
       },
-      "total": 115096,
-      "share_cn": 0.5229460624174602
+      "total": 54907,
+      "share_cn": 0
     },
     {
       "classification": "HS",
@@ -653,13 +632,13 @@
         "trade": 13556
       },
       "chn": {
-        "available": true,
+        "available": false,
         "export": 0,
-        "import": 44810,
-        "trade": 44810
+        "import": 0,
+        "trade": 0
       },
-      "total": 58366,
-      "share_cn": 0.7677414933351608
+      "total": 13556,
+      "share_cn": 0
     },
     {
       "classification": "HS",
@@ -697,11 +676,11 @@
       "chn": {
         "available": true,
         "export": 34328896,
-        "import": 149849858,
-        "trade": 184178754
+        "import": 0,
+        "trade": 34328896
       },
-      "total": 392248742,
-      "share_cn": 0.46954581182570115
+      "total": 242398884,
+      "share_cn": 0.14162151010563234
     }
   ]
 }
