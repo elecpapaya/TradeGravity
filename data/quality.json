@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-08-10T04:27:58Z",
+  "generated_at": "2026-08-17T03:41:11Z",
   "primary_provider": "wits",
   "dominant_period": "Y:2023",
   "summary": {
@@ -34,8 +34,8 @@
       "usa_period": "2021",
       "chn_period": "2021",
       "issues": [
-        "stale_usa",
-        "stale_chn"
+        "stale_chn",
+        "stale_usa"
       ]
     },
     {
@@ -49,43 +49,44 @@
   ],
   "collection_runs": [
     {
-      "run_id": "1786335969126679617-comtrade-products-semiconductor-monthly-hs6",
+      "run_id": "1786937954981250382-comtrade-products-semiconductor-monthly-hs6",
       "provider": "comtrade",
       "mode": "products-semiconductor-monthly-hs6",
-      "started_at": "2026-08-10T04:26:09.126684784Z",
-      "finished_at": "2026-08-10T04:27:58.230975425Z",
+      "started_at": "2026-08-17T03:39:14.981256291Z",
+      "finished_at": "2026-08-17T03:41:10.647237471Z",
       "status": "success",
       "reporter_count": 11,
       "request_count": 48,
-      "success_count": 42,
+      "success_count": 44,
       "failure_count": 0,
-      "skipped_count": 6,
-      "stored_count": 7558,
+      "skipped_count": 4,
+      "stored_count": 7704,
       "errors": []
     },
     {
-      "run_id": "1786335467595112894-comtrade-products-strategic-hs6",
+      "run_id": "1786937414087633995-comtrade-products-strategic-hs6",
       "provider": "comtrade",
       "mode": "products-strategic-hs6",
-      "started_at": "2026-08-10T04:17:47.595114566Z",
-      "finished_at": "2026-08-10T04:26:07.199156335Z",
+      "started_at": "2026-08-17T03:30:14.087635884Z",
+      "finished_at": "2026-08-17T03:39:13.058568933Z",
       "status": "partial",
       "reporter_count": 11,
       "request_count": 200,
-      "success_count": 199,
-      "failure_count": 1,
+      "success_count": 198,
+      "failure_count": 2,
       "skipped_count": 20,
-      "stored_count": 6279,
+      "stored_count": 6241,
       "errors": [
-        "PHL/CHN/import/2020: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }"
+        "DEU/USA/export/2022: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }",
+        "KOR/USA/import/2019: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }"
       ]
     },
     {
-      "run_id": "1786332374686605977-trains-tariffs-strategic-hs6",
+      "run_id": "1786933980609216538-trains-tariffs-strategic-hs6",
       "provider": "trains",
       "mode": "tariffs-strategic-hs6",
-      "started_at": "2026-08-10T03:26:14.686611578Z",
-      "finished_at": "2026-08-10T03:42:38.197385924Z",
+      "started_at": "2026-08-17T02:33:00.609222539Z",
+      "finished_at": "2026-08-17T02:55:05.397665611Z",
       "status": "success",
       "reporter_count": 41,
       "request_count": 41,
@@ -96,11 +97,11 @@
       "errors": []
     },
     {
-      "run_id": "1786332088078829614-comtrade-bilateral-matrix",
+      "run_id": "1786933732214508018-comtrade-bilateral-matrix",
       "provider": "comtrade",
       "mode": "bilateral-matrix",
-      "started_at": "2026-08-10T03:21:28.078835354Z",
-      "finished_at": "2026-08-10T03:26:14.566383409Z",
+      "started_at": "2026-08-17T02:28:52.21451425Z",
+      "finished_at": "2026-08-17T02:33:00.495665734Z",
       "status": "success",
       "reporter_count": 51,
       "request_count": 102,
@@ -111,28 +112,28 @@
       "errors": []
     },
     {
-      "run_id": "1786331543719341317-comtrade-products-hs2",
+      "run_id": "1786933230745056925-comtrade-products-hs2",
       "provider": "comtrade",
       "mode": "products-hs2",
-      "started_at": "2026-08-10T03:12:23.719343501Z",
-      "finished_at": "2026-08-10T03:21:27.964996512Z",
+      "started_at": "2026-08-17T02:20:30.745059219Z",
+      "finished_at": "2026-08-17T02:28:52.106094728Z",
       "status": "partial",
       "reporter_count": 51,
       "request_count": 200,
       "success_count": 191,
       "failure_count": 1,
       "skipped_count": 12,
-      "stored_count": 17581,
+      "stored_count": 17588,
       "errors": [
-        "GRC/USA/export/2023: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }"
+        "NOR/CHN/export/2023: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }"
       ]
     },
     {
-      "run_id": "1786331333089455505-wits-totals",
+      "run_id": "1786933026867105859-wits-totals",
       "provider": "wits",
       "mode": "totals",
-      "started_at": "2026-08-10T03:08:53.089466596Z",
-      "finished_at": "2026-08-10T03:12:23.610509699Z",
+      "started_at": "2026-08-17T02:17:06.867117561Z",
+      "finished_at": "2026-08-17T02:20:30.631076979Z",
       "status": "success",
       "reporter_count": 51,
       "request_count": 200,
@@ -563,6 +564,17 @@
       "delta_ratio": 1.2687823065441236e-13
     },
     {
+      "iso3": "GRC",
+      "partner": "USA",
+      "period_type": "Y",
+      "period": "2023",
+      "primary_provider": "wits",
+      "secondary_provider": "comtrade",
+      "primary_trade_usd": 3911794715.023,
+      "secondary_trade_usd": 3911794715.026,
+      "delta_ratio": 7.669777219882619e-13
+    },
+    {
       "iso3": "HUN",
       "partner": "CHN",
       "period_type": "Y",
@@ -847,17 +859,6 @@
       "primary_trade_usd": 105722377322.29701,
       "secondary_trade_usd": 103027260470.96101,
       "delta_ratio": -0.02549239734857527
-    },
-    {
-      "iso3": "NOR",
-      "partner": "CHN",
-      "period_type": "Y",
-      "period": "2023",
-      "primary_provider": "wits",
-      "secondary_provider": "comtrade",
-      "primary_trade_usd": 14389881753.421999,
-      "secondary_trade_usd": 14389881753.425001,
-      "delta_ratio": 2.0863039735075945e-13
     },
     {
       "iso3": "NOR",
