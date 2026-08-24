@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-08-17T03:41:11Z",
+  "generated_at": "2026-08-24T03:35:38Z",
   "provider": "comtrade",
   "level": 6,
   "partners": [
@@ -41,8 +41,8 @@
     {
       "reporter_iso3": "JPN",
       "href": "./JPN.json",
-      "row_count": 280,
-      "period_count": 10
+      "row_count": 308,
+      "period_count": 11
     },
     {
       "reporter_iso3": "KOR",
@@ -87,6 +87,6 @@
       "period_count": 11
     }
   ],
-  "observation_count": 7704,
+  "observation_count": 7515,
   "scope": "Selected monthly UN Comtrade HS6 observations against USA and China; a turning-point signal, not a complete semiconductor market or physical route"
 }
