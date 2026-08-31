@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-08-24T03:35:38Z",
+  "generated_at": "2026-08-31T08:02:23Z",
   "primary_provider": "wits",
   "dominant_period": "Y:2023",
   "summary": {
@@ -9,7 +9,7 @@
     "incomparable_reporters": 2,
     "missing_partner_blocks": 2,
     "stale_partner_blocks": 4,
-    "provider_comparison_count": 95
+    "provider_comparison_count": 96
   },
   "reporter_issues": [
     {
@@ -49,45 +49,41 @@
   ],
   "collection_runs": [
     {
-      "run_id": "1787542425886849802-comtrade-products-semiconductor-monthly-hs6",
+      "run_id": "1788163187013765956-comtrade-products-semiconductor-monthly-hs6",
       "provider": "comtrade",
       "mode": "products-semiconductor-monthly-hs6",
-      "started_at": "2026-08-24T03:33:45.886853729Z",
-      "finished_at": "2026-08-24T03:35:38.572665903Z",
+      "started_at": "2026-08-31T07:59:47.0137705Z",
+      "finished_at": "2026-08-31T08:02:23.540847548Z",
       "status": "success",
       "reporter_count": 11,
       "request_count": 48,
       "success_count": 44,
       "failure_count": 0,
       "skipped_count": 4,
-      "stored_count": 7515,
+      "stored_count": 7705,
       "errors": []
     },
     {
-      "run_id": "1787541918112179824-comtrade-products-strategic-hs6",
+      "run_id": "1788162684669737841-comtrade-products-strategic-hs6",
       "provider": "comtrade",
       "mode": "products-strategic-hs6",
-      "started_at": "2026-08-24T03:25:18.112181938Z",
-      "finished_at": "2026-08-24T03:33:44.55279445Z",
-      "status": "partial",
+      "started_at": "2026-08-31T07:51:24.669739967Z",
+      "finished_at": "2026-08-31T07:59:46.054179727Z",
+      "status": "success",
       "reporter_count": 11,
       "request_count": 200,
-      "success_count": 197,
-      "failure_count": 3,
+      "success_count": 200,
+      "failure_count": 0,
       "skipped_count": 20,
-      "stored_count": 6220,
-      "errors": [
-        "DEU/USA/export/2021: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }",
-        "PHL/USA/export/2020: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }",
-        "KOR/USA/export/2022: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }"
-      ]
+      "stored_count": 6316,
+      "errors": []
     },
     {
-      "run_id": "1787538934406263145-trains-tariffs-strategic-hs6",
+      "run_id": "1788159002730654638-trains-tariffs-strategic-hs6",
       "provider": "trains",
       "mode": "tariffs-strategic-hs6",
-      "started_at": "2026-08-24T02:35:34.406269279Z",
-      "finished_at": "2026-08-24T02:50:11.037751002Z",
+      "started_at": "2026-08-31T06:50:02.730660419Z",
+      "finished_at": "2026-08-31T07:13:06.872792351Z",
       "status": "success",
       "reporter_count": 41,
       "request_count": 41,
@@ -98,11 +94,11 @@
       "errors": []
     },
     {
-      "run_id": "1787538670771212251-comtrade-bilateral-matrix",
+      "run_id": "1788158760989806020-comtrade-bilateral-matrix",
       "provider": "comtrade",
       "mode": "bilateral-matrix",
-      "started_at": "2026-08-24T02:31:10.771218577Z",
-      "finished_at": "2026-08-24T02:35:34.306394892Z",
+      "started_at": "2026-08-31T06:46:00.989811761Z",
+      "finished_at": "2026-08-31T06:50:02.630024942Z",
       "status": "success",
       "reporter_count": 51,
       "request_count": 102,
@@ -113,28 +109,26 @@
       "errors": []
     },
     {
-      "run_id": "1787538202933075173-comtrade-products-hs2",
+      "run_id": "1788158284314853546-comtrade-products-hs2",
       "provider": "comtrade",
       "mode": "products-hs2",
-      "started_at": "2026-08-24T02:23:22.933077585Z",
-      "finished_at": "2026-08-24T02:31:10.676938073Z",
-      "status": "partial",
+      "started_at": "2026-08-31T06:38:04.314856311Z",
+      "finished_at": "2026-08-31T06:46:00.889862193Z",
+      "status": "success",
       "reporter_count": 51,
       "request_count": 200,
-      "success_count": 191,
-      "failure_count": 1,
+      "success_count": 192,
+      "failure_count": 0,
       "skipped_count": 12,
-      "stored_count": 17573,
-      "errors": [
-        "NOR/CHN/import/2023: comtrade: request failed (429 Too Many Requests): { \"statusCode\": 429, \"message\": \"Rate limit is exceeded. Try again in 2 seconds.\" }"
-      ]
+      "stored_count": 17676,
+      "errors": []
     },
     {
-      "run_id": "1787538012440015575-wits-totals",
+      "run_id": "1788158014813679877-wits-totals",
       "provider": "wits",
       "mode": "totals",
-      "started_at": "2026-08-24T02:20:12.440024747Z",
-      "finished_at": "2026-08-24T02:23:22.825615813Z",
+      "started_at": "2026-08-31T06:33:34.81368664Z",
+      "finished_at": "2026-08-31T06:38:04.209026414Z",
       "status": "success",
       "reporter_count": 51,
       "request_count": 200,
@@ -715,8 +709,8 @@
       "primary_provider": "wits",
       "secondary_provider": "comtrade",
       "primary_trade_usd": 294496582325.373,
-      "secondary_trade_usd": 294496582325.3749,
-      "delta_ratio": 6.4248278496472824e-15
+      "secondary_trade_usd": 300060623356.2842,
+      "delta_ratio": 0.01889339763122885
     },
     {
       "iso3": "JPN",
@@ -726,8 +720,8 @@
       "primary_provider": "wits",
       "secondary_provider": "comtrade",
       "primary_trade_usd": 221175085983.64902,
-      "secondary_trade_usd": 221175085983.64697,
-      "delta_ratio": -9.24461145920458e-15
+      "secondary_trade_usd": 228527571541.67303,
+      "delta_ratio": 0.0332428289801482
     },
     {
       "iso3": "KAZ",
@@ -858,8 +852,19 @@
       "primary_provider": "wits",
       "secondary_provider": "comtrade",
       "primary_trade_usd": 105722377322.29701,
-      "secondary_trade_usd": 103027260470.96101,
-      "delta_ratio": -0.02549239734857527
+      "secondary_trade_usd": 103027260470.961,
+      "delta_ratio": -0.025492397348575415
+    },
+    {
+      "iso3": "NOR",
+      "partner": "CHN",
+      "period_type": "Y",
+      "period": "2023",
+      "primary_provider": "wits",
+      "secondary_provider": "comtrade",
+      "primary_trade_usd": 14389881753.421999,
+      "secondary_trade_usd": 14389881753.425001,
+      "delta_ratio": 2.0863039735075945e-13
     },
     {
       "iso3": "NOR",
@@ -869,8 +874,8 @@
       "primary_provider": "wits",
       "secondary_provider": "comtrade",
       "primary_trade_usd": 13090752691.823,
-      "secondary_trade_usd": 13090752691.821997,
-      "delta_ratio": -7.663924332525617e-14
+      "secondary_trade_usd": 13090752691.821999,
+      "delta_ratio": -7.649354134174807e-14
     },
     {
       "iso3": "NZL",
@@ -913,8 +918,8 @@
       "primary_provider": "wits",
       "secondary_provider": "comtrade",
       "primary_trade_usd": 6670900390.832001,
-      "secondary_trade_usd": 6670900390.836,
-      "delta_ratio": 5.995757467020078e-13
+      "secondary_trade_usd": 6670900390.835999,
+      "delta_ratio": 5.992898259835042e-13
     },
     {
       "iso3": "PER",
@@ -1001,8 +1006,8 @@
       "primary_provider": "wits",
       "secondary_provider": "comtrade",
       "primary_trade_usd": 8101239638.537,
-      "secondary_trade_usd": 8101239638.535997,
-      "delta_ratio": -1.2372325116455583e-13
+      "secondary_trade_usd": 8101239638.536001,
+      "delta_ratio": -1.2325237294889625e-13
     },
     {
       "iso3": "SAU",
@@ -1023,8 +1028,8 @@
       "primary_provider": "wits",
       "secondary_provider": "comtrade",
       "primary_trade_usd": 21660009219.299995,
-      "secondary_trade_usd": 21660009219.305996,
-      "delta_ratio": 2.770321442652668e-13
+      "secondary_trade_usd": 21660009219.306004,
+      "delta_ratio": 2.77384378396564e-13
     },
     {
       "iso3": "SGP",

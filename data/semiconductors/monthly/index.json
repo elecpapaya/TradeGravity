@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-08-24T03:35:38Z",
+  "generated_at": "2026-08-31T08:02:23Z",
   "provider": "comtrade",
   "level": 6,
   "partners": [
@@ -35,8 +35,8 @@
     {
       "reporter_iso3": "DEU",
       "href": "./DEU.json",
-      "row_count": 280,
-      "period_count": 10
+      "row_count": 308,
+      "period_count": 11
     },
     {
       "reporter_iso3": "JPN",
@@ -53,8 +53,8 @@
     {
       "reporter_iso3": "MEX",
       "href": "./MEX.json",
-      "row_count": 242,
-      "period_count": 10
+      "row_count": 266,
+      "period_count": 11
     },
     {
       "reporter_iso3": "MYS",
@@ -87,6 +87,6 @@
       "period_count": 11
     }
   ],
-  "observation_count": 7515,
+  "observation_count": 7705,
   "scope": "Selected monthly UN Comtrade HS6 observations against USA and China; a turning-point signal, not a complete semiconductor market or physical route"
 }
