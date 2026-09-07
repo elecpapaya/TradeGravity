@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-08-31T08:02:23Z",
+  "generated_at": "2026-09-07T06:55:48Z",
   "provider": "comtrade",
   "reporter_iso3": "DEU",
   "period": "2023",
@@ -14,31 +14,31 @@
       "anchor_iso3": "USA",
       "reporter_export_available": true,
       "anchor_import_available": true,
-      "reporter_export_usd": 173071201815.456,
+      "reporter_export_usd": 171616997717.431,
       "anchor_import_usd": 162959184239,
-      "export_gap_usd": 10112017576.455994,
-      "export_symmetric_gap_ratio": 0.0601851379881894,
+      "export_gap_usd": 8657813478.431,
+      "export_symmetric_gap_ratio": 0.051753914028216344,
       "reporter_import_available": true,
       "anchor_export_available": true,
-      "reporter_import_usd": 102050993414.799,
+      "reporter_import_usd": 101552304266.323,
       "anchor_export_usd": 76472551326,
-      "import_gap_usd": 25578442088.798996,
-      "import_symmetric_gap_ratio": 0.28655539106549466
+      "import_gap_usd": 25079752940.322998,
+      "import_symmetric_gap_ratio": 0.2817556330196458
     },
     {
       "anchor_iso3": "CHN",
       "reporter_export_available": true,
       "anchor_import_available": true,
-      "reporter_export_usd": 106869688999.974,
+      "reporter_export_usd": 106018864822.227,
       "anchor_import_usd": 106207382759,
-      "export_gap_usd": 662306240.973999,
-      "export_symmetric_gap_ratio": 0.006216588537721025,
+      "export_gap_usd": -188517936.772995,
+      "export_symmetric_gap_ratio": -0.0017765751307537215,
       "reporter_import_available": true,
       "anchor_export_available": true,
-      "reporter_import_usd": 175604709805.683,
+      "reporter_import_usd": 178215751880.557,
       "anchor_export_usd": 100565204356,
-      "import_gap_usd": 75039505449.68301,
-      "import_symmetric_gap_ratio": 0.5434299798909401
+      "import_gap_usd": 77650547524.557,
+      "import_symmetric_gap_ratio": 0.557072108316232
     }
   ]
 }
