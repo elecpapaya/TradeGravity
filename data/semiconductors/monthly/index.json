@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "generated_at": "2026-09-07T06:55:48Z",
+  "generated_at": "2026-09-14T07:30:56Z",
   "provider": "comtrade",
   "level": 6,
   "partners": [
@@ -28,7 +28,8 @@
     "2026-03",
     "2026-04",
     "2026-05",
-    "2026-06"
+    "2026-06",
+    "2026-07"
   ],
   "partitions": [
     {
@@ -58,7 +59,7 @@
     {
       "reporter_iso3": "MYS",
       "href": "./MYS.json",
-      "row_count": 276,
+      "row_count": 275,
       "period_count": 10
     },
     {
@@ -82,10 +83,10 @@
     {
       "reporter_iso3": "USA",
       "href": "./USA.json",
-      "row_count": 280,
-      "period_count": 10
+      "row_count": 308,
+      "period_count": 11
     }
   ],
-  "observation_count": 6933,
+  "observation_count": 6987,
   "scope": "Selected monthly UN Comtrade HS6 observations against USA and China; a turning-point signal, not a complete semiconductor market or physical route"
 }
